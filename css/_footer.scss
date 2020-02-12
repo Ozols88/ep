@@ -1,0 +1,54 @@
+@import "colors";
+
+// ep footer
+
+.container-footer {
+  user-select: none;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 5.5vh;
+  background: #F1F5DC;
+  border-top: 1px solid $bc-40wc;
+  margin-top: auto;
+  &.system {
+    background: #FBE3AB;
+  }
+
+  .menu-footer {
+    display: flex;
+    margin-top: -3px;
+
+    .link-container {
+      width: 8vw;
+      text-align: center;
+    }
+
+    a {
+      display: block;
+      width: 100%;
+      font-size: 0.85vw;
+      color: $bc-40wc;
+      text-decoration: none;
+      border-top: 3px solid transparent;
+      padding-top: 1px;
+    }
+    a:hover {
+      color: $bc;
+    }
+    a.active {
+      color: $bc;
+      font-size: 0.85vw;
+      font-weight: bold;
+      border-bottom: 3px solid $bc;
+      text-transform: uppercase;
+      padding-bottom: 0;
+    }
+  }
+
+  .copyright {
+    font-size: 0.6vw;
+    color: $bc-40wc;
+    margin-top: auto;
+  }
+}

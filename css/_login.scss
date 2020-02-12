@@ -1,0 +1,127 @@
+@import "colors";
+
+// ep system login page
+
+#container-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 92vh;
+  background-color: $c1-90wc;
+}
+
+.container-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 8vh;
+  background-color: $c1-60wc;
+  border-bottom: 1px solid $bc-40wc;
+  z-index: 1;}
+
+.exit-container {
+  display: flex;
+  justify-content: flex-end;
+  background-color: $c1-90wc;
+  height: 8vh;
+  width: 100%;
+
+  .exit-button {
+    align-self: center;
+    margin-right: 3vw;
+    width: 10vw;
+    height: 40%;
+    font-size: 0.6vw;
+    color: $bc-40wc;
+    background-color: inherit;
+    border: 1px solid $bc-40wc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .exit-button:hover {
+    color: $bc;
+    border: 1px solid $bc;
+  }
+}
+
+#login-box {
+  width: 14vw;
+  border-radius: 10px;
+  border: 3px solid $bc;
+  background: $c1-60wc;
+}
+
+#login-logo {
+  display: block;
+  width: 80%;
+  margin: 6.0vh auto 4.0vh auto;
+  user-select: none;
+}
+
+.login-field {
+  display: block;
+  width: 80%;
+  height: 3vh;
+  margin: 2.8vh auto;
+  font-size: 0.9vw;
+  border-radius: 5px;
+  border: 1px solid $bc-40wc;
+  text-align: center;
+  color: $bc;
+}
+.login-field:focus {
+  border: 1px solid $bc;
+}
+.login-field::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+  color: $bc-90wc;
+  font-size: unset;
+}
+.login-field:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color: $bc-90wc;
+  font-size: unset;
+  opacity: 1;
+}
+.login-field::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color: $bc-90wc;
+  font-size: unset;
+  opacity: 1;
+}
+.login-field:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: $bc-90wc;
+  font-size: unset;
+}
+.login-field::-ms-input-placeholder { /* Microsoft Edge */
+  color: $bc-90wc;
+  font-size: unset;
+}
+.login-field::placeholder { /* Most modern browsers support this now. */
+  color: $bc-90wc;
+}
+
+#login-button {
+  display: block;
+  width: 50%;
+  height: 3vh;
+  margin: 4vh auto 6vh auto;
+  font-size: 0.7vw;
+  border-radius: 5px;
+  color: $bc-40wc;
+  background-color: inherit;
+  border: 1px solid $bc-40wc;
+  cursor: pointer;
+  user-select: none;
+}
+#login-button:hover {
+  border: 1px solid $bc;
+  color: $bc;
+}
+
+.login-message {
+  //border: 1px solid $bc;
+  color: $bc;
+  text-align: center;
+  margin-top: 2vh;
+  user-select: none;
+}

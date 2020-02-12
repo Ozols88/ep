@@ -1,0 +1,568 @@
+@import "colors";
+
+// all menu levels and home menu
+
+.menu {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+
+/* HUD */
+
+
+.head-up-display-bar {
+  height: 12vh;
+  text-align: center;
+  background: $c1-90wc;
+  user-select: none;
+}
+
+.head-up-display-bar span {
+  line-height: 12vh;
+  font-size: 2.8vw;
+  font-weight: bold;
+  color: $bc-90wc;
+  text-transform: uppercase;
+}
+
+
+/* NAVBAR */
+
+
+.navbar {
+  display: flex;
+  background: $c1;
+  &.admin {
+    background: $c1; // Line color for admin
+  }
+  &.level-1 {
+    padding-top: 0;
+    .button {
+      height: 6vh;
+      font-size: 1.3vw;
+      padding-top: 1px;
+    }
+    .count {
+      height: 50%;
+      padding-top: 1px;
+    }
+    .lock {
+      height: 50%;
+      width: 1.6vw;
+    }
+  }
+  &.level-2 {
+    padding-top: 2px;
+    .button {
+      height: 4.5vh;
+      font-size: 0.90vw;
+      padding-top: 2px;
+    }
+    .count {
+      height: 50%;
+      padding-top: 2px;
+    }
+    .lock {
+      height: 50%;
+      width: 1.3vw;
+    }
+  }
+  &.level-3 {
+    padding-top: 2px;
+    .button {
+      height: 3.5vh;
+      font-size: 0.80vw;
+    }
+    .count, .lock {
+      height: 60%;
+    }
+    .lock {
+      width: 1.3vw;
+    }
+  }
+  &.level-4 {
+    margin-top: 5px;
+    .button {
+      height: 3vh;
+      font-size: 0.7vw;
+    }
+    .count, .lock {
+      height: 60%;
+    }
+    .lock {
+      width: 1.2vw;
+    }
+  }
+  .container-button {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: #FFFFFF;
+    &.disabled {
+      pointer-events: none;
+    }
+    .button {
+      display: flex;
+      text-decoration: none;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      .count {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 0.4vw;
+        padding-left: 0.4vw;
+        padding-right: 0.4vw;
+        background: #FFFFFF;
+        border-radius: 5px;
+      }
+      .lock {
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        margin: 0 0.4vw;
+        border-radius: 5px;
+      }
+    }
+  }
+}
+
+// When home menu is present
+.navbar.level-1.unselected .container-button .button {
+  color: $c1-80bc;
+}
+.navbar.level-1.unselected .container-button:hover .button {
+  color: $bc;
+  background: $c1;
+}
+.navbar.level-1.unselected .container-button:hover .button.admin-menu {
+}
+.navbar.level-1 .container-button {
+  &:nth-of-type(even) .button {
+    background: #6C5A32;
+  }
+  .button {
+    font-weight: bold;
+    background: $bc;
+    color: $c1-80bc;
+  }
+  .button.locked {
+  }
+  &:hover .button {
+    color: $c1;
+  }
+
+  .button.active-menu {
+    background: $c1;
+    color: $bc;
+  }
+  .button.admin-menu {
+  }
+  &:hover .button.admin-menu {
+  }
+  .button.admin-menu.active-menu {
+  }
+
+
+  &:nth-of-type(odd) .button .count {
+    color: $bc;
+  }
+  &:nth-of-type(even) .button .count {
+    color: #6C5A32;
+  }
+  .button .count {
+    background: $c1-80bc;
+  }
+  &:hover .button .count {
+    background: $c1;
+  }
+
+  .button.active-menu .count {
+    background: $bc;
+    color: $c1;
+  }
+
+  .button.admin-menu .count {
+  }
+
+
+  .lock {
+    background-image: url("../epsystem/account/img/lock-icon-lvl1.svg");
+    background-color: #8B6F33;
+  }
+  &:hover .lock {
+    background-color: $c1;
+  }
+}
+
+.navbar.level-2 .container-button {
+  &:nth-of-type(even) .button {
+    background: #BA8E2F;
+  }
+  &:nth-of-type(even) .button.admin-menu {
+    background: #90A16A;
+  }
+  .button {
+    font-weight: bold;
+    background: $c1-40bc;
+    color: $bc;
+  }
+  .button.locked {
+    color: #A58231;
+  }
+  &:hover .button {
+    color: $c1;
+  }
+
+  .button.admin-menu {
+    background: #95A66D;
+  }
+  .button.active-menu {
+    background: $c1;
+    color: $bc;
+  }
+  &:hover .button.admin-menu {
+  }
+  .button.admin-menu.active-menu {
+    background: $c1;
+    color: $bc;
+  }
+
+
+  &:nth-of-type(odd) .button .count {
+    color: $c1-40bc;
+  }
+  &:nth-of-type(even) .button .count {
+    color: #BA8E2F;
+  }
+  .button .count {
+    background: $bc;
+  }
+  &:hover .button .count {
+    background: $c1;
+    color: $c1-40bc;
+  }
+
+  .button.active-menu .count {
+    background: $bc;
+    color: $c1;
+  }
+
+  .button.admin-menu .count {
+  }
+
+
+  .lock {
+    background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
+    background-color: $bc;
+  }
+  &:hover .lock {
+    background-color: $c1;
+  }
+  .active-menu .lock {
+    background-color: $bc;
+  }
+  &:hover .active-menu .lock {
+    background-color: $bc;
+  }
+
+  .button.locked .lock {
+    background-color: #A58231;
+  }
+  &:hover .button.locked .lock {
+    background-color: $c1;
+  }
+}
+
+.navbar.level-3 .container-button {
+  &:nth-of-type(even) .button {
+    background: #BA8E2F;
+  }
+  &:nth-of-type(even) .button.admin-menu {
+    background: #90A16A;
+  }
+  .button {
+    font-weight: bold;
+    background: $c1-40bc;
+    color: $c1;
+  }
+  .button.locked {
+    color: #A58231;
+  }
+  &:hover .button {
+    color: $bc;
+  }
+
+  .button.admin-menu {
+    background: #95A66D;
+  }
+  .button.active-menu {
+    background: $c1;
+    color: $bc;
+  }
+  &:hover .button.admin-menu {
+  }
+  .button.admin-menu.active-menu {
+    background: $c1;
+    color: $bc;
+  }
+
+
+  &:nth-of-type(odd) .button .count {
+    color: $c1-40bc;
+  }
+  &:nth-of-type(even) .button .count {
+    color: #BA8E2F;
+  }
+  .button .count {
+    background: $c1;
+  }
+  &:hover .button .count {
+    background: $bc;
+  }
+
+  .button.active-menu .count {
+    background: $bc;
+    color: $c1;
+  }
+
+  .button.admin-menu .count {
+  }
+
+  .lock {
+    background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
+    background-color: $c1;
+  }
+  &:hover .lock {
+    background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
+    background-color: $bc;
+  }
+  .active-menu .lock {
+    background-color: $bc;
+  }
+  &:hover .active-menu .lock {
+    background-color: $bc;
+  }
+
+  .button.locked .lock {
+    background-color: #A58231;
+  }
+  &:hover .button.locked .lock {
+    background-color: $bc;
+  }
+}
+
+.navbar.level-4 .container-button {
+  &:nth-of-type(even) .button {
+    background: #F6F0E3;
+  }
+  .button {
+    font-weight: bold;
+    background: $c1-90wc;
+    color: $bc;
+  }
+  .button.locked {
+    color: #E2DFD6;
+  }
+  &:hover .button {
+    background: $c1;
+    color: $bc;
+  }
+
+  .button.active-menu {
+    background: $c1;
+    color: $bc;
+  }
+  
+
+  .lock {
+    background-image: url("../epsystem/account/img/lock-icon-lvl4.svg");
+    background-color: $bc;
+  }
+  .active-menu .lock {
+  }
+  &:hover .lock {
+    background-color: $bc;
+  }
+  &:hover .active-menu .lock {
+    background-color: $bc;
+  }
+
+  .button.locked .lock {
+    background-color: #E2DFD6;
+  }
+  &:hover .button.locked .lock {
+    background-image: url("../epsystem/account/img/lock-icon-lvl4-hl.svg");
+    background-color: $bc;
+  }
+}
+
+
+/* HOME BAR */
+
+
+.home-menu {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #FFFCF8;
+  padding: 0 1vw;
+  user-select: none;
+  margin-top: 0.5vh;
+  flex: 1;
+}
+
+.home-menu .title {
+  text-transform: uppercase;
+  text-align: center;
+  color: $bc-90wc;
+  font-weight: bold;
+  font-size: 1.3vw;
+  margin: 3vh 0 1.5vh 0;
+}
+
+.home-menu .description {
+  display: block;
+  text-align: center;
+  color: $bc-90wc;
+  font-size: 0.8vw;
+}
+
+.home-menu .total-count {
+  text-align: center;
+  margin: 5vh 0 5vh 0;
+}
+.home-menu .total-count .count {
+  display: inline-block;
+  padding: 0 1vw;
+  font-size: 1.3vw;
+  font-weight: bold;
+  background: #FFFCF8;
+  color: $bc-90wc;
+}
+.home-menu .total-count span {
+  font-size: 1.2vw;
+  font-weight: bold;
+  color: $bc-90wc;
+  text-transform: uppercase;
+}
+
+.home-menu .last-hours {
+  text-align: center;
+  margin-bottom: 5vh;
+}
+.home-menu .last-hours .title {
+  margin: 0 0 1.5vh 0;
+  font-size: 1.05vw;
+  font-weight: bold;
+  color: $bc-90wc;
+  text-transform: uppercase;
+}
+
+.home-menu .last-hours .details-count {
+  margin-top: 1vh;
+  text-align: initial;
+}
+.home-menu .last-hours .details-count span {
+  font-size: 1.2vw;
+  font-weight: bold;
+  color: $bc-90wc;
+  text-transform: uppercase;
+}
+.home-menu .last-hours .details-count .count {
+  display: inline-block;
+  float: right;
+  background: #FFFCF8;
+  font-size: 1.3vw;
+  font-weight: bold;
+  color: $bc-90wc;
+  width: 20%;
+  text-align: center;
+}
+
+.home-menu .bottom {
+  margin-top: auto;
+}
+
+.home-menu .bottom .enter-button {
+  display: flex;
+  width: 60%;
+  height: 6vh;
+  justify-content: center;
+  align-items: center;
+  background: #FFFCF8;
+  color: #EFE8E4;
+  border: 1px solid #F9F1EA;
+  font-size: 1.05vw;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0 auto 1.5vh auto;
+  border-radius: 5px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.home-menu .bottom .note {
+  display: block;
+  text-align: center;
+  font-size: 0.8vw;
+  color: $bc-90wc;
+  margin: 0 auto 3vh auto;
+}
+
+
+.container-button:hover .home-menu {
+  border: 1px solid #F4AC32;
+  background: #FFFCF8
+}
+.container-button:hover .home-menu.admin {
+  border: 1px solid $c2;
+}
+
+.container-button:hover .title {
+  color: #F4AC32;
+}
+
+.container-button:hover .description {
+  color: $bc;
+}
+
+.container-button:hover .total-count .count {
+  background: #F4AC32;
+  color: #FFFFFF;
+}
+
+.container-button:hover .total-count span {
+  color: #EFE8E4;
+}
+
+.container-button:hover .last-hours .title {
+  color: #FCE7CA;
+}
+
+.container-button:hover .last-hours .details-count span {
+  color: #EFE8E4;
+}
+
+.container-button:hover .last-hours .details-count .count {
+  background: #FFFCF8;
+  color: #F4AC32;
+}
+
+.container-button:hover .bottom .enter-button {
+  background: #FFFCF8;
+  border: 1px solid #F4AC32;
+  color: #F4AC32;
+}
+
+.container-button .bottom .enter-button:hover {
+  background: #F4AC32;
+  color: #FFFFFF;
+}
+
+.container-button:hover .bottom .note {
+  color: #C89933;
+}

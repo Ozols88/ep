@@ -1,0 +1,39 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  letter-spacing: 0.5px;
+}
+
+html {
+  overflow-y: scroll;
+  overflow-y: overlay;
+  scroll-behavior: smooth;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar
+{
+  width: 10px;
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  background-color: #000000;
+}
+
+@import "colors";
+@import "login";
+@import "header";
+@import "menu";
+@import "bar";
+@import "table";
+@import "footer";

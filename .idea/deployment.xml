@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="ozols88.id.lv" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="ozols88.id.lv">
+        <serverdata>
+          <mappings>
+            <mapping deploy="ep" local="$PROJECT_DIR$" web="ep" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

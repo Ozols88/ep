@@ -1,0 +1,76 @@
+@import "colors";
+
+// ep header
+
+.container-header {
+  user-select: none;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 8vh;
+  background: #F1F5DC;
+  border-bottom: 1px solid $bc-40wc;
+  z-index: 1;
+  &.system {
+    background: #FBE3AB;
+  }
+
+  .logo-header {
+    align-self: center;
+    height: 70%;
+    padding: 0 0 0 1vw;
+  }
+
+  .menu-header {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: -3px;
+
+    .link-container {
+      width: 8vw;
+      text-align: center;
+    }
+
+    a {
+      display: block;
+      width: 100%;
+      font-size: 0.85vw;
+      color: $bc-40wc;
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      padding-bottom: 1px;
+    }
+    a:hover {
+      color: $bc;
+    }
+    a.active {
+      color: $bc;
+      font-size: 0.85vw;
+      font-weight: bold;
+      border-bottom: 3px solid $bc;
+      text-transform: uppercase;
+      padding-bottom: 0;
+    }
+
+    span {
+      margin: 0 3vw;
+    }
+  }
+
+  .exit-button {
+    align-self: center;
+    height: 40%;
+    width: 10vw;
+    margin: 0 3vw 0 0;
+    font-size: 0.6vw;
+    color: $bc-40wc;
+    background-color: inherit;
+    border: 1px solid $bc-40wc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .exit-button:hover {
+    color: $bc;
+    border: 1px solid $bc;
+  }
+}

@@ -1,0 +1,64 @@
+.container-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 8vh;
+  background: #F1F5DC;
+  border-bottom: 1px solid #A99E85;
+  z-index: 1;
+}
+.container-header .logo-header {
+  align-self: center;
+  height: 70%;
+  padding: 0 0 0 1vw;
+}
+.container-header .menu-header {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: -3px;
+}
+.container-header .menu-header .link-container {
+  width: 8vw;
+  text-align: center;
+}
+.container-header .menu-header a {
+  display: block;
+  width: 100%;
+  font-size: 0.85vw;
+  color: #A99E85;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  padding-bottom: 1px;
+}
+.container-header .menu-header a:hover {
+  color: #705D34;
+}
+.container-header .menu-header a.active {
+  color: #705D34;
+  font-size: 0.85vw;
+  font-weight: bold;
+  border-bottom: 3px solid #705D34;
+  text-transform: uppercase;
+  padding-bottom: 0;
+}
+.container-header .menu-header span {
+  margin: 0 3vw;
+}
+.container-header .exit-button {
+  align-self: center;
+  height: 40%;
+  width: 10vw;
+  margin: 0 3vw 0 0;
+  font-size: 0.6vw;
+  color: #A99E85;
+  background-color: inherit;
+  border: 1px solid #A99E85;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.container-header .exit-button:hover {
+  color: #705D34;
+  border: 1px solid #705D34;
+}
+
+/*# sourceMappingURL=_header.css.map */

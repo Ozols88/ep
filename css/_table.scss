@@ -8,20 +8,30 @@
 
 .header {
   display: inline-table;
-  width: 80vw;
+  width: 75vw;
+  &.small {
+    width: 20vw;
+  }
+  &.medium {
+    width: 40vw;
+  }
 }
 
-.header-extension:first-child {
-  width: 10vw;
-  height: 3vh;
-  background: #F8F7F5;
-  border-right: 1px solid #FFFFFF;
-}
-.header-extension:last-child {
-  width: 10vw;
+.header-extension {
+  width: 12.5vw;
   height: 3vh;
   background: #F8F7F5;
   border-left: 1px solid #FFFFFF;
+  border-right: 1px solid #FFFFFF;
+  &.small {
+    width: 40vw;
+  }
+  &.medium {
+    width: 30vw;
+  }
+}
+.header-extension.admin {
+  background: #F6FAFA;
 }
 
 .head {
@@ -29,137 +39,128 @@
   text-align: center;
   line-height: 3vh;
   user-select: none;
-  background: #F0EEEA;
-  color: #705D34;
+  background: $c10;
+  color: $c1;
   font-size: 0.75vw;
   font-weight: bold;
   border-left: 1px solid #FFFFFF;
   border-right: 1px solid #FFFFFF;
 }
+.head.admin {
+  background: $c62;
+}
 
-.id {
-  width: 5%;
+.id, .open, .tasks {
+  //width: 7.5%;
 }
-.project {
-  width: 18%;
-}
-.type {
-  width: 12%;
-}
-.client {
-  width: 14%;
-}
-.objectives {
-  width: 8%;
-}
-.assignments {
-  width: 22%;
-}
-.time {
+.time, .value {
   width: 8%;
   cursor: pointer;
-}
-.value {
-  width: 8%;
-  cursor: pointer;
-}
-.open {
-  width: 5%;
-}
-.start-date {
-  width: 14%;
-}
-.finish-date {
-  width: 14%;
-}
-.completed-in {
-  width: 10%;
-}
-.cancellation-reason {
-  width: 24%;
-}
-.cancel-date {
-  width: 14%;
-}
-.pending-for {
-  width: 10%;
-}
-.pending-reason {
-  width: 20%;
 }
 .earn {
   width: 10%;
 }
+.type {
+  width: 12%;
+}
+.client, .date {
+  width: 9%;
+}
+.name {
+  width: 18%;
+}
 
 .table {
   display: table;
+  table-layout: fixed;
+  width: 75vw;
+  margin: 0 auto;
   border-spacing: 0 10px;
-  width: 80vw;
   text-align: center;
   font-size: 0.9vw;
-  margin: 0 auto;
-  table-layout: fixed;
+  &.small {
+    width: 20vw;
+  }
+  &.medium {
+    width: 40vw;
+  }
+}
+
+.empty-table {
+  user-select: none;
+  text-align: center;
+  font-size: 2.8vw;
+  font-weight: bold;
+  color: $c63;
+  line-height: 12vh;
 }
 
 .row {
   display: table-row;
-  height: 3vh;
   line-height: 3vh;
 }
 .row:hover {}
 
 .cell {
   display: table-cell;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.cell.id {
-  //background: #F8F7F5;
-}
-.cell.open {
-  //background: #F8F7F5;
+  //white-space: nowrap;
+  //overflow: hidden;
 }
 
-.cell a {
+.cell .content {
   display: block;
+  width: 100%;
   text-decoration: none;
-  color: #E2DFD6;
-  border: 1px solid #F0EEEA;
+  background: none;
+  font-size: 0.9vw;
+  color: $c9;
+  border: 1px solid $c11;
+  cursor: pointer;
+  line-height: inherit;
 }
-.cell.id a {
-  background: #F8F7F5;
+.cell .content:empty::after{
+  content: "\00a0";
 }
-.cell.earn a {
-  font-weight: bold;
-  color: #D1E9C0;
+.cell.id .content {
+  background: $c11;
 }
-.cell:first-child a {
+.cell:first-child .content {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
-.cell:last-child a {
+.cell:last-child .content {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-.row:hover .cell a {
-  border: 1px solid #E2DFD6;
-  color: #705D34;
+.row:hover .cell .content {
+  border: 1px solid $c2;
+  color: $c1;
 }
-.row:hover .cell.id a {
-  background: #F8F7F5;
-  border: 1px solid #E2DFD6;
-  color: #705D34;
-}
-.row:hover .cell.open a {
-  border: 1px solid #E2DFD6;
-}
-.row:hover .cell.earn a {
-  color: #A3D848;
+.row:hover .cell.id .content {
+  background: $c2;
+  color: $c1;
 }
 
 .cell .open-button {
-  background-color: #F8F7F5;
-  background-image: url("../epsystem/account/img/project-open-button.svg");
+   background-color: $c11;
+   background-image: url("../epsystem/account/img/open-button.svg");
+   background-repeat: no-repeat;
+   background-size: 100% 100%;
+   height: 100%;
+   width: 100%;
+   text-indent: 100%;
+   white-space: nowrap;
+   overflow: hidden;
+   border-top-right-radius: 5px;
+   border-bottom-right-radius: 5px;
+}
+.row:hover .cell .open-button {
+  background-color: $c2;
+  background-image: url("../epsystem/account/img/open-button-hl.svg");
+}
+.cell .add-button {
+  background-color: $c11;
+  background-image: url("../epsystem/account/img/add-button.svg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
   height: 100%;
@@ -170,13 +171,9 @@
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-.row:hover .cell .open-button {
-  background-color: #F8F7F5;
-  background-image: url("../epsystem/account/img/project-open-button-hl.svg");
-}
-
-.cell a {
-  font-weight: initial;
+.row:hover .cell .add-button {
+  background-color: $c2;
+  background-image: url("../epsystem/account/img/add-button-hl.svg");
 }
 
 .sub-table {
@@ -194,18 +191,74 @@
   display: table-cell;
 }
 
-.sub-cell a {
+.sub-cell .content {
   border-radius: 0;
   border-left: none;
   border-right: 1px solid #F9F1EA;
 }
-.sub-cell:first-child a {
+.sub-cell:first-child .content {
   border-left: 1px solid #F9F1EA;
 }
-.row:hover .sub-cell a {
+.row:hover .sub-cell .content {
   border-left: none;
   border-right: 1px solid #FFD275;
 }
-.row:hover .sub-cell:first-child a {
+.row:hover .sub-cell:first-child .content {
   border-left: 1px solid #FFD275;
+}
+
+
+
+
+
+.field {
+  display: table-row;
+  line-height: 3vh;
+  width: 100%;
+  font-size: 0.9vw;
+  border-radius: 5px;
+  border: 1px solid $c11;
+  text-align: center;
+  color: $c1;
+
+}
+.field.admin {
+  border: 1px solid $c63;
+}
+.field.admin::placeholder {
+  color: $c61;
+}
+.field:focus::placeholder {
+  color: transparent;
+}
+.field:focus {
+  border: 1px solid $c2;
+}
+
+
+
+.table.admin {
+  .cell .content {
+    color: $c61;
+    border: 1px solid $c63;
+  }
+  .row:hover .cell .content {
+    color: $c1;
+    border: 1px solid $c2;
+  }
+
+  .cell .add-button {
+    background-image: url("../epsystem/account/img/add-button-admin.svg");
+    background-color: $c63;
+  }
+  .row:hover .cell .add-button {
+    background-color: $c2;
+    background-image: url("../epsystem/account/img/add-button-hl.svg");
+  }
+  .cell.id .content {
+    background-color: $c63;
+  }
+  .row:hover .cell.id .content {
+    background-color: $c2;
+  }
 }

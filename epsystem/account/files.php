@@ -14,7 +14,7 @@ if (isset($_SESSION['account'])) {
             <div class="navbar level-1">
                 <div class="container-button">
                     <a class="button">+ Upload</a> <?php
-                    if (!isset($_GET['t'])) { ?>
+                    if (!isset($_GET['l1'])) { ?>
                         <div class="home-menu">
                             <span class="title">ALL ACTIVE PROJECTS</span>
                             <span class="description">Here you can access and view projects that are currently in production</span>
@@ -42,7 +42,7 @@ if (isset($_SESSION['account'])) {
                 </div>
                 <div class="container-button">
                     <a class="button">3D</a> <?php
-                    if (!isset($_GET['t'])) { ?>
+                    if (!isset($_GET['l1'])) { ?>
                         <div class="home-menu">
                             <span class="title">ALL ACTIVE PROJECTS</span>
                             <span class="description">Here you can access and view projects that are currently in production</span>
@@ -70,7 +70,7 @@ if (isset($_SESSION['account'])) {
                 </div>
                 <div class="container-button">
                     <a class="button">Drawings</a> <?php
-                    if (!isset($_GET['t'])) { ?>
+                    if (!isset($_GET['l1'])) { ?>
                         <div class="home-menu">
                             <span class="title">ALL ACTIVE PROJECTS</span>
                             <span class="description">Here you can access and view projects that are currently in production</span>
@@ -98,7 +98,7 @@ if (isset($_SESSION['account'])) {
                 </div>
                 <div class="container-button">
                     <a class="button">Audio</a> <?php
-                    if (!isset($_GET['t'])) { ?>
+                    if (!isset($_GET['l1'])) { ?>
                         <div class="home-menu">
                             <span class="title">ALL ACTIVE PROJECTS</span>
                             <span class="description">Here you can access and view projects that are currently in production</span>
@@ -126,7 +126,7 @@ if (isset($_SESSION['account'])) {
                 </div>
                 <div class="container-button">
                     <a class="button">Templates</a> <?php
-                    if (!isset($_GET['t'])) { ?>
+                    if (!isset($_GET['l1'])) { ?>
                         <div class="home-menu">
                             <span class="title">ALL ACTIVE PROJECTS</span>
                             <span class="description">Here you can access and view projects that are currently in production</span>

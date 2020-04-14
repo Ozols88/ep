@@ -33,6 +33,9 @@
         <div class="link-container">
             <a href="epsystem">ep system</a>
         </div>
+        <div class="link-container">
+            <a href="epvideos">ep videos</a>
+        </div>
     </nav>
     <img class="logo-header" src="/ep/img/logo.svg" alt="ep" style="visibility: hidden">
 </div>
@@ -43,12 +46,17 @@
     <div class="navbar level-1">
         <div class="container-button">
             <a href="epanimations" class="button">
-                <span>EP ANIMATIONS</span>
+                <span>ep animations</span>
             </a>
         </div>
         <div class="container-button">
             <a href="epsystem" class="button">
-                <span>EP SYSTEM</span>
+                <span>ep system</span>
+            </a>
+        </div>
+        <div class="container-button">
+            <a href="epvideos" class="button">
+                <span>ep videos</span>
             </a>
         </div>
     </div>

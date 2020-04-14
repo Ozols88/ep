@@ -44,14 +44,14 @@ function searchTable() {
     var rows, inputId, inputProject, inputType, inputClient;
     rows = document.getElementsByClassName("row");
     inputId = document.querySelector(".search-bar .input-id").value;
-    inputProject = document.querySelector(".search-bar .input-project").value;
+    inputProject = document.querySelector(".search-bar .input-name").value;
     inputType = document.querySelector(".search-bar .custom-select .input-type").value;
     inputClient = document.querySelector(".search-bar .input-client").value;
 
     console.log(rows);
     for (i = 0; i < rows.length; i++) {
         id = rows[i].querySelector(".cell.id");
-        project = rows[i].querySelector(".cell.project");
+        project = rows[i].querySelector(".cell.name");
         type = rows[i].querySelector(".cell.type");
         client = rows[i].querySelector(".cell.client");
 

@@ -1,69 +1,133 @@
 // Color Palette for ep system
-// bc - Base Color
-// wc - White Color
-
-// BASE COLOR
-
-$bc: #705D34; // Base color
-$bc-95wc: #F8F7F5; // 95% white color mix
-$bc-90wc: #F0EEEA; // 90% white color mix
-$bc-80wc: #E2DFD6; // 80% white color mix
-$bc-60wc: #C6BEAE; // 60% white color mix
-$bc-40wc: #A99E85; // 40% white color mix
-$bc-20wc: #8D7D5D; // 20% white color mix
-
-// COLOR #1
-
-$c1: #F5B82E; // Main color #1
-$c1-10bc: #E8AF2E; // 10% base color mix
-$c1-20bc: #DAA62F; // 20% base color mix
 $c1-40bc: #C09331; // 40% base color mix
-$c1-60bc: #A58231; // 60% base color mix
-$c1-80bc: #8B6F33; // 80% base color mix
-$c1-90wc: #FEF8EA; // 90% white color mix
-$c1-80wc: #FDF1D5; // 80% white color mix
-$c1-60wc: #FBE3AB; // 60% white color mix
-$c1-40wc: #F9D482; // 40% white color mix
-$c1-20wc: #F7C658; // 20% white color mix
 
-// Color #2
-
-$c2: #559997; // Main color #2
-$c2-10bc: #58938D; // 10% base color mix
-$c2-20bc: #5A8D83; // 20% base color mix
-$c2-40bc: #608170; // 40% base color mix
-$c2-60bc: #65755B; // 60% base color mix
-$c2-80bc: #6B6948; // 80% base color mix
-$c2-90wc: #EEF5F4; // 90% white color mix
-$c2-80wc: #DDEBEA; // 80% white color mix
-$c2-60wc: #BBD6D5; // 60% white color mix
-$c2-40wc: #99C2C1; // 40% white color mix
-$c2-20wc: #77ADAC; // 20% white color mix
-
-// Color #3
-
-$c3: #A3D848; // Main color #3
-$c3-10bc: #9ECC46; // 10% base color mix
-$c3-20bc: #98C044; // 20% base color mix
-$c3-40bc: #8FA740; // 40% base color mix
-$c3-60bc: #848E3C; // 60% base color mix
-$c3-80bc: #7B7538; // 80% base color mix
-$c3-90wc: #F3F9EF; // 90% white color mix
-$c3-80wc: #E8F4E0; // 80% white color mix
-$c3-60wc: #D1E9C0; // 60% white color mix
-$c3-40wc: #BADEA1; // 40% white color mix
-$c3-20wc: #A3D381; // 20% white color mix
-
-// Color #4
-
-$c4: #C46C73; // Main color #4
-$c4-10bc: #BB6A6D; // 10% base color mix
-$c4-20bc: #B36966; // 20% base color mix
-$c4-40bc: #A2665A; // 40% base color mix
-$c4-60bc: #92634D; // 60% base color mix
-$c4-80bc: #816041; // 80% base color mix
-$c4-90wc: #F9F0F1; // 90% white color mix
-$c4-80wc: #F3E2E3; // 80% white color mix
-$c4-60wc: #E7C4C7; // 60% white color mix
-$c4-40wc: #DCA7AB; // 40% white color mix
-$c4-20wc: #D0898F; // 20% white color mix
+$c1: #705D34;
+$c2: #F5B82E;
+$c3: #559997;
+$c4: #A3D848;
+$c5: #C46C73;
+$c6: #7F6E49;
+$c7: #8D7D5D;
+$c8: #A99E85;
+$c9: #C6BEAE;
+$c10: #E2DFD6;
+$c11: #F0EEEA;
+$c12: #7E6633;
+$c13: #8B6F33;
+$c14: #987832;
+$c15: #A58132;
+$c16: #AC8631;
+$c17: #6D633E;
+$c18: #6B6948;
+$c19: #686F52;
+$c20: #65755C;
+$c21: #647861;
+$c22: #756A36;
+$c23: #7A7638;
+$c24: #7F823A;
+$c25: #848E3C;
+$c26: #87943D;
+$c27: #795F3A;
+$c28: #816041;
+$c29: #896247;
+$c30: #92634D;
+$c31: #966450;
+$c32: #F6BF43;
+$c33: #F7C658;
+$c34: #F9D482;
+$c35: #FBE3AB;
+$c36: #FDF1D5;
+$c37: #FEF8EA;
+$c38: #E5B539;
+$c39: #D5B243;
+$c40: #C5AF4E;
+$c41: #B5AC58;
+$c42: #ADAA5D;
+$c43: #EDBB31;
+$c44: #E5BE33;
+$c45: #DCC236;
+$c46: #D4C538;
+$c47: #D0C63A;
+$c48: #F0B035;
+$c49: #EBA93C;
+$c50: #E6A143;
+$c51: #E19A4A;
+$c52: #DF964D;
+$c53: #E7AF2F;
+$c54: #DAA62F;
+$c55: #CD9D30;
+$c56: #C09430;
+$c57: #B98F31;
+$c58: #66A3A2;
+$c59: #77ADAC;
+$c60: #99C2C1;
+$c61: #BBD6D5;
+$c62: #DDEBEA;
+$c63: #EEF5F4;
+$c64: #5D9F8F;
+$c65: #65A687;
+$c66: #6DAC7F;
+$c67: #74B277;
+$c68: #78B573;
+$c69: #609493;
+$c70: #6B9090;
+$c71: #778B8C;
+$c72: #818789;
+$c73: #878587;
+$c74: #659C8C;
+$c75: #759F82;
+$c76: #85A277;
+$c77: #95A56D;
+$c78: #9DA768;
+$c79: #58938D;
+$c80: #5A8D83;
+$c81: #5D8779;
+$c82: #60816F;
+$c83: #617E6A;
+$c84: #ACDC5B;
+$c85: #B5E06D;
+$c86: #C8E891;
+$c87: #DAEFB6;
+$c88: #EDF7DA;
+$c89: #F6FBEC;
+$c90: #A6CD4C;
+$c91: #AAC251;
+$c92: #ADB755;
+$c93: #B0AD59;
+$c94: #B2A75B;
+$c95: #ABD545;
+$c96: #B3D243;
+$c97: #BCCE40;
+$c98: #C4CB3E;
+$c99: #C8CA3C;
+$c100: #9ECB46;
+$c101: #99BF44;
+$c102: #94B342;
+$c103: #8FA740;
+$c104: #8CA13F;
+$c105: #9BD250;
+$c106: #93CB58;
+$c107: #8BC560;
+$c108: #84BF68;
+$c109: #80BC6C;
+$c110: #CA7B81;
+$c111: #D0898F;
+$c112: #DCA7AB;
+$c113: #E7C4C7;
+$c114: #F3E2E3;
+$c115: #F9F0F1;
+$c116: #C9746C;
+$c117: #CE7B65;
+$c118: #D3835E;
+$c119: #D88A57;
+$c120: #DA8E54;
+$c121: #B97177;
+$c122: #AE757A;
+$c123: #A27A7E;
+$c124: #987E81;
+$c125: #928083;
+$c126: #C1776F;
+$c127: #BD826A;
+$c128: #BA8D66;
+$c129: #B79762;
+$c130: #B59D60;

@@ -1,94 +1,45 @@
 <?php
+ob_start();
 $page = "projects";
 include "includes/autoloader.php";
 session_start();
 if (isset($_SESSION['account'])) {
     $account = $_SESSION['account'];
+
     require_once "includes/header.php";
-    $project = new Project();
-    $pending = $project->selectPendingProjectList(); // only to get count
-    $active = $project->selectActiveProjectList(); // only to get count
-    $completed = $project->selectCompletedProjectList(); // only to get count
-    $canceled = $project->selectCanceledProjectList(); // only to get count
-    $count = [
-        "ACTIVE" => count($active)
-    ];
+
     if ($account->type == 1) { ?>
-        <div class="menu">
-        <div class="head-up-display-bar">
-            <span><?php echo $project::getHeadUp(); ?></span>
-        </div> <?php
+        <div class="menu"> <?php
+        require "includes/menu.php";
         if (!isset($_GET['p'])) {
-            if (isset($project::$menu) && isset($project::$menu['level-1'])) { ?>
-                <div class="navbar level-1"> <?php
-                foreach ($project::$menu['level-1'] as $menuLvl1ItemName => $menuLvl1Item) { ?>
-                    <div class="container-button">
-                        <a href="<?php echo "?t=" . $menuLvl1Item['link']; ?>" class="button<?php if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['t']) && $_GET['t'] == $menuLvl1Item['link']) echo " active-menu"; if (isset($menuLvl1Item['locked']) && $menuLvl1Item['locked'] == true) echo " locked"; ?>">
-                            <span><?php echo $menuLvl1ItemName; ?></span> <?php
-                            if (isset($menuLvl1Item['locked']) && $menuLvl1Item['locked'] == true) { ?>
-                                <div class="lock"></div> <?php
-                            }
-                            elseif (isset($count[$menuLvl1ItemName])) { ?>
-                                <div class="count"><?php echo $count[$menuLvl1ItemName]; ?></div> <?php
-                            } ?>
-                        </a> <?php
-                        if (!isset($_GET['t']) && isset($menuLvl1Item['home'])) { ?>
-                            <div class="home-menu<?php if ($menuLvl1Item['admin']) echo " admin"; ?>">
-                                <span class="title"><?php echo $menuLvl1Item['home']['title']; ?></span>
-                                <span class="description"><?php echo $menuLvl1Item['home']['description']; ?></span>
-                                <div class="total-count">
-                                    <div class="count"><?php echo $menuLvl1Item['home']['total']['count']; ?></div>
-                                    <span><?php echo $menuLvl1Item['home']['total']['name']; ?></span>
-                                </div>
-                                <div class="last-hours">
-                                    <span class="title"><?php echo $menuLvl1Item['home']['last-hours']['title']; ?></span> <?php
-                                    foreach ($menuLvl1Item['home']['last-hours']['details'] as $details) { ?>
-                                        <div class="details-count">
-                                            <span><?php echo $details['name']; ?></span>
-                                            <div class="count"><?php echo $details['count']; ?></div>
-                                        </div> <?php
-                                    } ?>
-                                </div>
-                                <div class="bottom">
-                                    <a href="<?php echo "?t=" . $menuLvl1Item['link']; ?>" class="enter-button"><?php echo $menuLvl1Item['home']['link']; ?></a>
-                                    <span class="note"><?php echo $menuLvl1Item['home']['note']; ?></span>
-                                </div>
-                            </div> <?php
-                        } ?>
-                    </div> <?php
-                } ?>
-                </div> <?php
-            }
-            if (isset($_GET['t']) && $_GET['t'] == "new") { ?>
-                
-                </div> <?php
-            }
-            elseif (isset($_GET['t']) && $_GET['t'] == "active") { ?>
-                <form class="info-bar<?php if (count($active) <= 10) echo " with-space"; ?>">
+            if (isset($_GET['l1']) && $_GET['l1'] == "active") {
+                $projects = Project::selectProjectListByStatus(1); ?>
+                <form class="info-bar">
                     <div class="section">
-                        <span>LAST</span>
+                        <div class="stage">LAST</div>
                         <button type="button" class="hours-button">12h</button>
                         <button type="button" class="hours-button active">24h</button>
                         <button type="button" class="hours-button">48h</button>
                     </div>
                     <div class="section">
-                        <span>NEW ADDED</span>
-                        <div class="count">+1</div>
-                        <div class="spacer"></div>
-                        <span>REACTIVATED</span>
-                        <div class="count">0</div>
+                        <div class="stage">NEW</div>
+                        <div class="content active">1</div>
+                        <div class="space"></div>
+                        <div class="stage">ACTIVATED</div>
+                        <div class="content active">1</div>
+                        <div class="space"></div>
+                        <div class="stage">PAUSED</div>
+                        <div class="content active">0</div>
                     </div>
                     <div class="section">
-                        <div class="count total">1</div>
-                        <span>TOTAL PROJECTS</span>
                     </div>
                 </form> <?php
-                if (count($active) > 10) { ?>
+                if (!isset($menu) || $menu['level-1']['ACTIVE']['count'] > 10) { ?>
                     <hr>
                     <form class="search-bar">
                         <div class="section">
                             <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
+                            <input type="text" name="name" class="input-name" placeholder="Enter Project Name">
                             <div class="custom-select">
                                 <select name="type" class="input-type" required>
                                     <option value="">All</option>
@@ -112,68 +63,67 @@ if (isset($_SESSION['account'])) {
                 <div class="table-header-container">
                     <div class="header-extension"></div>
                     <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project Name</div>
-                        <div class="head type">Project Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head assignments">Completed Assignments</div>
-                        <div class="head time" onclick="sortTable('.head.time', '.cell.time a b')">Time Spent</div>
-                        <div class="head value" onclick="sortTable('.head.value', '.cell.value a strong')">Value</div>
-                        <div class="head open">Open</div>
+                        <div class="head" style="width: 7.5%">№</div>
+                        <div class="head" style="width: 20%">Project Name</div>
+                        <div class="head" style="width: 15%">Project Preset</div>
+                        <div class="head" style="width: 15%">Client</div>
+                        <div class="head" style="width: 15%">Completed Assignments</div>
+                        <div class="head" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
+                        <div class="head" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Value</div>
+                        <div class="head" style="width: 7.5%">Open</div>
                     </div>
                     <div class="header-extension"></div>
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($active) {
-                        foreach ($active as $row) { ?>
+                    if ($projects) {
+                        foreach ($projects as $row) { ?>
                             <div class="row">
-                                <div class="cell id"><a href="<?php echo $_SERVER['PHP_SELF'] . "?p=" . $row['project_id']; ?>"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['project_id']; ?>"><?php echo $row['project_title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['project_id']; ?>"><?php echo $row['project_type']; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['project_id']; ?>"><?php echo $row['client_username']; ?></a></div>
-                                <div class="cell assignments"><a href="projects.php?p=<?php echo $row['project_id']; ?>"><?php echo "0 / 1"; ?></a></div>
-                                <div class="cell time"><a href="projects.php?p=<?php echo $row['project_id']; ?>"><?php echo ""; ?> Hours</a></div>
-                                <div class="cell value"><a href="projects.php?p=<?php echo $row['project_id']; ?>">€<span><?php echo ""; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="open-button">Open</a></div>
+                                <div class="cell id" style="width: 7.5%"><a href="<?php echo $_SERVER['PHP_SELF'] . "?p=" . $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
+                                <div class="cell" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['client_username']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['completed_assignments'] . " / " . $row['total_assignments']; ?></a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo ""; ?> Hours</a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content">€<span><?php echo $row['price']; ?></span></a></div>
+                                <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                             </div> <?php
                         }
                     } ?>
                 </div> <?php
             }
-            elseif (isset($_GET['t']) && $_GET['t'] == "pending") {
-                if (isset($pending) && count($pending) > 10) { ?>
-                    <form class="info-bar">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "pending") {
+                $projects = Project::selectProjectListByStatus(2); ?>
+                <form class="info-bar">
+                    <div class="section">
+                        <div class="stage">LAST</div>
+                        <button type="button" class="hours-button">12h</button>
+                        <button type="button" class="hours-button active">24h</button>
+                        <button type="button" class="hours-button">48h</button>
+                    </div>
+                    <div class="section">
+                        <div class="stage">NEW</div>
+                        <div class="content active">1</div>
+                        <div class="space"></div>
+                        <div class="stage">ACTIVATED</div>
+                        <div class="content active">1</div>
+                        <div class="space"></div>
+                        <div class="stage">PAUSED</div>
+                        <div class="content active">0</div>
+                    </div>
+                    <div class="section">
+                    </div>
+                </form> <?php
+                if (!isset($menu) || $menu['level-1']['PENDING']['count'] > 10) { ?>
                     <hr>
                     <form class="search-bar">
                         <div class="section">
                             <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
+                            <input type="text" name="project" class="input-name" placeholder="Enter Project Name">
                             <div class="custom-select">
                                 <select name="type" class="input-type" required>
                                     <option value="">All</option>
                                     <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
                                 </select>
                             </div>
                             <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
@@ -189,98 +139,65 @@ if (isset($_SESSION['account'])) {
                             <button type="button" class="reset-button"></button>
                         </div>
                     </form> <?php
-                }
-                else { ?>
-                    <form class="info-bar with-space">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                     <?php
                 } ?>
                 <div class="table-header-container">
                     <div class="header-extension"></div>
                     <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project Name</div>
-                        <div class="head type">Project Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head pending-for">Pending For</div>
-                        <div class="head pending-reason">Pending Reason</div>
-                        <div class="head time" onclick="sortTable('.head.time', '.cell.time a b')">Time Spent</div>
-                        <div class="head value" onclick="sortTable('.head.value', '.cell.value a strong')">Value</div>
-                        <div class="head open">Open</div>
+                        <div class="head" style="width: 7.5%">№</div>
+                        <div class="head" style="width: 20%">Project Name</div>
+                        <div class="head" style="width: 15%">Project Preset</div>
+                        <div class="head" style="width: 15%">Client</div>
+                        <div class="head" style="width: 15%">Pending Reason</div>
+                        <div class="head" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
+                        <div class="head" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Value</div>
+                        <div class="head" style="width: 7.5%">Open</div>
                     </div>
                     <div class="header-extension"></div>
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($pending) {
-                        foreach ($pending as $row) { ?>
+                    if ($projects) {
+                        foreach ($projects as $row) { ?>
                             <div class="row">
-                                <div class="cell id"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell pending-for"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "X Days"; ?></a></div>
-                                <div class="cell pending-reason"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Whyyy?"; ?></a></div>
-                                <div class="cell time"><a href="projects.php?p=<?php echo $row['id']; ?>"><b><?php echo $row['days_left']; ?></b> Days</a></div>
-                                <div class="cell value"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
+                                <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
+                                <div class="cell" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['client_username']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['note']; ?></a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo ""; ?> Hours</a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content">€<span><?php echo $row['price']; ?></span></a></div>
+                                <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                             </div> <?php
                         }
                     } ?>
                 </div> <?php
             }
-            elseif (isset($_GET['t']) && $_GET['t'] == "completed") {
-                if (isset($completed) && count($completed) > 10) { ?>
-                    <form class="info-bar">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "completed") {
+                $projects = Project::selectProjectListByStatus(3); ?>
+                <form class="info-bar">
+                    <div class="section">
+                        <div class="stage">LAST</div>
+                        <button type="button" class="hours-button">12h</button>
+                        <button type="button" class="hours-button active">24h</button>
+                        <button type="button" class="hours-button">48h</button>
+                    </div>
+                    <div class="section">
+                        <div class="stage">COMPLETED</div>
+                        <div class="content active">1</div>
+                    </div>
+                    <div class="section">
+                    </div>
+                </form> <?php
+                if (!isset($menu) || $menu['level-1']['COMPLETED']['count'] > 10) { ?>
                     <hr>
                     <form class="search-bar">
                         <div class="section">
                             <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
+                            <input type="text" name="project" class="input-name" placeholder="Enter Project Name">
                             <div class="custom-select">
                                 <select name="type" class="input-type" required>
                                     <option value="">All</option>
                                     <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
                                 </select>
                             </div>
                             <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
@@ -296,98 +213,65 @@ if (isset($_SESSION['account'])) {
                             <button type="button" class="reset-button"></button>
                         </div>
                     </form> <?php
-                }
-                else { ?>
-                    <form class="info-bar with-space">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <?php
                 } ?>
                 <div class="table-header-container">
                     <div class="header-extension"></div>
                     <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project Name</div>
-                        <div class="head type">Project Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head start-date">Start Date</div>
-                        <div class="head finish-date">Finish Date</div>
-                        <div class="head completed-in">Completed In</div>
-                        <div class="head value" onclick="sortTable('.head.value', '.cell.value a span')">Value</div>
-                        <div class="head open">Open</div>
+                        <div class="head" style="width: 7.5%">№</div>
+                        <div class="head" style="width: 20%">Project Name</div>
+                        <div class="head" style="width: 15%">Project Preset</div>
+                        <div class="head" style="width: 15%">Client</div>
+                        <div class="head" style="width: 15%">Finish Date</div>
+                        <div class="head" style="width: 10%">Time Spent</div>
+                        <div class="head" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a span')">Value</div>
+                        <div class="head" style="width: 7.5%">Open</div>
                     </div>
                     <div class="header-extension"></div>
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($completed) {
-                        foreach ($completed as $row) { ?>
+                    if ($projects) {
+                        foreach ($projects as $row) { ?>
                             <div class="row">
-                                <div class="cell id"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell start-date"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Date"; ?></a></div>
-                                <div class="cell finish-date"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Date"; ?></a></div>
-                                <div class="cell completed-in"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "X"; ?> Days</a></div>
-                                <div class="cell value"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
+                                <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
+                                <div class="cell" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['client_username']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['date']; ?></a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "Hours"; ?></a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content">€<span><?php echo $row['price']; ?></span></a></div>
+                                <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                             </div> <?php
                         }
                     } ?>
                 </div> <?php
             }
-            elseif (isset($_GET['t']) && $_GET['t'] == "canceled") {
-                if (isset($canceled) && count($canceled) > 10) { ?>
-                    <form class="info-bar">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "canceled") {
+                $projects = Project::selectProjectListByStatus(4); ?>
+                <form class="info-bar">
+                    <div class="section">
+                        <div class="stage">LAST</div>
+                        <button type="button" class="hours-button">12h</button>
+                        <button type="button" class="hours-button active">24h</button>
+                        <button type="button" class="hours-button">48h</button>
+                    </div>
+                    <div class="section">
+                        <div class="stage">CANCELED</div>
+                        <div class="content active">1</div>
+                    </div>
+                    <div class="section">
+                    </div>
+                </form> <?php
+                if (!isset($menu) || $menu['level-1']['CANCELED']['count'] > 10) { ?>
                     <hr>
                     <form class="search-bar">
                         <div class="section">
                             <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
+                            <input type="text" name="project" class="input-name" placeholder="Enter Project Name">
                             <div class="custom-select">
                                 <select name="type" class="input-type" required>
                                     <option value="">All</option>
                                     <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
                                 </select>
                             </div>
                             <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
@@ -403,214 +287,316 @@ if (isset($_SESSION['account'])) {
                             <button type="button" class="reset-button"></button>
                         </div>
                     </form> <?php
-                }
-                else { ?>
-                    <form class="info-bar with-space">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <?php
                 } ?>
                 <div class="table-header-container">
                     <div class="header-extension"></div>
                     <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project Name</div>
-                        <div class="head type">Project Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head cancellation-reason">Cancellation Reason</div>
-                        <div class="head cancel-date">Cancel Date</div>
-                        <div class="head value" onclick="sortTable('.head.value', '.cell.value a span')">Value</div>
-                        <div class="head open">Open</div>
+                        <div class="head" style="width: 7.5%">№</div>
+                        <div class="head" style="width: 20%">Project Name</div>
+                        <div class="head" style="width: 15%">Project Preset</div>
+                        <div class="head" style="width: 15%">Client</div>
+                        <div class="head" style="width: 15%">Cancellation Reason</div>
+                        <div class="head" style="width: 10%">Time Spent</div>
+                        <div class="head" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a span')">Value</div>
+                        <div class="head" style="width: 7.5%">Open</div>
                     </div>
                     <div class="header-extension"></div>
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($canceled) {
-                        foreach ($canceled as $row) { ?>
+                    if ($projects) {
+                        foreach ($projects as $row) { ?>
                             <div class="row">
-                                <div class="cell id"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell cancellation-reason"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Whyyy?"; ?></a></div>
-                                <div class="cell cancel-date"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Date"; ?></a></div>
-                                <div class="cell value"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
+                                <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
+                                <div class="cell" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['client_username']; ?></a></div>
+                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['note']; ?></a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['date']; ?></a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content">€<span><?php echo $row['price']; ?></span></a></div>
+                                <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                             </div> <?php
                         }
                     } ?>
                 </div> <?php
             }
-            elseif (isset($_GET['t']) && $_GET['t'] == "admin") { ?>
+            else { ?>
                 </div> <?php
             }
         }
         else {
-            $projectData = $project->selectAdminProject();
-            if (isset($project::$projectMenu) && isset($project::$projectMenu['level-1'])) { ?>
-                <div class="navbar level-1<?php if (!isset($_GET['t'])) echo " unselected" ?>"> <?php
-                foreach ($project::$projectMenu['level-1'] as $menuLvl1ItemName => $menuLvl1Item) {
-                    if ($menuLvl1Item['locked'] || isset($_GET['preview']) && $menuLvl1ItemName != "INFO" && $menuLvl1ItemName != "PRODUCTION")
-                        $locked = true;
-                    else
-                        $locked = false;
-                    // maybe count here?
-                    $href = "?p=" . $_GET['p'] . "&t=" . $menuLvl1Item['default-link'];
-                    if (isset($_GET['preview']))
-                        $href .= "&preview";
-                    ?>
+            if (isset($_GET['l4'])) {
+                if ($_GET['l4'] == "summary") {
+                    if (isset($_POST['delete'])) {
+                        Assignment::remove('assignment', $_GET['l3'], "projects.php?p=" . $_GET['p'] . "&l1=" . $_GET['l1']);
+                    } ?>
+                    </div>
+                    <form method="post" class="decision-bar">
+                        <input type="hidden" name="delete">
+                        <input type="submit" name="submit" value="DELETE ASSIGNMENT" class="button">
+                    </form> <?php
+                }
+                else {
+                    if (isset($_POST['delete'])) {
+                    Task::remove('task', $_GET['l4'], "projects.php?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=summary");
+                    } ?>
 
-                    <div class="container-button">
-                        <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['t']) && $_GET['t'] == $menuLvl1Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
-                            <span><?php echo $menuLvl1ItemName; ?></span> <?php
-                            if ($locked) { ?>
-                                <div class="lock"></div> <?php
-                            }
-                            elseif (isset($count[$menuLvl1ItemName])) { ?>
-                                <div class="count"><?php echo $count[$menuLvl1ItemName]; ?></div> <?php
-                            } ?>
-                        </a> <?php
-                        if (!isset($_GET['t']) && isset($menuLvl1Item['home'])) { ?>
-                            <div class="home-menu<?php if ($menuLvl1Item['admin']) echo " admin"; ?>">
-                                <span class="title"><?php echo $menuLvl1Item['home']['title']; ?></span>
-                                <span class="description"><?php echo $menuLvl1Item['home']['description']; ?></span>
-                                <div class="total-count">
-                                    <div class="count"><?php echo $menuLvl1Item['home']['total']['count']; ?></div>
-                                    <span><?php echo $menuLvl1Item['home']['total']['name']; ?></span>
-                                </div>
-                                <div class="last-hours">
-                                    <span class="title"><?php echo $menuLvl1Item['home']['last-hours']['title']; ?></span> <?php
-                                    foreach ($menuLvl1Item['home']['last-hours']['details'] as $details) { ?>
-                                        <div class="details-count">
-                                            <span><?php echo $details['name']; ?></span>
-                                            <div class="count"><?php echo $details['count']; ?></div>
-                                        </div> <?php
-                                    } ?>
-                                </div>
-                                <div class="bottom">
-                                    <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $menuLvl1Item['link']; ?>" class="enter-button"><?php echo $menuLvl1Item['home']['link']; ?></a>
-                                    <span class="note"><?php echo $menuLvl1Item['home']['note']; ?></span>
-                                </div>
-                            </div> <?php
-                        } ?>
+                    </div>
+                    <form method="post" class="decision-bar">
+                        <input type="hidden" name="delete">
+                        <input type="submit" name="submit" value="DELETE TASK" class="button">
+                    </form> <?php
+                }
+            }
+            if (isset($_GET['l1']) && $_GET['l1'] == "info") {
+                if (isset($_GET['l2']) && $_GET['l2'] == "summary") { ?>
                     </div> <?php
-                } ?>
-                </div> <?php
-                if (isset($_GET['t'])) {
-                    foreach ($project::$projectMenu['level-1'] as $menuLvl1Item) {
-                        if ($_GET['t'] == $menuLvl1Item['link'] && isset($menuLvl1Item['level-2'])) { ?>
-                            <div class="navbar level-2<?php if ($menuLvl1Item['admin']) echo " admin"; ?>"> <?php
-                            foreach ($menuLvl1Item['level-2'] as $menuLvl2ItemName => $menuLvl2Item) {
-                                if ($menuLvl2Item['locked'] || isset($_GET['preview']) && $menuLvl2ItemName != "OPERATIONS")
-                                    $locked = true;
-                                else
-                                    $locked = false;
-                                // maybe count here?
-                                $href = "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $menuLvl2Item['default-link'];
-                                if (isset($_GET['preview']))
-                                    $href .= "&preview";
-                                ?>
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "production") { ?>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "product") { ?>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "client") {
+                    if (isset($project) && !$project['client_username']) {
 
-                                <div class="container-button">
-                                    <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl2Item['admin']) echo " admin-menu"; if (isset($_GET['m']) && $_GET['m'] == $menuLvl2Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
-                                        <span><?php echo $menuLvl2ItemName; ?></span> <?php
-                                        if ($locked) { ?>
-                                            <div class="lock"></div> <?php
-                                        }
-                                        elseif (isset($count[$menuLvl2ItemName])) { ?>
-                                            <div class="count"><?php echo $count[$menuLvl2ItemName]; ?></div> <?php
-                                        } ?>
-                                    </a>
-                                </div> <?php
-                                if (isset($_GET['m']) && isset($menuLvl2Item['level-3']))
-                                    if ($_GET['m'] == $menuLvl2Item['link']) {
-                                        $menuLvl3 = $menuLvl2Item['level-3'];
-                                        if ($menuLvl2Item['admin']) $isAdminMenu = true;
-                                        else $isAdminMenu = false;
+                        if (!isset($_SESSION['add-client']))
+                            $_SESSION['add-client']['stage'] = 1;
+
+                        if (isset($_POST['submit'])) {
+                            if ($_SESSION['add-client']['stage'] == 1) {
+                                $_SESSION['add-client']['stage'] = 2;
+                            }
+                            elseif ($_SESSION['add-client']['stage'] == 2) {
+                                if (isset($_POST['new-client']))
+                                    $_SESSION['add-client']['new-client'] = true;
+                                else {
+                                    if (isset($_POST['username'])) {
+                                        $fieldsClient = [
+                                            'username' => $_POST['username'],
+                                            'type' => 2,
+                                            'reg_time' => date("Y-m-d H-i-s")
+                                        ];
+                                        $clientID = Project::insert('account', $fieldsClient, true, null);
+                                        $_POST['client'] = $clientID;
                                     }
-                            } ?>
-                            </div> <?php
-                            if (isset($_GET['m']) && isset($menuLvl3)) { ?>
-                                <div class="navbar level-3<?php if ($menuLvl2Item['admin']) echo " admin"; ?>"> <?php
-                                foreach ($menuLvl3 as $menuLvl3ItemName => $menuLvl3Item) {
-                                    if ($menuLvl3Item['locked'] || isset($_GET['preview']) && $menuLvl3ItemName != "COLORS")
-                                        $locked = true;
-                                    else
-                                        $locked = false;
-                                    // maybe count here?
-                                    $href = "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $menuLvl3Item['default-link'];
-                                    if (isset($_GET['preview']))
-                                        $href .= "&preview";
-                                    ?>
-
-                                    <div class="container-button">
-                                        <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl3Item['admin']) echo " admin-menu"; if (isset($_GET['b']) && $_GET['b'] == $menuLvl3Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
-                                            <span><?php echo $menuLvl3ItemName; ?></span> <?php
-                                            if ($locked) { ?>
-                                                <div class="lock"></div> <?php
-                                            }
-                                            elseif (isset($count[$menuLvl3ItemName])) { ?>
-                                                <div class="count"><?php echo $count[$menuLvl3ItemName]; ?></div> <?php
-                                            } ?>
-                                        </a>
-                                    </div> <?php
-                                    if (isset($_GET['b']) && isset($menuLvl3Item['level-4']))
-                                        if ($_GET['b'] == $menuLvl3Item['link'])
-                                            $menuLvl4 = $menuLvl3Item['level-4'];
-                                } ?>
+                                    if (isset($_POST['client'])) {
+                                        $fields = ["clientid" => $_POST['client']];
+                                        Project::update('project', $project['project_id'], $fields, $_SERVER['REQUEST_URI']);
+                                        unset($_SESSION['add-client']);
+                                    }
+                                }
+                            }
+                        }
+                        if (isset($_SESSION['add-client']['stage'])) {
+                            if ($_SESSION['add-client']['stage'] == 1) { ?>
+                                <div class="navbar level-3">
+                                    <form class="container-button disabled">
+                                        <a class="button admin-menu disabled"></a>
+                                    </form>
+                                    <form method="post" class="container-button">
+                                        <input type="submit" name="submit" value="Add Client" class="button admin-menu">
+                                    </form>
+                                    <form class="container-button disabled">
+                                        <a class="button admin-menu disabled"></a>
+                                    </form>
+                                </div>
                                 </div> <?php
-                                if (isset($_GET['b']) && isset($menuLvl4)) { ?>
-                                    <div class="navbar level-4<?php if ($menuLvl3Item['admin']) echo " admin"; ?>"> <?php
-                                        foreach ($menuLvl4 as $menuLvl4ItemName => $menuLvl4Item) {
-                                            if ($menuLvl4Item['locked'] || isset($_GET['preview']) && $menuLvl4ItemName != "ASSIGNMENT")
-                                                $locked = true;
-                                            else
-                                                $locked = false;
-                                            // maybe count here?
-                                            $href = "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=" . $menuLvl4Item['default-link'];
-                                            if (isset($_GET['preview']))
-                                                $href .= "&preview";
-                                            ?>
-
-                                            <div class="container-button">
-                                                <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl4Item['admin']) echo " admin-menu"; if (isset($_GET['x']) && $_GET['x'] == $menuLvl4Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
-                                                    <span><?php echo $menuLvl4ItemName; ?></span> <?php
-                                                    if ($locked) { ?>
-                                                        <div class="lock"></div> <?php
-                                                    }
-                                                    elseif (isset($count[$menuLvl4ItemName])) { ?>
-                                                        <div class="count"><?php echo $count[$menuLvl4ItemName]; ?></div> <?php
-                                                    } ?>
-                                                </a>
-                                            </div> <?php
+                            }
+                            elseif ($_SESSION['add-client']['stage'] == 2) {
+                                if (!isset($_SESSION['add-client']['new-client'])) { ?>
+                                    <div class="navbar level-3">
+                                        <form class="container-button disabled">
+                                            <a class="button admin-menu disabled"></a>
+                                        </form>
+                                        <form method="post" class="container-button">
+                                            <input type="hidden" name="new-client">
+                                            <input type="submit" name="submit" value="+ New Client" class="button admin-menu">
+                                        </form>
+                                        <form class="container-button disabled">
+                                            <a class="button admin-menu disabled"></a>
+                                        </form>
+                                    </div>
+                                    <div class="info-bar">
+                                    </div>
+                                    <div class="table-header-container">
+                                        <div class="header-extension admin"></div>
+                                        <div class="header">
+                                            <div class="head admin id" style="width: 7.5%">№</div>
+                                            <div class="head admin" style="width: 60%">Client Name</div>
+                                            <div class="head admin" style="width: 10%">Projects</div>
+                                            <div class="head admin" style="width: 15%">Reg. Date</div>
+                                            <div class="head admin" style="width: 7.5%">Add</div>
+                                        </div>
+                                        <div class="header-extension admin"></div>
+                                    </div>
+                                    </div>
+                                    <div class="table admin"> <?php
+                                        $clients = Project::selectClients();
+                                        foreach ($clients as $client) { ?>
+                                            <form method="post" class="row">
+                                                <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $client['id']); ?>" class="content"></div>
+                                                <div class="cell" style="width: 60%"><input type="submit" name="submit" value="<?php echo $client['username']; ?>" class="content"></div>
+                                                <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $client['project_count']; ?>" class="content"></div>
+                                                <div class="cell" style="width: 15%"><input type="submit" name="submit" value="<?php echo $client['reg_time_date']; ?>" class="content"></div>
+                                                <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                                                <input type="hidden" name="client" value="<?php echo $client['id']; ?>">
+                                            </form> <?php
                                         } ?>
+                                    </div> <?php
+                                }
+                                else { ?>
+                                    <div class="navbar level-3">
+                                        <form class="container-button disabled">
+                                            <a class="button admin-menu disabled"></a>
+                                        </form>
+                                        <form id="test2" name="test2" method="post" class="container-button">
+                                            <input type="submit" name="submit" value="Save" class="button admin-menu">
+                                        </form>
+                                        <form class="container-button disabled">
+                                            <a class="button admin-menu disabled"></a>
+                                        </form>
+                                    </div>
+                                    <div class="info-bar">
+                                    </div>
+                                    <div class="table-header-container">
+                                        <div class="header-extension small admin"></div>
+                                        <div class="header small">
+                                            <div class="head admin">Client Username</div>
+                                        </div>
+                                        <div class="header-extension small admin"></div>
+                                    </div>
+                                    </div>
+                                    <div class="table small">
+                                        <div class="row">
+                                            <input form="test2" name="username" id="username" class="field admin" placeholder="Enter Client Username">
+                                        </div>
                                     </div> <?php
                                 }
                             }
                         }
                     }
+                    else { ?>
+                        </div> <?php
+                    }
                 }
-            } ?>
-            </div> <?php
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "options") {
+                    if (isset($project) && !$project['assigned_to']) {
+
+                        if (!isset($_SESSION['new-manager']))
+                            $_SESSION['new-manager']['stage'] = 1;
+
+                        if (isset($_POST['submit'])) {
+                            if ($_SESSION['new-manager']['stage'] == 1) {
+                                $_SESSION['new-manager']['stage'] = 2;
+                            }
+                            elseif ($_SESSION['new-manager']['stage'] == 2) {
+                                $fieldsStatus = [
+                                    'projectid' => $project['project_id'],
+                                    'statusid' => $project['statusid'],
+                                    'time' => date("Y-m-d H-i-s"),
+                                    'assigned_by' => $account->id,
+                                    'assigned_to' => $_POST['assign-to'],
+                                    'note' => "Assigned Manager"
+                                ];
+                                $statusID = Project::insert('project_status', $fieldsStatus, true, null);
+                                Project::update('project', $fieldsStatus['projectid'], ["statusid" => $statusID], $_SERVER['REQUEST_URI']);
+                                unset($_SESSION['new-manager']);
+                            }
+                        }
+
+                        if (isset($_SESSION['new-manager']['stage'])) {
+                            if ($_SESSION['new-manager']['stage'] == 1) { ?>
+                                <div class="navbar level-3">
+                                    <form class="container-button disabled">
+                                        <a class="button admin-menu disabled"></a>
+                                    </form>
+                                    <form method="post" class="container-button">
+                                        <input type="submit" name="submit" value="Assign Manager" class="button admin-menu">
+                                    </form>
+                                    <form class="container-button disabled">
+                                        <a class="button admin-menu disabled"></a>
+                                    </form>
+                                </div>
+                                </div> <?php
+                            }
+                            elseif ($_SESSION['new-manager']['stage'] == 2) { ?>
+                                <div class="navbar level-3">
+                                    <form class="container-button disabled">
+                                        <a class="button admin-menu disabled"></a>
+                                    </form>
+                                    <form method="post" class="container-button">
+                                        <input type="hidden" name="assign-to" value="<?php echo $account->id; ?>">
+                                        <input type="submit" name="submit" value="I WILL DO IT" class="button admin-menu">
+                                    </form>
+                                    <form class="container-button disabled">
+                                        <a class="button admin-menu disabled"></a>
+                                    </form>
+                                </div>
+                                <div class="info-bar">
+                                </div>
+                                <div class="table-header-container">
+                                    <div class="header-extension admin"></div>
+                                    <div class="header">
+                                        <div class="head admin" style="width: 7.5%">№</div>
+                                        <div class="head admin" style="width: 50%">Member Name</div>
+                                        <div class="head admin" style="width: 35%">Reg. Date</div>
+                                        <div class="head admin" style="width: 7.5%">Add</div>
+                                    </div>
+                                    <div class="header-extension admin"></div>
+                                </div>
+                                </div>
+                                <div class="table admin"> <?php
+                                    $members = Project::selectMembers();
+                                    foreach ($members as $member) { ?>
+                                        <form method="post" class="row">
+                                            <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $member['id']); ?>" class="content"></div>
+                                            <div class="cell" style="width: 50%"><input type="submit" name="submit" value="<?php echo $member['username']; ?>" class="content"></div>
+                                            <div class="cell" style="width: 35%"><input type="submit" name="submit" value="<?php echo $member['reg_time_date']; ?>" class="content"></div>
+                                            <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                                            <input type="hidden" name="assign-to" value="<?php echo $member['id']; ?>">
+                                        </form> <?php
+                                    } ?>
+                                </div> <?php
+                            }
+                        }
+                    }
+                    else {
+
+                        if (isset($_POST['delete'])) {
+                            Project::remove('project', $_GET['p'], "projects.php?l1=active");
+                        } ?>
+
+                        <div class="navbar level-3">
+                            <form method="post" class="container-button">
+                                <input type="hidden" name="re-assign">
+                                <input type="submit" name="submit" value="RE-ASSIGN" class="button">
+                            </form>
+                            <form method="post" class="container-button">
+                                <input type="hidden" name="edit">
+                                <input type="submit" name="submit" value="EDIT" class="button">
+                            </form>
+                            <form method="post" class="container-button">
+                                <input type="hidden" name="pause">
+                                <input type="submit" name="submit" value="PAUSE" class="button">
+                            </form>
+                            <form method="post" class="container-button">
+                                <input type="hidden" name="cancel">
+                                <input type="submit" name="submit" value="CANCEL" class="button">
+                            </form>
+                            <form method="post" class="container-button">
+                                <input type="hidden" name="delete">
+                                <input type="submit" name="submit" value="DELETE" class="button">
+                            </form>
+                        </div>
+                        </div> <?php
+                    }
+                }
+            }
+            else { ?>
+                </div> <?php
+            }
             if (isset($_GET['preview'])) { ?>
                 <div class="decision-bar">
                     <div class="button">MAYBE LATER</div>
@@ -620,591 +606,8 @@ if (isset($_SESSION['account'])) {
             }
         }
     }
-    elseif ($account->type == 2) { ?>
-        <div class="menu">
-        <div class="head-up-display-bar">
-            <span><?php echo $project::getHeadUp(); ?></span>
-        </div> <?php
-        if (!isset($_GET['p'])) {
-            if (isset($project::$menu) && isset($project::$menu['level-1'])) { ?>
-                <div class="navbar level-1"> <?php
-                    foreach ($project::$menu['level-1'] as $menuLvl1ItemName => $menuLvl1Item) { ?>
-                        <div class="container-button">
-                            <a href="<?php echo "?t=" . $menuLvl1Item['link']; ?>" class="button<?php if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['t']) && $_GET['t'] == $menuLvl1Item['link']) echo " active-menu"; ?>">
-                                <span><?php echo $menuLvl1ItemName; ?></span> <?php
-                                if (isset($menuLvl1Item['locked']) && $menuLvl1Item['locked'] == true) { ?>
-                                    <div class="lock"></div> <?php
-                                }
-                                elseif (isset($count[$menuLvl1ItemName])) { ?>
-                                    <div class="count"><?php echo $count[$menuLvl1ItemName]; ?></div> <?php
-                                } ?>
-                            </a> <?php
-                            if (!isset($_GET['t']) && isset($menuLvl1Item['home'])) { ?>
-                                <div class="home-menu<?php if ($menuLvl1Item['admin']) echo " admin"; ?>">
-                                    <span class="title"><?php echo $menuLvl1Item['home']['title']; ?></span>
-                                    <span class="description"><?php echo $menuLvl1Item['home']['description']; ?></span>
-                                    <div class="total-count">
-                                        <div class="count"><?php echo $menuLvl1Item['home']['total']['count']; ?></div>
-                                        <span><?php echo $menuLvl1Item['home']['total']['name']; ?></span>
-                                    </div>
-                                    <div class="last-hours">
-                                        <span class="title"><?php echo $menuLvl1Item['home']['last-hours']['title']; ?></span> <?php
-                                        foreach ($menuLvl1Item['home']['last-hours']['details'] as $details) { ?>
-                                            <div class="details-count">
-                                                <span><?php echo $details['name']; ?></span>
-                                                <div class="count"><?php echo $details['count']; ?></div>
-                                            </div> <?php
-                                        } ?>
-                                    </div>
-                                    <div class="bottom">
-                                        <a href="<?php echo "?t=" . $menuLvl1Item['link']; ?>" class="enter-button"><?php echo $menuLvl1Item['home']['link']; ?></a>
-                                        <span class="note"><?php echo $menuLvl1Item['home']['note']; ?></span>
-                                    </div>
-                                </div> <?php
-                            } ?>
-                        </div> <?php
-                    } ?>
-                </div> <?php
-            }
-            if (isset($_GET['t']) && $_GET['t'] == "active") { ?>
-                <form class="info-bar<?php if (count($active) <= 10) echo " with-space"; ?>">
-                    <div class="section">
-                        <span>LAST</span>
-                        <button type="button" class="hours-button">12h</button>
-                        <button type="button" class="hours-button active">24h</button>
-                        <button type="button" class="hours-button">48h</button>
-                    </div>
-                    <div class="section">
-                        <span>NEW ADDED</span>
-                        <div class="count">+15</div>
-                    </div>
-                    <div class="section">
-                        <span>REACTIVATED</span>
-                        <div class="count">+8</div>
-                    </div>
-                    <div class="spacer"></div>
-                    <div class="section">
-                        <div class="count total">100</div>
-                        <span>TOTAL PROJECTS</span>
-                    </div>
-                </form> <?php
-                if (count($active) > 10) { ?>
-                    <hr>
-                    <form class="search-bar">
-                        <div class="section">
-                            <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
-                            <div class="custom-select">
-                                <select name="type" class="input-type" required>
-                                    <option value="">All</option>
-                                    <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
-                                </select>
-                            </div>
-                            <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
-                            <button type="button" onclick="searchTable()" class="search-button"></button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="filter-button">PRIORITIZE</button>
-                            <button type="button" class="filter-button">FILTER OPTION 2</button>
-                            <button type="button" class="filter-button">FILTER OPTION 3</button>
-                            <button type="button" class="filter-button">FILTER OPTION 4</button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="reset-button"></button>
-                        </div>
-                    </form> <?php
-                } ?>
-                <div class="table-header-container">
-                    <div class="header-extension"></div>
-                    <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project</div>
-                        <div class="head type">Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head progress">Oper.</div>
-                        <div class="head progress">Res.</div>
-                        <div class="head progress">Vis.</div>
-                        <div class="head progress">Creat.</div>
-                        <div class="head progress">Des.</div>
-                        <div class="head progress">Anim.</div>
-                        <div class="head progress">Aud.</div>
-                        <div class="head progress">Ext.</div>
-                        <div class="head progress">Enha.</div>
-                        <div class="head progress">Appr.</div>
-                        <div class="head deadline" onclick="sortTable('.head.deadline', '.cell.deadline a b')">Deadline In</div>
-                        <div class="head price" onclick="sortTable('.head.price', '.cell.price a strong')">Price</div>
-                        <div class="head open">Open</div>
-                    </div>
-                    <div class="header-extension"></div>
-                </div>
-                </div>
-                <div class="table"> <?php
-                    if ($active) {
-                        foreach ($active as $row) { ?>
-                            <div class="row">
-                                <div class="cell id"><a href="<?php echo $_SERVER['PHP_SELF'] . "?p=" . $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell progress"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "0/5"; ?></a></div>
-                                <div class="cell deadline"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['days_left']; ?> Days</a></div>
-                                <div class="cell price"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
-                            </div> <?php
-                        }
-                    } ?>
-                </div> <?php
-            }
-            elseif (isset($_GET['t']) && $_GET['t'] == "pending") {
-                if (count($pending) > 10) { ?>
-                    <form class="info-bar">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <hr>
-                    <form class="search-bar">
-                        <div class="section">
-                            <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
-                            <div class="custom-select">
-                                <select name="type" class="input-type" required>
-                                    <option value="">All</option>
-                                    <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
-                                </select>
-                            </div>
-                            <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
-                            <button type="button" onclick="searchTable()" class="search-button"></button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="filter-button">PRIORITIZE</button>
-                            <button type="button" class="filter-button">FILTER OPTION 2</button>
-                            <button type="button" class="filter-button">FILTER OPTION 3</button>
-                            <button type="button" class="filter-button">FILTER OPTION 4</button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="reset-button"></button>
-                        </div>
-                    </form> <?php
-                }
-                else { ?>
-                    <form class="info-bar with-space">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <?php
-                } ?>
-                <div class="table-header-container">
-                    <div class="header-extension"></div>
-                    <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project</div>
-                        <div class="head type">Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head pending-for">Pending For</div>
-                        <div class="head pending-reason">Pending Reason</div>
-                        <div class="head deadline" onclick="sortTable('.head.deadline', '.cell.deadline a b')">Deadline In</div>
-                        <div class="head price" onclick="sortTable('.head.price', '.cell.price a strong')">Price</div>
-                        <div class="head open">Open</div>
-                    </div>
-                    <div class="header-extension"></div>
-                </div>
-                </div>
-                <div class="table"> <?php
-                    if ($pending) {
-                        foreach ($pending as $row) { ?>
-                            <div class="row">
-                                <div class="cell id"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell pending-for"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "X Days"; ?></a></div>
-                                <div class="cell pending-reason"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Whyyy?"; ?></a></div>
-                                <div class="cell deadline"><a href="projects.php?p=<?php echo $row['id']; ?>"><b><?php echo $row['days_left']; ?></b> Days</a></div>
-                                <div class="cell price"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
-                            </div> <?php
-                        }
-                    } ?>
-                </div> <?php
-            }
-            elseif (isset($_GET['t']) && $_GET['t'] == "completed") {
-                if (count($completed) > 10) { ?>
-                    <form class="info-bar">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <hr>
-                    <form class="search-bar">
-                        <div class="section">
-                            <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
-                            <div class="custom-select">
-                                <select name="type" class="input-type" required>
-                                    <option value="">All</option>
-                                    <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
-                                </select>
-                            </div>
-                            <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
-                            <button type="button" onclick="searchTable()" class="search-button"></button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="filter-button">PRIORITIZE</button>
-                            <button type="button" class="filter-button">FILTER OPTION 2</button>
-                            <button type="button" class="filter-button">FILTER OPTION 3</button>
-                            <button type="button" class="filter-button">FILTER OPTION 4</button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="reset-button"></button>
-                        </div>
-                    </form> <?php
-                }
-                else { ?>
-                    <form class="info-bar with-space">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <?php
-                } ?>
-                <div class="table-header-container">
-                    <div class="header-extension"></div>
-                    <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project</div>
-                        <div class="head type">Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head start-date">Start Date</div>
-                        <div class="head finish-date">Finish Date</div>
-                        <div class="head completed-in">Completed In</div>
-                        <div class="head price" onclick="sortTable('.head.price', '.cell.price a span')">Price</div>
-                        <div class="head open">Open</div>
-                    </div>
-                    <div class="header-extension"></div>
-                </div>
-                </div>
-                <div class="table"> <?php
-                    if ($completed) {
-                        foreach ($completed as $row) { ?>
-                            <div class="row">
-                                <div class="cell id"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell start-date"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Date"; ?></a></div>
-                                <div class="cell finish-date"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Date"; ?></a></div>
-                                <div class="cell completed-in"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "X"; ?> Days</a></div>
-                                <div class="cell price"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
-                            </div> <?php
-                        }
-                    } ?>
-                </div> <?php
-            }
-            elseif (isset($_GET['t']) && $_GET['t'] == "canceled") {
-                if (count($canceled) > 10) { ?>
-                    <form class="info-bar">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <hr>
-                    <form class="search-bar">
-                        <div class="section">
-                            <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="project" class="input-project" placeholder="Enter Project Name">
-                            <div class="custom-select">
-                                <select name="type" class="input-type" required>
-                                    <option value="">All</option>
-                                    <option value="Animated Video">Animated Video</option>
-                                    <option value="TO BE FILLED">TO BE FILLED</option>
-                                </select>
-                            </div>
-                            <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
-                            <button type="button" onclick="searchTable()" class="search-button"></button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="filter-button">PRIORITIZE</button>
-                            <button type="button" class="filter-button">FILTER OPTION 2</button>
-                            <button type="button" class="filter-button">FILTER OPTION 3</button>
-                            <button type="button" class="filter-button">FILTER OPTION 4</button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="reset-button"></button>
-                        </div>
-                    </form> <?php
-                }
-                else { ?>
-                    <form class="info-bar with-space">
-                        <div class="section">
-                            <span>LAST</span>
-                            <button type="button" class="hours-button">12h</button>
-                            <button type="button" class="hours-button active">24h</button>
-                            <button type="button" class="hours-button">48h</button>
-                        </div>
-                        <div class="section">
-                            <span>NEW ADDED</span>
-                            <div class="count">+15</div>
-                        </div>
-                        <div class="section">
-                            <span>REACTIVATED</span>
-                            <div class="count">+8</div>
-                        </div>
-                        <div class="spacer"></div>
-                        <div class="section">
-                            <div class="count total">100</div>
-                            <span>TOTAL PROJECTS</span>
-                        </div>
-                    </form>
-                    <?php
-                } ?>
-                <div class="table-header-container">
-                    <div class="header-extension"></div>
-                    <div class="header">
-                        <div class="head id">№</div>
-                        <div class="head project">Project</div>
-                        <div class="head type">Type</div>
-                        <div class="head client">Client</div>
-                        <div class="head cancellation-reason">Cancellation Reason</div>
-                        <div class="head cancel-date">Cancel Date</div>
-                        <div class="head price" onclick="sortTable('.head.price', '.cell.price a span')">Price</div>
-                        <div class="head open">Open</div>
-                    </div>
-                    <div class="header-extension"></div>
-                </div>
-                </div>
-                <div class="table"> <?php
-                    if ($canceled) {
-                        foreach ($canceled as $row) { ?>
-                            <div class="row">
-                                <div class="cell id"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "#" . sprintf('%04d', $row['id']); ?></a></div>
-                                <div class="cell project"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['title']; ?></a></div>
-                                <div class="cell type"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "TO BE FILLED"; ?></a></div>
-                                <div class="cell client"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo $row['client']; ?></a></div>
-                                <div class="cell cancellation-reason"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Whyyy?"; ?></a></div>
-                                <div class="cell cancel-date"><a href="projects.php?p=<?php echo $row['id']; ?>"><?php echo "Date"; ?></a></div>
-                                <div class="cell price"><a href="projects.php?p=<?php echo $row['id']; ?>">$<span><?php echo $row['price']; ?></span></a></div>
-                                <div class="cell open"><a href="projects.php?p=<?php echo $row['id']; ?>" class="open-button">Open</a></div>
-                            </div> <?php
-                        }
-                    } ?>
-                </div> <?php
-            }
-        }
-        else {
-            $projectData = $project->selectAdminProject();
-            if (isset($project::$projectMenu) && isset($project::$projectMenu['level-1'])) { ?>
-                <div class="navbar level-1"> <?php
-                    foreach ($project::$projectMenu['level-1'] as $menuLvl1ItemName => $menuLvl1Item) { ?>
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $menuLvl1Item['default-link']; ?>" class="button<?php if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['t']) && $_GET['t'] == $menuLvl1Item['link']) echo " active-menu"; ?>">
-                                <span><?php echo $menuLvl1ItemName; ?></span> <?php
-                                if (isset($menuLvl1Item['locked']) && $menuLvl1Item['locked'] == true) { ?>
-                                    <div class="lock"></div> <?php
-                                }
-                                elseif (isset($count[$menuLvl1ItemName])) { ?>
-                                    <div class="count"><?php echo $count[$menuLvl1ItemName]; ?></div> <?php
-                                } ?>
-                            </a> <?php
-                            if (!isset($_GET['t']) && isset($menuLvl1Item['home'])) { ?>
-                                <div class="home-menu<?php if ($menuLvl1Item['admin']) echo " admin"; ?>">
-                                    <span class="title"><?php echo $menuLvl1Item['home']['title']; ?></span>
-                                    <span class="description"><?php echo $menuLvl1Item['home']['description']; ?></span>
-                                    <div class="total-count">
-                                        <div class="count"><?php echo $menuLvl1Item['home']['total']['count']; ?></div>
-                                        <span><?php echo $menuLvl1Item['home']['total']['name']; ?></span>
-                                    </div>
-                                    <div class="last-hours">
-                                        <span class="title"><?php echo $menuLvl1Item['home']['last-hours']['title']; ?></span> <?php
-                                        foreach ($menuLvl1Item['home']['last-hours']['details'] as $details) { ?>
-                                            <div class="details-count">
-                                                <span><?php echo $details['name']; ?></span>
-                                                <div class="count"><?php echo $details['count']; ?></div>
-                                            </div> <?php
-                                        } ?>
-                                    </div>
-                                    <div class="bottom">
-                                        <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $menuLvl1Item['link']; ?>" class="enter-button"><?php echo $menuLvl1Item['home']['link']; ?></a>
-                                        <span class="note"><?php echo $menuLvl1Item['home']['note']; ?></span>
-                                    </div>
-                                </div> <?php
-                            } ?>
-                        </div> <?php
-                    } ?>
-                </div> <?php
-                if (isset($_GET['t'])) {
-                    foreach ($project::$projectMenu['level-1'] as $menuLvl1Item) {
-                        if ($_GET['t'] == $menuLvl1Item['link'] && isset($menuLvl1Item['level-2'])) { ?>
-                            <div class="navbar level-2"> <?php
-                                foreach ($menuLvl1Item['level-2'] as $menuLvl2ItemName => $menuLvl2Item) { ?>
-                                    <div class="container-button">
-                                        <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $menuLvl2Item['default-link']; ?>" class="button<?php if ($menuLvl2Item['admin']) echo " admin-menu"; if (isset($_GET['m']) && $_GET['m'] == $menuLvl2Item['link']) echo " active-menu"; ?>">
-                                            <span><?php echo $menuLvl2ItemName; ?></span> <?php
-                                            if (isset($menuLvl2Item['locked']) && $menuLvl2Item['locked'] == true) { ?>
-                                                <div class="lock"></div> <?php
-                                            }
-                                            elseif (isset($count[$menuLvl2ItemName])) { ?>
-                                                <div class="count"><?php echo $count[$menuLvl2ItemName]; ?></div> <?php
-                                            } ?>
-                                        </a>
-                                    </div> <?php
-                                    if (isset($_GET['m']) && isset($menuLvl2Item['level-3']))
-                                        if ($_GET['m'] == $menuLvl2Item['link'])
-                                            $menuLvl3 = $menuLvl2Item['level-3'];
-                                } ?>
-                            </div> <?php
-                            if (isset($_GET['m']) && isset($menuLvl3)) { ?>
-                                <div class="navbar level-3"> <?php
-                                    foreach ($menuLvl3 as $menuLvl3ItemName => $menuLvl3Item) { ?>
-                                        <div class="container-button">
-                                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $menuLvl3Item['default-link']; ?>" class="button<?php if ($menuLvl3Item['admin']) echo " admin-menu"; if (isset($_GET['b']) && $_GET['b'] == $menuLvl3Item['link']) echo " active-menu"; ?>">
-                                                <span><?php echo $menuLvl3ItemName; ?></span> <?php
-                                                if (isset($menuLvl3Item['locked']) && $menuLvl3Item['locked'] == true) { ?>
-                                                    <div class="lock"></div> <?php
-                                                }
-                                                elseif (isset($count[$menuLvl3ItemName])) { ?>
-                                                    <div class="count"><?php echo $count[$menuLvl3ItemName]; ?></div> <?php
-                                                } ?>
-                                            </a>
-                                        </div> <?php
-                                    } ?>
-                                </div> <?php
-                            }
-                        }
-                    }
-                }
-                if (isset($_GET['b']) && $_GET['b'] == "colors") { ?>
-                    <div class="navbar level-4">
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=assignment"; ?>" class="button<?php if (isset($_GET['x']) && $_GET['x'] == "assignment") echo " active-menu"; ?>">
-                                <span>Assignment</span>
-                            </a>
-                        </div>
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=task-1"; ?>" class="button<?php if (isset($_GET['x']) && $_GET['x'] == "task-1") echo " active-menu"; ?>">
-                                <span>Task #1</span>
-                            </a>
-                        </div>
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=task-2"; ?>" class="button<?php if (isset($_GET['x']) && $_GET['x'] == "task-2") echo " active-menu"; ?>">
-                                <span>Task #2</span>
-                            </a>
-                        </div>
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=task-3"; ?>" class="button<?php if (isset($_GET['x']) && $_GET['x'] == "task-3") echo " active-menu"; ?>">
-                                <span>Task #3</span>
-                            </a>
-                        </div>
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=task-4"; ?>" class="button<?php if (isset($_GET['x']) && $_GET['x'] == "task-4") echo " active-menu"; ?>">
-                                <span>Task #4</span>
-                            </a>
-                        </div>
-                        <div class="container-button">
-                            <a href="<?php echo "?p=" . $_GET['p'] . "&t=" . $_GET['t'] . "&m=" . $_GET['m'] . "&b=" . $_GET['b'] . "&x=task-5"; ?>" class="button<?php if (isset($_GET['x']) && $_GET['x'] == "task-5") echo " active-menu"; ?>">
-                                <span>Task #5</span>
-                            </a>
-                        </div>
-                    </div> <?php
-                }
-            } ?>
-            </div> <?php
-        }
-    }
+
     require_once "includes/footer.php";
+
 }
 else require_once "login.php";

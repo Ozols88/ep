@@ -2,95 +2,33 @@
 
 class Database
 {
-    public function __construct($table)
-    {
-        $this->table = $table;
-    }
-
-    public $loginStatuses = [
-        1 => "Logged in!",
-        2 => "Wrong data!",
-        3 => "Fill in both fields!"
-    ];
-    public function getLoginStatusName()
-    {
-        return $this->loginStatuses[$this->loginStatus];
-    }
-
-    public $objectives = [
-        0 => "Single",
-        1 => "Multiple"
-    ];
-    public static $objectivesStatic = [
-        0 => "Single",
-        1 => "Multiple"
-    ];
-    public function getProjectObjectiveName($num)
-    {
-        if (isset($this->objectives[$num]))
-            return $this->objectives[$num];
-        else
-            return "-";
-    }
-    public static function getProjectObjectiveNameStatic($num)
-    {
-        if (isset(self::$objectivesStatic[$num]))
-            return self::$objectivesStatic[$num];
-        else
-            return "-";
-    }
-
-    public $drawingTypes = [
-        1 => "Backgrounds",
-        2 => "Characters",
-        3 => "Assets",
-        4 => "Special"
-    ];
-    public function getDrawingTypeName($num)
-    {
-        if (isset($this->drawingTypes[$num]))
-            return $this->drawingTypes[$num];
-        else
-            return "Unknown";
-    }
-
-    public function dateToDays($date)
-    {
-        $date = strtotime($date);
-        $diff = $date - time();
-        $days = floor($diff / (60 * 60 * 24));
-        return $days;
-    }
-
-    public function dateToDateWithoutSeconds($value)
-    {
-        if ($value)
-            return date('d M Y', strtotime($value));
-        else
-            return "-";
-    }
-
     protected function connect()
     {
-        try {
-            $conn = new PDO("mysql:host=localhost;dbname=epa;charset=utf8", 'root', 'php159A');
+        static $conn;
+
+        $dsn = 'mysql:host=localhost;dbname=epa;charset=utf8';
+        $username = 'root';
+        $password = 'php159A';
+
+        if (!$conn) {
+            $conn = new PDO($dsn, $username, $password);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $conn;
-        } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-            return null;
         }
+        return $conn;
     }
     protected static function connectStatic()
     {
-        try {
-            $conn = new PDO("mysql:host=localhost;dbname=epa;charset=utf8", 'root', 'php159A');
+        static $conn;
+
+        $dsn = 'mysql:host=localhost;dbname=epa;charset=utf8';
+        $username = 'root';
+        $password = 'php159A';
+
+        if (!$conn) {
+            $conn = new PDO($dsn, $username, $password);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $conn;
-        } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-            return null;
         }
+        return $conn;
     }
 
     public function select($params, $sql)
@@ -115,50 +53,113 @@ class Database
         else
             return null;
     }
+    public static function selectNextNewID($table)
+    {
+        $rows = self::selectStatic(array($table), "SELECT T.AUTO_INCREMENT AS `id` FROM information_schema.TABLES T WHERE T.TABLE_SCHEMA = 'epa' AND T.TABLE_NAME = '$table'");
+        return $rows[0][0];
+    }
 
-    public function insert($fields)
+    public static function insert($table, $fields, $lastID, $redirect)
     {
         $implodeColumns = implode(', ', array_keys($fields));
         $implodePlaceholder = implode(", :", array_keys($fields));
-        $sql = "INSERT INTO `$this->table` ($implodeColumns) VALUES (:" . $implodePlaceholder . ")";
-        $stmt = $this->connect()->prepare($sql);
+        $sql = "INSERT INTO `$table` ($implodeColumns) VALUES (:" . $implodePlaceholder . ")";
+        $stmt = self::connectStatic()->prepare($sql);
         foreach ($fields as $key => $value) {
             $stmt->bindValue(':' . $key, $value);
         }
         $stmtExec = $stmt->execute();
-        if ($stmtExec) {
-            header('Location: ' . $_SERVER['PHP_SELF']);
-        } else {
-            echo "Kļūda pievienojot datus!";
+
+        if ($lastID) $id = self::connectStatic()->lastInsertId();
+
+        if ($stmtExec && $redirect) {
+            header('Location: ' . $redirect);
         }
+
+        if (isset($id)) return $id;
+        else return null;
     }
 
-    public function update($id, $fields)
+    public static function update($table, $id, $fields, $redirect)
     {
         foreach ($fields as $key => $value) {
             $valueSets[] = $key . " = '" . $value . "'";
         }
-        $sql = "UPDATE `$this->table` SET " . join(", ", $valueSets) . " WHERE `id` = :id";
-        $stmt = $this->connect()->prepare($sql);
+        $sql = "UPDATE `$table` SET " . join(", ", $valueSets) . " WHERE `id` = :id";
+        $stmt = self::connectStatic()->prepare($sql);
         $stmt->bindValue(":id", $id);
         $stmtExec = $stmt->execute();
-        if ($stmtExec) {
-            header('Location: ' . $_SERVER['PHP_SELF']);
-        } else {
-            echo "Kļūda mainot datus!";
+
+        if ($stmtExec && $redirect) {
+            header('Location: ' . $redirect);
         }
     }
 
-    public function remove($id)
+    public static function remove($table, $id, $redirect)
     {
-        $sql = "DELETE FROM `$this->table` WHERE `id` = :id";
-        $stmt = $this->connect()->prepare($sql);
+        $sql = "DELETE FROM `$table` WHERE `id` = :id";
+        $stmt = self::connectStatic()->prepare($sql);
         $stmt->bindValue(":id", $id);
         $stmtExec = $stmt->execute();
-        if ($stmtExec) {
-            header('Location: ' . $_SERVER['PHP_SELF']);
-        } else {
-            echo "Kļūda dzēšot datus!";
+
+        if ($stmtExec && $redirect) {
+            header('Location: ' . $redirect);
         }
+    }
+
+    public static function datetimeToDays($date)
+    {
+        $date = strtotime($date);
+        $diff = $date - time();
+        $days = floor($diff / (60 * 60 * 24));
+        return $days;
+    }
+    public static function datetimeToDateWithoutSeconds($value)
+    {
+        if ($value)
+            return date('d.m.Y', strtotime($value));
+        else
+            return "-";
+    }
+    public static function datetimeToDate($value)
+    {
+        if ($value)
+            return date('d M Y', strtotime($value));
+        else
+            return "-";
+    }
+
+    public static function selectMembers() {
+        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account` WHERE `account`.`type` = '1'");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);
+            }
+            return $rows;
+        }
+        else return null;
+    }
+    public static function selectMemberCount() {
+        $rows = self::selectStatic(null, "SELECT COUNT(*) FROM `account` WHERE `account`.`type` = '1'");
+        if ($rows[0][0]) {
+            return $rows[0][0];
+        }
+        else return null;
+    }
+    public static function selectClients() {
+        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time`, COUNT(`project`.`id`) AS `project_count`, COUNT(`account`.`id`) AS `client_count` FROM `account` LEFT JOIN `project` ON `account`.`id` = `project`.`clientid` WHERE `account`.`type` = '2' GROUP BY `account`.`id`");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                $rows[$key]['reg_time_date'] = self::datetimeToDateWithoutSeconds($rows[$key]['reg_time']);
+            }
+            return $rows;
+        }
+        else return null;
+    }
+
+    public static function selectAccountByID($id) {
+        $rows = self::selectStatic(array($id), "SELECT * FROM `account` WHERE `id` = ?");
+        if ($rows[0]) return $rows[0];
+        else return null;
     }
 }

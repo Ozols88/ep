@@ -5,8 +5,6 @@
 .menu {
   position: sticky;
   top: 0;
-  display: flex;
-  flex-direction: column;
   user-select: none;
 }
 
@@ -17,7 +15,7 @@
 .head-up-display-bar {
   height: 12vh;
   text-align: center;
-  background: $c1-90wc;
+  background: $c37;
   user-select: none;
 }
 
@@ -25,7 +23,7 @@
   line-height: 12vh;
   font-size: 2.8vw;
   font-weight: bold;
-  color: $bc-90wc;
+  color: $c11;
   text-transform: uppercase;
 }
 
@@ -35,11 +33,15 @@
 
 .navbar {
   display: flex;
-  background: $c1;
+  flex: 0 0 auto;
+  background: $c2;
   &.admin {
-    background: $c1; // Line color for admin
+    background: $c2; // Line color for admin
   }
   &.level-1 {
+    &.current {
+      height: calc(100vh - 8vh - 12vh - 5.5vh);
+    }
     padding-top: 0;
     .button {
       height: 6vh;
@@ -56,6 +58,9 @@
     }
   }
   &.level-2 {
+    &.current {
+      height: calc(100vh - 8vh - 12vh - 6vh - 5.5vh);
+    }
     padding-top: 2px;
     .button {
       height: 4.5vh;
@@ -72,6 +77,9 @@
     }
   }
   &.level-3 {
+    &.current {
+      height: calc(100vh - 8vh - 12vh - 6vh - 4.5vh - 5.5vh - 2px);
+    }
     padding-top: 2px;
     .button {
       height: 3.5vh;
@@ -111,6 +119,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      border: none;
       .count {
         display: flex;
         justify-content: center;
@@ -132,58 +141,62 @@
 }
 
 // When home menu is present
-.navbar.level-1.unselected .container-button .button {
-  color: $c1-80bc;
-}
-.navbar.level-1.unselected .container-button:hover .button {
-  color: $bc;
-  background: $c1;
-}
-.navbar.level-1.unselected .container-button:hover .button.admin-menu {
+
+.navbar.level-1 .container-button .button.page:hover {
+  color: $c1;
+  background: $c2;
 }
 .navbar.level-1 .container-button {
   &:nth-of-type(even) .button {
     background: #6C5A32;
   }
+  &:nth-of-type(even) .button.admin-menu {
+    background: #5E7A67;
+  }
   .button {
     font-weight: bold;
-    background: $bc;
-    color: $c1-80bc;
+    background: $c1;
+    color: $c13;
   }
   .button.locked {
   }
   &:hover .button {
-    color: $c1;
+    color: $c2;
   }
 
   .button.active-menu {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
   .button.admin-menu {
+    background: $c83;
+    color: $c79;
   }
   &:hover .button.admin-menu {
+    color: $c2;
   }
   .button.admin-menu.active-menu {
+    background: $c2;
+    color: $c1;
   }
 
 
   &:nth-of-type(odd) .button .count {
-    color: $bc;
+    color: $c1;
   }
   &:nth-of-type(even) .button .count {
     color: #6C5A32;
   }
   .button .count {
-    background: $c1-80bc;
+    background: $c13;
   }
   &:hover .button .count {
-    background: $c1;
+    background: $c2;
   }
 
   .button.active-menu .count {
-    background: $bc;
-    color: $c1;
+    background: $c1;
+    color: $c2;
   }
 
   .button.admin-menu .count {
@@ -192,64 +205,64 @@
 
   .lock {
     background-image: url("../epsystem/account/img/lock-icon-lvl1.svg");
-    background-color: #8B6F33;
+    background-color: $c13;
   }
   &:hover .lock {
-    background-color: $c1;
+    background-color: $c2;
   }
 }
 
 .navbar.level-2 .container-button {
   &:nth-of-type(even) .button {
-    background: #BA8E2F;
+    background: #BA8F2E;
   }
   &:nth-of-type(even) .button.admin-menu {
-    background: #90A16A;
+    background: #719A7E;
   }
   .button {
     font-weight: bold;
-    background: $c1-40bc;
-    color: $bc;
+    background: $c56;
+    color: $c1;
   }
   .button.locked {
-    color: #A58231;
+    color: $c15;
   }
   &:hover .button {
-    color: $c1;
+    color: $c2;
   }
 
   .button.admin-menu {
-    background: #95A66D;
+    background: $c75;
   }
   .button.active-menu {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
   &:hover .button.admin-menu {
   }
   .button.admin-menu.active-menu {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
 
 
   &:nth-of-type(odd) .button .count {
-    color: $c1-40bc;
+    color: $c56;
   }
   &:nth-of-type(even) .button .count {
-    color: #BA8E2F;
+    color: #BA8F2E;
   }
   .button .count {
-    background: $bc;
+    background: $c1;
   }
   &:hover .button .count {
-    background: $c1;
-    color: $c1-40bc;
+    background: $c2;
+    color: $c56;
   }
 
   .button.active-menu .count {
-    background: $bc;
-    color: $c1;
+    background: $c1;
+    color: $c2;
   }
 
   .button.admin-menu .count {
@@ -258,57 +271,57 @@
 
   .lock {
     background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
-    background-color: $bc;
-  }
-  &:hover .lock {
     background-color: $c1;
   }
+  &:hover .lock {
+    background-color: $c2;
+  }
   .active-menu .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
   &:hover .active-menu .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
 
   .button.locked .lock {
-    background-color: #A58231;
+    background-color: $c15;
   }
   &:hover .button.locked .lock {
-    background-color: $c1;
+    background-color: $c2;
   }
 }
 
 .navbar.level-3 .container-button {
   &:nth-of-type(even) .button {
-    background: #BA8E2F;
+    background: #BA8F2E;
   }
   &:nth-of-type(even) .button.admin-menu {
-    background: #90A16A;
+    background: #719A7E;
   }
   .button {
     font-weight: bold;
     background: $c1-40bc;
-    color: $c1;
+    color: $c2;
   }
   .button.locked {
-    color: #A58231;
+    color: $c15;
   }
   &:hover .button {
-    color: $bc;
+    color: $c1;
   }
 
   .button.admin-menu {
-    background: #95A66D;
+    background: $c75;
   }
   .button.active-menu {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
   &:hover .button.admin-menu {
   }
   .button.admin-menu.active-menu {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
 
 
@@ -316,18 +329,18 @@
     color: $c1-40bc;
   }
   &:nth-of-type(even) .button .count {
-    color: #BA8E2F;
+    color: #BA8F2E;
   }
   .button .count {
-    background: $c1;
+    background: $c2;
   }
   &:hover .button .count {
-    background: $bc;
+    background: $c1;
   }
 
   .button.active-menu .count {
-    background: $bc;
-    color: $c1;
+    background: $c1;
+    color: $c2;
   }
 
   .button.admin-menu .count {
@@ -335,24 +348,24 @@
 
   .lock {
     background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
-    background-color: $c1;
+    background-color: $c2;
   }
   &:hover .lock {
     background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
-    background-color: $bc;
+    background-color: $c1;
   }
   .active-menu .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
   &:hover .active-menu .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
 
   .button.locked .lock {
-    background-color: #A58231;
+    background-color: $c15;
   }
   &:hover .button.locked .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
 }
 
@@ -362,42 +375,42 @@
   }
   .button {
     font-weight: bold;
-    background: $c1-90wc;
-    color: $bc;
+    background: $c37;
+    color: $c1;
   }
   .button.locked {
-    color: #E2DFD6;
+    color: $c10;
   }
   &:hover .button {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
 
   .button.active-menu {
-    background: $c1;
-    color: $bc;
+    background: $c2;
+    color: $c1;
   }
   
 
   .lock {
     background-image: url("../epsystem/account/img/lock-icon-lvl4.svg");
-    background-color: $bc;
+    background-color: $c1;
   }
   .active-menu .lock {
   }
   &:hover .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
   &:hover .active-menu .lock {
-    background-color: $bc;
+    background-color: $c1;
   }
 
   .button.locked .lock {
-    background-color: #E2DFD6;
+    background-color: $c10;
   }
   &:hover .button.locked .lock {
     background-image: url("../epsystem/account/img/lock-icon-lvl4-hl.svg");
-    background-color: $bc;
+    background-color: $c1;
   }
 }
 
@@ -407,18 +420,18 @@
 
 .home-menu {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  border: 1px solid #FFFCF8;
+  border: 1px solid $c63;
   padding: 0 1vw;
   user-select: none;
-  margin-top: 0.5vh;
-  flex: 1;
+  margin: 0.2vh 0;
 }
 
 .home-menu .title {
   text-transform: uppercase;
   text-align: center;
-  color: $bc-90wc;
+  color: $c11;
   font-weight: bold;
   font-size: 1.3vw;
   margin: 3vh 0 1.5vh 0;
@@ -427,7 +440,7 @@
 .home-menu .description {
   display: block;
   text-align: center;
-  color: $bc-90wc;
+  color: $c11;
   font-size: 0.8vw;
 }
 
@@ -441,12 +454,12 @@
   font-size: 1.3vw;
   font-weight: bold;
   background: #FFFCF8;
-  color: $bc-90wc;
+  color: $c11;
 }
 .home-menu .total-count span {
   font-size: 1.2vw;
   font-weight: bold;
-  color: $bc-90wc;
+  color: $c11;
   text-transform: uppercase;
 }
 
@@ -458,7 +471,7 @@
   margin: 0 0 1.5vh 0;
   font-size: 1.05vw;
   font-weight: bold;
-  color: $bc-90wc;
+  color: $c11;
   text-transform: uppercase;
 }
 
@@ -469,7 +482,7 @@
 .home-menu .last-hours .details-count span {
   font-size: 1.2vw;
   font-weight: bold;
-  color: $bc-90wc;
+  color: $c11;
   text-transform: uppercase;
 }
 .home-menu .last-hours .details-count .count {
@@ -478,7 +491,7 @@
   background: #FFFCF8;
   font-size: 1.3vw;
   font-weight: bold;
-  color: $bc-90wc;
+  color: $c11;
   width: 20%;
   text-align: center;
 }
@@ -509,17 +522,17 @@
   display: block;
   text-align: center;
   font-size: 0.8vw;
-  color: $bc-90wc;
+  color: $c11;
   margin: 0 auto 3vh auto;
 }
 
 
 .container-button:hover .home-menu {
   border: 1px solid #F4AC32;
-  background: #FFFCF8
+  background: #FFFFFF
 }
 .container-button:hover .home-menu.admin {
-  border: 1px solid $c2;
+  border: 1px solid $c3;
 }
 
 .container-button:hover .title {
@@ -527,7 +540,7 @@
 }
 
 .container-button:hover .description {
-  color: $bc;
+  color: $c1;
 }
 
 .container-button:hover .total-count .count {
@@ -565,4 +578,17 @@
 
 .container-button:hover .bottom .note {
   color: #C89933;
+}
+
+
+.navbar.unselected .container-button .button {
+  color: $c13;
+}
+.navbar.unselected .container-button:hover .button {
+  color: $c1;
+  background: $c2;
+}
+.navbar.unselected .container-button:hover .button.admin-menu {
+  color: $c1;
+  background: $c2;
 }

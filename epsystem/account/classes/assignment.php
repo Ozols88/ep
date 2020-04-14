@@ -3,251 +3,59 @@ require_once "database.php";
 
 class Assignment extends Database
 {
-    public function __construct($table = "assignment")
-    {
-        parent::__construct($table);
+    public static function selectPresets() {
+        $rows = self::selectStatic(null, "SELECT `preset-assignment`.`id`, `preset-assignment`.`title`, `department`.`title` AS `department`, `preset-assignment`.`objective`, ( SELECT COUNT(*) FROM `preset-task` WHERE `preset-assignmentid` = `preset-assignment`.`id` ) AS `task_count` FROM `preset-assignment` INNER JOIN `department` ON `department`.`id` = `preset-assignment`.`departmentid`");
+        if ($rows) return $rows;
+        else return null;
     }
 
-    public static $menu = [
-        "level-1" => [
-            "+ New Assignment" => [
-                "admin" => true,
-                "locked" => false,
-                "link" => "new",
-                "default-link" => "new",
-                "hud" => "New Assignment",
-                "home" => [
-                    "title" => "Title",
-                    "description" => "Description",
-                    "total" => [
-                        "name" => "Total Projects",
-                        "count" => 62
-                    ],
-                    "last-hours" => [
-                        "title" => "In the last 24h",
-                        "details" => [
-                            [
-                                "name" => "Moved to pending",
-                                "count" => "+5"
-                            ]
-                        ],
-                    ],
-                    "link" => "List",
-                    "note" => "Note"
-                ]
-            ],
-            "AVAILABLE ASSIGNMENTS" => [
-                "admin" => false,
-                "locked" => false,
-                "link" => "available",
-                "default-link" => "available&m=production",
-                "hud" => "Available Assignments",
-                "home" => [
-                    "title" => "Title",
-                    "description" => "Description",
-                    "total" => [
-                        "name" => "Total Projects",
-                        "count" => 62
-                    ],
-                    "last-hours" => [
-                        "title" => "In the last 24h",
-                        "details" => [
-                            [
-                                "name" => "Moved to pending",
-                                "count" => "+5"
-                            ]
-                        ],
-                    ],
-                    "link" => "List",
-                    "note" => "Note"
-                ],
-                "level-2" => [
-                    "PRODUCTION" => [
-                        "admin" => false,
-                        "locked" => false,
-                        "link" => "production",
-                        "default-link" => "production",
-                        "hud" => "Production"
-                    ],
-                    "APPROVALS" => [
-                        "admin" => false,
-                        "locked" => false,
-                        "link" => "approvals",
-                        "default-link" => "approvals",
-                        "hud" => "Approvals"
-                    ],
-                    "EP OPERATIONS" => [
-                        "admin" => true,
-                        "locked" => false,
-                        "link" => "ep-operations",
-                        "default-link" => "ep-operations",
-                        "hud" => "EP Operations"
-                    ],
-                    "MANAGEMENT" => [
-                        "admin" => true,
-                        "locked" => false,
-                        "link" => "management",
-                        "default-link" => "management",
-                        "hud" => "Management",
-                        "level-3" => [
-                            "SOMETHING1" => [
-                                "admin" => true,
-                                "locked" => false,
-                                "link" => "something1",
-                                "default-link" => "something1",
-                                "hud" => "Something"
-                            ],
-                            "SOMETHING2" => [
-                                "admin" => true,
-                                "locked" => false,
-                                "link" => "something2",
-                                "default-link" => "something2",
-                                "hud" => "Something"
-                            ],
-                            "SOMETHING3" => [
-                                "admin" => true,
-                                "locked" => false,
-                                "link" => "something3",
-                                "default-link" => "something3",
-                                "hud" => "Something"
-                            ],
-                            "SOMETHING4" => [
-                                "admin" => true,
-                                "locked" => false,
-                                "link" => "something4",
-                                "default-link" => "something4",
-                                "hud" => "Something"
-                            ],
-                            "SOMETHING5" => [
-                                "admin" => true,
-                                "locked" => false,
-                                "link" => "something5",
-                                "default-link" => "something5",
-                                "hud" => "Something"
-                            ],
-                        ]
-                    ],
-                    "ADMIN" => [
-                        "admin" => true,
-                        "locked" => false,
-                        "link" => "admin",
-                        "default-link" => "admin",
-                        "hud" => "ADMIN"
-                    ]
-                ]
-            ],
-            "MY ASSIGNMENTS" => [
-                "admin" => false,
-                "locked" => false,
-                "link" => "my",
-                "default-link" => "my&m=active",
-                "hud" => "My Assignments",
-                "home" => [
-                    "title" => "Title",
-                    "description" => "Description",
-                    "total" => [
-                        "name" => "Total Projects",
-                        "count" => 62
-                    ],
-                    "last-hours" => [
-                        "title" => "In the last 24h",
-                        "details" => [
-                            [
-                                "name" => "Moved to pending",
-                                "count" => "+5"
-                            ]
-                        ],
-                    ],
-                    "link" => "List",
-                    "note" => "Note"
-                ],
-                "level-2" => [
-                    "PENDING" => [
-                        "admin" => false,
-                        "locked" => false,
-                        "link" => "pending",
-                        "default-link" => "pending",
-                        "hud" => "My Pending Assignments"
-                    ],
-                    "ACTIVE" => [
-                        "admin" => false,
-                        "locked" => false,
-                        "link" => "active",
-                        "default-link" => "active",
-                        "hud" => "My Active Assignments"
-                    ],
-                    "COMPLETED" => [
-                        "admin" => false,
-                        "locked" => false,
-                        "link" => "completed",
-                        "default-link" => "completed",
-                        "hud" => "My Completed Assignments"
-                    ],
-                    "CANCELED" => [
-                        "admin" => false,
-                        "locked" => false,
-                        "link" => "canceled",
-                        "default-link" => "canceled",
-                        "hud" => "My Canceled Assignments"
-                    ]
-                ]
-            ],
-            "ADMIN" => [
-                "admin" => true,
-                "locked" => false,
-                "link" => "admin",
-                "default-link" => "admin",
-                "hud" => "Admin",
-                "home" => [
-                    "title" => "Title",
-                    "description" => "Description",
-                    "total" => [
-                        "name" => "Total Projects",
-                        "count" => 62
-                    ],
-                    "last-hours" => [
-                        "title" => "In the last 24h",
-                        "details" => [
-                            [
-                                "name" => "Moved to pending",
-                                "count" => "+5"
-                            ]
-                        ],
-                    ],
-                    "link" => "List",
-                    "note" => "Note"
-                ]
-            ]
-        ]
-    ];
+    public static function selectPresetByID($id) {
+        $rows = self::selectStatic(array($id), "SELECT * FROM `preset-assignment` WHERE `id` = ?");
+        if ($rows[0]) return $rows[0];
+        else return null;
+    }
 
-    public static function getHeadUp() {
-        $headupInitial = "Assignments";
-        if (isset($_GET['t']) && isset(self::$menu['level-1'])) {
-            foreach (self::$menu['level-1'] as $menuLvl1) {
-                if ($menuLvl1['link'] == $_GET['t']) {
-                    if (isset($menuLvl1['hud']))
-                        $headup = $menuLvl1['hud'];
-                    if (isset($_GET['m']) && isset($menuLvl1['level-2'])) {
-                        foreach ($menuLvl1['level-2'] as $menuLvl2) {
-                            if ($menuLvl2['link'] == $_GET['m']) {
-                                if (isset($menuLvl2['hud']))
-                                    $headup = $menuLvl2['hud'];
-                                if (isset($_GET['b']) && isset($menuLvl2['level-3'])) {
-                                    foreach ($menuLvl2['level-3'] as $menuLvl3) {
-                                        if ($menuLvl3['link'] == $_GET['b']) {
-                                            if (isset($menuLvl3['hud']))
-                                                $headup = $menuLvl3['hud'];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    public static function selectDepartments() {
+        $rows = self::selectStatic(null, "SELECT * FROM `department`");
+        if ($rows) return $rows;
+        else return null;
+    }
+
+    public static function selectDepartmentByID($id) {
+        $rows = self::selectStatic(array($id), "SELECT * FROM `department` WHERE `id` = ?");
+        if ($rows[0]) return $rows[0];
+        else return null;
+    }
+
+    public static function selectAvailableAssignmentCount($preset)
+    {
+        if ($preset == true)
+            $rows = self::selectStatic(array(), "SELECT count(*) AS `count` FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`statusid` = '5' AND `assignment`.`presetid` IS NOT NULL");
+        else
+            $rows = self::selectStatic(array(), "SELECT count(*) AS `count` FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`statusid` = '5' AND `assignment`.`presetid` IS NULL");
+        if ($rows[0]['count']) return $rows[0]['count'];
+        else return 0;
+    }
+
+    public static function selectAssignmentListByStatus($statusID, $preset)
+    {
+        if (isset($preset)) {
+            if ($preset == true)
+                $rows = self::selectStatic(array($statusID), "SELECT `assignment`.`projectid` AS `project_id`, `assignment`.`id` AS `assignment_id`, `assignment`.`title` AS `assignment_name`, `assignment`.`departmentid` AS `department_id`, `department`.`title` AS `department`, `preset-project`.`title` AS `project_preset`, ( SELECT COUNT(*) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `task_count`, ( SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(`estimated`))) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `time`, ( SELECT SUM(`value`) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `earn` FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` INNER JOIN `department` ON `department`.`id` = `assignment`.`departmentid` INNER JOIN `project` ON `project`.`id` = `assignment`.`projectid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` WHERE `assignment_status`.`statusid` = ? AND `assignment`.`presetid` IS NOT NULL");
+            else
+                $rows = self::selectStatic(array($statusID), "SELECT `assignment`.`projectid` AS `project_id`, `assignment`.`id` AS `assignment_id`, `assignment`.`title` AS `assignment_name`, `assignment`.`departmentid` AS `department_id`, `department`.`title` AS `department`, `preset-project`.`title` AS `project_preset`, ( SELECT COUNT(*) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `task_count`, ( SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(`estimated`))) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `time`, ( SELECT SUM(`value`) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `earn` FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` INNER JOIN `department` ON `department`.`id` = `assignment`.`departmentid` INNER JOIN `project` ON `project`.`id` = `assignment`.`projectid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` WHERE `assignment_status`.`statusid` = ? AND `assignment`.`presetid` IS NULL");
         }
-        if (isset($headup)) return $headup;
-        else return $headupInitial;
+        else {
+            $rows = self::selectStatic(array($statusID), "SELECT `assignment`.`projectid` AS `project_id`, `assignment`.`id` AS `assignment_id`, `assignment`.`title` AS `assignment_name`, `assignment`.`departmentid` AS `department_id`, `department`.`title` AS `department`, `preset-project`.`title` AS `project_preset`, ( SELECT COUNT(*) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `task_count`, ( SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(`estimated`))) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `time`, ( SELECT SUM(`value`) FROM `task` WHERE `task`.`assignmentid` = `assignment`.`id` ) AS `earn` FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` INNER JOIN `department` ON `department`.`id` = `assignment`.`departmentid` INNER JOIN `project` ON `project`.`id` = `assignment`.`projectid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` WHERE `assignment_status`.`statusid` = ?");
+        }
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                if (!$rows[$key]['project_preset'])
+                    $rows[$key]['project_preset'] = "Custom";
+                $rows[$key]['time'] = date('i', strtotime($rows[$key]['time'])) . " min";
+            }
+            return $rows;
+        }
+        else return null;
     }
 }

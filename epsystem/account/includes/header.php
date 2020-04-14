@@ -28,25 +28,82 @@
 if ($_SESSION['account']->type == 1) { ?>
     <div class="container-header system">
         <img class="logo-header" src="/ep/epsystem/account/img/logo-member.svg" alt="ep"> <?php
-        if (isset($_GET['p'])) {
+        if (basename($_SERVER['PHP_SELF']) == 'projects.php' && isset($_GET['p'])) {
             $showLinks = false;
-            $exitTitle = "Exit Project #" . sprintf('%04d', $_GET['p']);
-            $exitLink = "/ep/epsystem/account/projects.php?t=active";
-            if (isset($_GET['preview']))
-                $exitLink = "/ep/epsystem/account/assignments.php?t=available&m=for-me&b=production";
+            if (isset($_POST['new-client']) || isset($_SESSION['add-client']['new-client'])) {
+                $exitTitle = "Cancel Client";
+                $exitLink = "/ep/epsystem/account/projects.php?p=" . $_GET['p'] . "&l1=info&l2=client";
+            }
+            else {
+                $exitTitle = "Exit Project #" . sprintf('%04d', $_GET['p']);
+                if (isset($_GET['preview']))
+                    $exitLink = "/ep/epsystem/account/assignments.php?l1=available&l2=production";
+                else
+                    $exitLink = "/ep/epsystem/account/projects.php?l1=active";
+            }
+        }
+        elseif (basename($_SERVER['PHP_SELF']) == 'new-project.php') {
+            $showLinks = false;
+            if (isset($_POST['new-client']) || isset($_SESSION['new-project']['new-client'])) {
+                $exitTitle = "Cancel New Client";
+                $exitLink = "/ep/epsystem/account/new-project.php";
+            }
+            elseif (isset($_SESSION['new-assignment']['new-project'])) {
+                $exitTitle = "Cancel New Project";
+                $exitLink = "/ep/epsystem/account/new-assignment.php";
+            }
+            else {
+                $exitTitle = "Cancel New Project";
+                $exitLink = "/ep/epsystem/account/projects.php?l1=active";
+            }
+        }
+        elseif (basename($_SERVER['PHP_SELF']) == 'new-assignment.php') {
+            $showLinks = false;
+            if (isset($_POST['add-task-page']) || isset($_SESSION['new-assignment']['add-task-page'])) {
+                $exitTitle = "Cancel Add Task";
+                $exitLink = "/ep/epsystem/account/new-assignment.php";
+            }
+            elseif (isset($_GET['p']) && isset($_GET['t'])) {
+                $exitTitle = "Cancel New Assignment";
+                $exitLink = "/ep/epsystem/account/projects.php?p=" . $_GET['p'] . "&l1=" . $_GET['t'];
+            }
+            elseif (isset($_SESSION['new-project']['new-assignment'])) {
+                $exitTitle = "Cancel New Assignment";
+                $exitLink = "/ep/epsystem/account/new-project.php";
+            }
+            else {
+                $exitTitle = "Cancel New Assignment";
+                $exitLink = "/ep/epsystem/account/assignments.php";
+            }
+        }
+        elseif (basename($_SERVER['PHP_SELF']) == 'new-task.php') {
+            $showLinks = false;
+            if (isset($_POST['new-link']) || isset($_SESSION['new-task']['new-link'])) {
+                $exitTitle = "Cancel New Link";
+                $exitLink = "/ep/epsystem/account/new-task.php";
+            }
+            elseif (isset($_SESSION['new-assignment']['stage'])) {
+                $exitTitle = "Cancel New Task";
+                $exitLink = "/ep/epsystem/account/new-assignment.php";
+            }
+            else {
+                $exitTitle = "Cancel New Task";
+                $exitLink = "/ep/epsystem/account/assignments.php";
+            }
         }
         else {
             $showLinks = true;
-            $exitTitle = "Log out of the ep system";
+            $exitTitle = "Log out of ep system";
             $exitLink = "/ep/epsystem/account/logout.php";
         }
+
         if ($showLinks) { ?>
             <nav class="menu-header">
                 <div class="link-container">
-                    <a href="/ep/epsystem/account/"<?php if ($page == "hub") echo ' class="active"'; ?>>Hub</a>
+                    <a href="/ep/epsystem/account"<?php if ($page == "hub") echo ' class="active"'; ?>>Hub</a>
                 </div>
                 <div class="link-container">
-                    <a href="/ep/epsystem/account/projects.php?t=active"<?php if ($page == "projects") echo ' class="active"'; ?>>Projects</a>
+                    <a href="/ep/epsystem/account/projects.php?l1=active"<?php if ($page == "projects") echo ' class="active"'; ?>>Projects</a>
                 </div>
                 <div class="link-container">
                     <a href="/ep/epsystem/account/assignments.php"<?php if ($page == "assignments") echo ' class="active"'; ?>>Assignments</a>
@@ -67,7 +124,9 @@ if ($_SESSION['account']->type == 1) { ?>
                 </div>
             </nav> <?php
         } ?>
-        <button class="exit-button" onclick="location.href='<?php echo $exitLink; ?>'"><?php echo $exitTitle; ?></button>
+        <form method="post" class="exit-form">
+            <input type="submit" name="exit" value="<?php echo $exitTitle; ?>" class="exit-button">
+        </form>
     </div> <?php
 }
 elseif ($_SESSION['account']->type == 2) { ?>
@@ -76,7 +135,7 @@ elseif ($_SESSION['account']->type == 2) { ?>
         if (isset($_GET['p'])) {
             $showLinks = false;
             $exitTitle = "Exit Project #" . sprintf('%04d', $_GET['p']);
-            $exitLink = "/ep/epsystem/account/projects.php?t=active";
+            $exitLink = "/ep/epsystem/account/projects.php?l1=active";
         }
         else {
             $showLinks = true;
@@ -89,10 +148,10 @@ elseif ($_SESSION['account']->type == 2) { ?>
                     <a href="/ep/epsystem/account/"<?php if ($page == "hub") echo ' class="active"'; ?>>Hub</a>
                 </div>
                 <div class="link-container">
-                    <a href="/ep/epsystem/account/projects.php?t=active"<?php if ($page == "projects") echo ' class="active"'; ?>>Projects</a>
+                    <a href="/ep/epsystem/account/projects.php?l1=active"<?php if ($page == "projects") echo ' class="active"'; ?>>Projects</a>
                 </div>
                 <div class="link-container">
-                    <a href="/ep/epsystem/account/approvals.php?t=active"<?php if ($page == "approvals") echo ' class="active"'; ?>>Approvals</a>
+                    <a href="/ep/epsystem/account/approvals.php?l1=active"<?php if ($page == "approvals") echo ' class="active"'; ?>>Approvals</a>
                 </div>
                 <span></span>
                 <div class="link-container">
@@ -110,6 +169,40 @@ elseif ($_SESSION['account']->type == 2) { ?>
                 </div>
             </nav> <?php
         } ?>
-        <button class="exit-button" onclick="location.href='<?php echo $exitLink; ?>'"><?php echo $exitTitle; ?></button>
+        <form method="post" class="exit-form">
+            <input type="submit" name="exit" value="<?php echo $exitTitle; ?>" class="exit-button">
+        </form>
     </div> <?php
+}
+
+if (isset($_POST['exit']) && isset($exitLink)) {
+    if (basename($_SERVER['PHP_SELF']) == 'projects.php') {
+        if (isset($_SESSION['add-client']['new-client']))
+            unset($_SESSION['add-client']['new-client']);
+        unset($_SESSION['new-manager']);
+    }
+    elseif (basename($_SERVER['PHP_SELF']) == 'new-project.php') {
+        if (isset($_SESSION['new-project']['new-client']))
+            unset($_SESSION['new-project']['new-client']);
+        else {
+            unset($_SESSION['new-assignment']['new-project']);
+            unset($_SESSION['new-project']);
+        }
+    }
+    elseif (basename($_SERVER['PHP_SELF']) == 'new-assignment.php') {
+        if (isset($_SESSION['new-assignment']['add-task-page']))
+            unset($_SESSION['new-assignment']['add-task-page']);
+        else
+            unset($_SESSION['new-assignment']);
+    }
+    elseif (basename($_SERVER['PHP_SELF']) == 'new-task.php') {
+        if (isset($_SESSION['new-task']['new-link']))
+            unset($_SESSION['new-task']['new-link']);
+        else {
+            unset($_SESSION['new-assignment']['new-task']);
+            unset($_SESSION['new-task']);
+        }
+    }
+
+    header("Location: " . $exitLink);
 }

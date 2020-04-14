@@ -9,10 +9,10 @@
   justify-content: space-between;
   height: 8vh;
   background: #F1F5DC;
-  border-bottom: 1px solid $bc-40wc;
+  border-bottom: 1px solid $c8;
   z-index: 1;
   &.system {
-    background: #FBE3AB;
+    background: $c35;
   }
 
   .logo-header {
@@ -35,19 +35,19 @@
       display: block;
       width: 100%;
       font-size: 0.85vw;
-      color: $bc-40wc;
+      color: $c8;
       text-decoration: none;
       border-bottom: 3px solid transparent;
       padding-bottom: 1px;
     }
     a:hover {
-      color: $bc;
+      color: $c1;
     }
     a.active {
-      color: $bc;
+      color: $c1;
       font-size: 0.85vw;
       font-weight: bold;
-      border-bottom: 3px solid $bc;
+      border-bottom: 3px solid $c1;
       text-transform: uppercase;
       padding-bottom: 0;
     }
@@ -57,20 +57,24 @@
     }
   }
 
-  .exit-button {
-    align-self: center;
-    height: 40%;
-    width: 10vw;
-    margin: 0 3vw 0 0;
-    font-size: 0.6vw;
-    color: $bc-40wc;
-    background-color: inherit;
-    border: 1px solid $bc-40wc;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .exit-button:hover {
-    color: $bc;
-    border: 1px solid $bc;
+  .exit-form {
+    display: flex;
+    height: 100%;
+    .exit-button {
+      align-self: center;
+      height: 40%;
+      width: 10vw;
+      margin: 0 3vw 0 0;
+      font-size: 0.6vw;
+      color: $c8;
+      background-color: inherit;
+      border: 1px solid $c8;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .exit-button:hover {
+      color: $c1;
+      border: 1px solid $c1;
+    }
   }
 }

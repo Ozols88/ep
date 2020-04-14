@@ -9,9 +9,8 @@ class Account extends Database
     private $password;
     public $type;
 
-    public function __construct($fields, $table = "account")
+    public function __construct($fields)
     {
-        parent::__construct($table);
         if (empty($fields['user']) || empty($fields['pass'])) {
             $this->loginStatus = 3;
         }
@@ -22,7 +21,7 @@ class Account extends Database
             if ($stmt->rowCount() == 1) {
                 $userData = $stmt->fetch();
                 if (password_verify($fields['pass'], $userData['password'])) {
-                    header("Location: " . $_SERVER['REQUEST_URI']);
+                    header("Location: /ep/epsystem/account");
                     $this->id = $userData['id'];
                     $this->username = $userData['username'];
                     $this->password = $userData['password'];
@@ -35,6 +34,16 @@ class Account extends Database
         }
     }
 
+    public $loginStatuses = [
+        1 => "Logged in!",
+        2 => "Wrong data!",
+        3 => "Fill in both fields!"
+    ];
+    public function getLoginStatusName()
+    {
+        return $this->loginStatuses[$this->loginStatus];
+    }
+
     public function selectAdminAccountList()
     {
         $rows = $this->select(null, "SELECT `id`, `username` FROM `account`");
@@ -45,17 +54,7 @@ class Account extends Database
     {
         $rows = $this->select(array($_GET['a']), "SELECT * FROM `account` WHERE account.id = ?");
         if ($rows) {
-            $rows[0]['reg_date'] = $this->dateToDateWithoutSeconds($rows[0]['reg_time']);
-            return $rows;
-        }
-        else return null;
-    }
-
-    public function selectArtistAccount()
-    {
-        $rows = $this->select(array($this->id), "SELECT * FROM `account` WHERE account.id = ?");
-        if ($rows) {
-            $rows[0]['reg_date'] = $this->dateToDateWithoutSeconds($rows[0]['reg_time']);
+            $rows[0]['reg_date'] = $this->datetimeToDateWithoutSeconds($rows[0]['reg_time']);
             return $rows;
         }
         else return null;

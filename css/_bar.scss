@@ -8,44 +8,93 @@
 
 .info-bar {
   display: flex;
+  margin: 0 12.5vw;
   justify-content: space-between;
   align-items: flex-end;
   text-align: center;
   background: #FFFFFF;
   user-select: none;
   height: 10vh;
-  padding: 0 10vw 2vh 10vw;
-}
-.info-bar.with-space {
-  height: 11vh;
-  padding-bottom: 3vh;
+  padding: 0 0 3vh 0;
+  &.extended {
+    margin: 0;
+    justify-content: space-around;
+  }
+  .section {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    // NON-ADMIN COLOR
+    /*&.line-left {
+      border-left: 1px solid $c9;
+    }
+    &.line-right {
+      border-right: 1px solid $c9;
+    }*/
+    &.line-left {
+      border-left: 1px solid $c61;
+    }
+    &.line-right {
+      border-right: 1px solid $c61;
+    }
+    .stage {
+      border: none;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 3vh;
+      color: $c9;
+      font-weight: bold;
+      font-size: 0.9vw;
+      &.active {
+        color: $c2;
+      }
+      &.admin {
+        color: $c61;
+      }
+    }
+    input.stage {
+      cursor: pointer;
+    }
+
+    .divider {
+      width: 10px;
+      margin: 0;
+      background: $c9;
+    }
+    .space {
+      margin: 0 2vw;
+    }
+
+    .content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $c1;
+      height: 3vh;
+      font-weight: bold;
+      font-size: 0.9vw;
+      padding: 0 0.5vw;
+      &.active {
+        color: $c2;
+      }
+    }
+  }
 }
 
-.info-bar .spacer {
-  margin: 0 2vw;
-}
-
-.info-bar .section {
-  display: flex;
-  //margin: 0 1vw;
-  align-items: center;
-}
-
-.info-bar span {
-  color: #E2DFD6;
-  font-weight: bold;
-  font-size: 0.9vw;
-}
 
 .info-bar .hours-button {
   font-size: 0.9vw;
   font-weight: bold;
   width: 4vw;
   height: 3vh;
-  border: 1px solid $bc-90wc;
+  border: none;
   border-radius: 5px;
-  background: #FFFCF8;
-  color: #E2DFD6;
+  background: $c11;
+  color: $c9;
   cursor: pointer;
   margin: 0 0.1vw;
 }
@@ -53,27 +102,13 @@
   margin-left: 0.5vw;
 }
 .info-bar .hours-button:hover {
-  color: $bc;
-  border: 1px solid $bc-80wc;
-}
-.info-bar .hours-button.active {
-  background: #F5B82E;
-  color: #705D34;
+  color: $c1;
   border: none;
 }
-
-.info-bar .count {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #F5B82E;
-  height: 3vh;
-  font-weight: bold;
-  font-size: 1.1vw;
-  padding: 0 0.5vw;
-}
-.info-bar .count.total {
-  color: #705D34;
+.info-bar .hours-button.active {
+  background: $c2;
+  color: $c1;
+  border: none;
 }
 
 
@@ -95,7 +130,7 @@ hr {
   display: flex;
   justify-content: center;
   height: 10vh;
-  padding-top: 2vh;
+  padding-top: 3vh;
   text-align: center;
   background: #FFFFFF;
   align-items: flex-start;
@@ -236,22 +271,22 @@ hr {
   user-select: none;
 
    .button:nth-of-type(even) {
-    background: #DCA7AB;
+    background: $c112;
   }
   .button {
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background: $c1-90wc;
-    color: $bc;
+    background: $c37;
+    color: $c1;
     font-weight: bold;
     font-size: 0.7vw;
     flex: 1;
     height: 3vh;
     text-align: center;
     &:hover {
-      background: $c3;
+      background: $c4;
     }
   }
 }

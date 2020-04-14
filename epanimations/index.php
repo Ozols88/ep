@@ -26,8 +26,9 @@
 <body>
 <div class="container-header">
     <img class="logo-header" src="/ep/epanimations/img/logo.svg" alt="ep">
-    <button class="exit-button" onclick="location.href='/ep'">Go to ep home</button>
-</div>
+    <form method="post" class="exit-form">
+        <input type="submit" name="exit" value="Go to ep home" class="exit-button">
+    </form></div>
 <div class="menu">
     <div class="head-up-display-bar">
         <span>Welcome to ep animations</span>
@@ -46,4 +47,7 @@
         </div>
     </div>
 </body>
-</html>
+</html> <?php
+if (isset($_POST['exit'])) {
+    header("Location: /ep");
+}

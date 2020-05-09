@@ -9,7 +9,7 @@ if (isset($_SESSION['account'])) {
         $types = [
             0 => "CUSTOM",
             1 => "PRODUCTION",
-            3 => "APPROVAL",
+            3 => "REVIEW",
             2 => "MANAGEMENT"
         ];
 
@@ -31,6 +31,9 @@ if (isset($_SESSION['account'])) {
     elseif (!isset($_SESSION['new-assignment']))
         $_SESSION['new-assignment']['stage'] = '1';
 
+    if (!isset($_SESSION['new-assignment']['project']))
+        $_SESSION['new-assignment']['project'] = ""; // Info bar fix
+
     if (!isset($_SESSION['num']['new-assignment']))
         $_SESSION['num']['new-assignment'] = 1;
 
@@ -50,19 +53,38 @@ if (isset($_SESSION['account'])) {
                         $_SESSION['new-assignment']['project'] = substr($_SESSION['new-assignment']['project'], 0, 10) . "...";
                 }
                 $_SESSION['new-assignment']['stage'] = '2';
+                if (!isset($_SESSION['new-assignment']['type']))
+                    $_SESSION['new-assignment']['type'] = ""; // Info bar fix
             }
         }
         elseif ($_SESSION['new-assignment']['stage'] == '2') {
             if (isset($_POST['type'])) {
+                unset($_SESSION['new-assignment']['presetTasks']);
+                unset($_SESSION['new-assignment']['tasks']);
+                unset($_SESSION['new-assignment']['fields']['presetid']);
+                unset($_SESSION['new-assignment']['preset']);
+                unset($_SESSION['new-assignment']['fields']['title']);
+                unset($_SESSION['new-assignment']['title']);
+                unset($_SESSION['new-assignment']['fields']['departmentid']);
+                unset($_SESSION['new-assignment']['department']);
+                unset($_SESSION['new-assignment']['fields']['objective']);
+                unset($_SESSION['new-assignment']['objective']);
+
                 $_SESSION['new-assignment']['fields']['type'] = $_POST['type'];
                 $_SESSION['new-assignment']['type'] = ucfirst(strtolower($_POST['submit']));
                 if (strlen($_SESSION['new-assignment']['type']) > 10)
                     $_SESSION['new-assignment']['type'] = substr($_SESSION['new-assignment']['type'], 0, 10) . "...";
 
-                if ($_POST['type'] == 0)
+                if ($_POST['type'] == 0) {
                     $_SESSION['new-assignment']['stage'] = '3c';
-                else
+                    if (!isset($_SESSION['new-assignment']['department']))
+                        $_SESSION['new-assignment']['department'] = ""; // Info bar fix
+                }
+                else {
                     $_SESSION['new-assignment']['stage'] = '3';
+                    if (!isset($_SESSION['new-assignment']['preset']))
+                        $_SESSION['new-assignment']['preset'] = ""; // Info bar fix
+                }
             }
         }
         elseif ($_SESSION['new-assignment']['stage'] == '3') {
@@ -79,6 +101,8 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-assignment']['fields']['departmentid'] = $presetData['departmentid'];
                 $_SESSION['new-assignment']['fields']['objective'] = $presetData['objective'];
                 $_SESSION['new-assignment']['stage'] = '4';
+                if (!isset($_SESSION['new-assignment']['tasks']))
+                    $_SESSION['new-assignment']['tasks'] = ""; // Info bar fix
             }
         }
         elseif ($_SESSION['new-assignment']['stage'] == '4') {
@@ -86,18 +110,23 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-assignment']['add-task-page'] = true;
 
             if (isset($_POST['add-task'])) {
-                $_SESSION['new-assignment']['tasks'][$_POST['add-task']] = Task::selectTask($_POST['add-task']);
+                if ($_SESSION['new-assignment']['tasks'] == "")
+                    $_SESSION['new-assignment']['tasks'] = null;
+                $_SESSION['new-assignment']['tasks'][$_POST['add-task']]['fields'] = Task::selectTaskPreset($_POST['add-task']);
                 unset($_SESSION['new-assignment']['presetTasks'][$_POST['add-task']]);
                 unset($_SESSION['new-assignment']['add-task-page']);
+                header("Refresh:0");
             }
             if (isset($_POST['del-task'])) {
                 unset($_SESSION['new-assignment']['tasks'][$_POST['del-task']]);
-                $_SESSION['new-assignment']['presetTasks'][$_POST['del-task']] = Task::selectTask($_POST['del-task']);
+                $_SESSION['new-assignment']['presetTasks'][$_POST['del-task']] = Task::selectTaskPreset($_POST['del-task']);
             }
 
             if ($_POST['submit'] == "SAVE") {
                 // From new-project
                 if (isset($_SESSION['new-project']['new-assignment'])) {
+                    if ($_SESSION['new-project']['assignments'] == "")
+                        $_SESSION['new-project']['assignments'] = null;
                     $_SESSION['new-project']['assignments'][$_SESSION['num']['new-assignment']]['fields'] = [
                         'title' => $_SESSION['new-assignment']['fields']['title'],
                         'departmentid' => $_SESSION['new-assignment']['fields']['departmentid'],
@@ -131,11 +160,12 @@ if (isset($_SESSION['account'])) {
                     foreach ($_SESSION['new-assignment']['tasks'] as $task) {
                         $fieldsTask = [
                             'assignmentid' => $_SESSION['new-assignment']['fields']['assignmentid'],
-                            'presetid' => $task['id'],
-                            'objective' => $task['objective'],
-                            'description' => $task['description'],
+                            'presetid' => $task['fields']['id'],
+                            'objective' => $task['fields']['objective'],
+                            'description' => $task['fields']['description'],
+                            'actionid' => $task['fields']['actionid'],
                             'number' => $taskNumber,
-                            'estimated' => $task['estimated']
+                            'estimated' => $task['fields']['estimated']
                         ];
                         $taskID = Task::insert('task', $fieldsTask, true, null);
                         $taskNumber++;
@@ -168,6 +198,8 @@ if (isset($_SESSION['account'])) {
                     $_SESSION['new-assignment']['department'] = substr($_SESSION['new-assignment']['department'], 0, 10) . "...";
 
                 $_SESSION['new-assignment']['stage'] = '4c';
+                if (!isset($_SESSION['new-assignment']['title']))
+                    $_SESSION['new-assignment']['title'] = ""; // Info bar fix
             }
         }
         elseif ($_SESSION['new-assignment']['stage'] == '4c') {
@@ -177,6 +209,8 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-assignment']['title'] = substr($_SESSION['new-assignment']['title'], 0, 10) . "...";
 
             $_SESSION['new-assignment']['stage'] = '5c';
+            if (!isset($_SESSION['new-assignment']['objective']))
+                $_SESSION['new-assignment']['objective'] = ""; // Info bar fix
         }
         elseif ($_SESSION['new-assignment']['stage'] == '5c') {
             $_SESSION['new-assignment']['fields']['objective'] = $_POST['objective'];
@@ -185,6 +219,8 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-assignment']['objective'] = substr($_SESSION['new-assignment']['objective'], 0, 10) . "...";
 
             $_SESSION['new-assignment']['stage'] = '6c';
+            if (!isset($_SESSION['new-assignment']['tasks']))
+                $_SESSION['new-assignment']['tasks'] = ""; // Info bar fix
         }
         elseif ($_SESSION['new-assignment']['stage'] == '6c') {
             if (isset($_POST['new-task'])) {
@@ -199,11 +235,12 @@ if (isset($_SESSION['account'])) {
             if ($_POST['submit'] == "SAVE") {
                 // From new-project
                 if (isset($_SESSION['new-project']['new-assignment'])) {
+                    if ($_SESSION['new-project']['assignments'] == "")
+                        $_SESSION['new-project']['assignments'] = null;
                     $_SESSION['new-project']['assignments'][$_SESSION['num']['new-assignment']]['fields'] = [
                         'title' => $_SESSION['new-assignment']['fields']['title'],
                         'departmentid' => $_SESSION['new-assignment']['fields']['departmentid'],
                         'type' => $_SESSION['new-assignment']['fields']['type'],
-                        'presetid' => $_SESSION['new-assignment']['fields']['presetid'],
                         'objective' => $_SESSION['new-assignment']['fields']['objective']
                     ];
                     $_SESSION['new-project']['assignments'][$_SESSION['num']['new-assignment']++]['tasks'] = $_SESSION['new-assignment']['tasks'];
@@ -253,7 +290,28 @@ if (isset($_SESSION['account'])) {
                 }
             }
         }
+
+        if (empty($_SESSION['new-assignment']['project'])) $_SESSION['new-assignment']['stage'] = '1';
+        elseif (empty($_SESSION['new-assignment']['type'])) $_SESSION['new-assignment']['stage'] = '2';
+        elseif ($_SESSION['new-assignment']['fields']['type'] != 0) {
+            if (empty($_SESSION['new-assignment']['preset'])) $_SESSION['new-assignment']['stage'] = '3';
+            else $_SESSION['new-assignment']['stage'] = '4';
+        }
+        else {
+            if (empty($_SESSION['new-assignment']['department'])) $_SESSION['new-assignment']['stage'] = '3c';
+            elseif (empty($_SESSION['new-assignment']['title'])) $_SESSION['new-assignment']['stage'] = '4c';
+            elseif (empty($_SESSION['new-assignment']['objective'])) $_SESSION['new-assignment']['stage'] = '5c';
+            else $_SESSION['new-assignment']['stage'] = '6c';
+        }
     }
+    if (isset($_POST['stage1'])) $_SESSION['new-assignment']['stage'] = '1';
+    if (isset($_POST['stage2'])) $_SESSION['new-assignment']['stage'] = '2';
+    if (isset($_POST['stage3'])) $_SESSION['new-assignment']['stage'] = '3';
+    if (isset($_POST['stage4'])) $_SESSION['new-assignment']['stage'] = '4';
+    if (isset($_POST['stage3c'])) $_SESSION['new-assignment']['stage'] = '3c';
+    if (isset($_POST['stage4c'])) $_SESSION['new-assignment']['stage'] = '4c';
+    if (isset($_POST['stage5c'])) $_SESSION['new-assignment']['stage'] = '5c';
+    if (isset($_POST['stage6c'])) $_SESSION['new-assignment']['stage'] = '6c';
 
     if (isset($_POST['cancel']))
         unset($_SESSION['new-assignment']);
@@ -276,22 +334,8 @@ if (isset($_SESSION['account'])) {
                     <input class="button admin-menu disabled">
                 </form>
             </div> <?php
-            $projects = Project::selectProjectList(); ?>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">PROJECT:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">TYPE:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">TASKS:</div>
-                </div>
-            </div>
+            $projects = Project::selectProjectList();
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension admin"></div>
                 <div class="header">
@@ -317,7 +361,7 @@ if (isset($_SESSION['account'])) {
                         <div class="cell" style="width: 15%"><input type="submit" name="submit" value="<?php echo $project['status']; ?>" class="content"></div>
                         <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $project['total_assignments']; ?>" class="content"></div>
                         <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo "" . " Hours"; ?>" class="content"></div>
-                        <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                        <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
                         <input type="hidden" name="project" value="<?php echo $project['project_id']; ?>">
                     </form> <?php
                 } ?>
@@ -340,7 +384,7 @@ if (isset($_SESSION['account'])) {
                 </form>
                 <form method="post" class="container-button">
                     <input type="hidden" name="type" value="3">
-                    <input type="submit" name="submit" value="APPROVAL" class="button admin-menu">
+                    <input type="submit" name="submit" value="REVIEW" class="button admin-menu">
                     <div class="home-menu"></div>
                 </form>
                 <form method="post" class="container-button">
@@ -367,27 +411,8 @@ if (isset($_SESSION['account'])) {
                     <input class="button disabled admin-menu">
                 </form>
             </div> <?php
-            $assignmentPresets = Assignment::selectPresets(); ?>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">PROJECT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">TYPE:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">PRESET:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">TASKS:</div>
-                </div>
-            </div>
+            $assignmentPresets = Assignment::selectPresets();
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension admin"></div>
                 <div class="header">
@@ -409,7 +434,7 @@ if (isset($_SESSION['account'])) {
                         <div class="cell" style="width: 35%"><input type="submit" name="submit" value="<?php echo $preset['objective']; ?>" class="content"></div>
                         <div class="cell" style="width: 15%"><input type="submit" name="submit" value="<?php echo $preset['department']; ?>" class="content"></div>
                         <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $preset['task_count']; ?>" class="content"></div>
-                        <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                        <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
                         <input type="hidden" name="preset" value="<?php echo $preset['id']; ?>">
                     </form> <?php
                 } ?>
@@ -428,29 +453,8 @@ if (isset($_SESSION['account'])) {
                     <form method="post" class="container-button">
                         <input type="submit" name="submit" value="SAVE" class="button admin-menu">
                     </form>
-                </div>
-                <div class="info-bar extended">
-                    <div class="section line-right">
-                        <div class="stage admin">№:</div>
-                        <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">PROJECT:</div>
-                        <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">TYPE:</div>
-                        <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">PRESET:</div>
-                        <div class="content"><?php echo $_SESSION['new-assignment']['preset']; ?></div>
-                    </div>
-                    <div class="section line-left">
-                        <div class="stage active">TASKS:</div>
-                        <div class="content"><?php if (isset($_SESSION['new-assignment']['tasks'])) echo count($_SESSION['new-assignment']['tasks']); else echo "0"; ?></div>
-                    </div>
-                </div>
+                </div> <?php
+                include_once "includes/info-bar.php"; ?>
                 <div class="table-header-container">
                     <div class="header-extension admin"></div>
                     <div class="header">
@@ -464,16 +468,16 @@ if (isset($_SESSION['account'])) {
                 </div>
                 </div>
                 <div class="table admin"> <?php
-                    if (isset($_SESSION['new-assignment']['tasks'])) {
+                    if (is_array($_SESSION['new-assignment']['tasks'])) {
                         foreach ($_SESSION['new-assignment']['tasks'] as $task) {
                             $nextID = Database::selectNextNewID('task') - 1; ?>
                             <form method="post" class="row">
                                 <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('task') + 1); ?>" class="content"></div>
-                                <div class="cell" style="width: 50%"><input type="submit" name="submit" value="<?php echo $task['objective']; ?>" class="content"></div>
+                                <div class="cell" style="width: 50%"><input type="submit" name="submit" value="<?php echo $task['fields']['objective']; ?>" class="content"></div>
                                 <div class="cell" style="width: 25%"><input type="submit" name="submit" value="<?php echo "?"; ?>" class="content"></div>
-                                <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $task['estimated']; ?>" class="content"></div>
-                                <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
-                                <input type="hidden" name="del-task" value="<?php echo $task['id']; ?>">
+                                <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $task['fields']['estimated']; ?>" class="content"></div>
+                                <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Remove" class="content add-button"></div>
+                                <input type="hidden" name="del-task" value="<?php echo $task['fields']['id']; ?>">
                             </form> <?php
                         }
                     } ?>
@@ -494,29 +498,8 @@ if (isset($_SESSION['account'])) {
                     <form class="container-button disabled">
                         <input class="button admin-menu disabled">
                     </form>
-                </div>
-                <div class="info-bar extended">
-                    <div class="section line-right">
-                        <div class="stage admin">№:</div>
-                        <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">PROJECT:</div>
-                        <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">TYPE:</div>
-                        <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">PRESET:</div>
-                        <div class="content"><?php echo $_SESSION['new-assignment']['preset']; ?></div>
-                    </div>
-                    <div class="section line-left">
-                        <div class="stage active">TASKS:</div>
-                        <div class="content"><?php if (isset($_SESSION['new-assignment']['tasks'])) echo count($_SESSION['new-assignment']['tasks']); else echo "0"; ?></div>
-                    </div>
-                </div>
+                </div> <?php
+                include_once "includes/info-bar.php"; ?>
                 <div class="table-header-container">
                     <div class="header-extension admin"></div>
                     <div class="header">
@@ -562,33 +545,8 @@ if (isset($_SESSION['account'])) {
                     <input class="button admin-menu disabled">
                 </form>
             </div> <?php
-            $departments = Assignment::selectDepartments(); ?>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">PROJECT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">TYPE:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">DEPARTMENT:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">NAME:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">OBJECTIVE:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">TASKS:</div>
-                </div>
-            </div>
+            $departments = Assignment::selectDepartments();
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension admin"></div>
                 <div class="header">
@@ -608,7 +566,7 @@ if (isset($_SESSION['account'])) {
                         <div class="cell" style="width: 20%"><input type="submit" name="submit" value="<?php echo $department['title']; ?>" class="content"></div>
                         <div class="cell" style="width: 55%"><input type="submit" name="submit" value="<?php echo $department['description']; ?>" class="content"></div>
                         <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo "?"; ?>" class="content"></div>
-                        <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                        <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
                         <input type="hidden" name="department" value="<?php echo $department['id']; ?>">
                     </form> <?php
                 } ?>
@@ -623,39 +581,13 @@ if (isset($_SESSION['account'])) {
                     <a class="button admin-menu disabled"></a>
                 </form>
                 <form id="title" name="title" method="post" class="container-button">
-                    <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                    <input type="submit" name="submit" value="NEXT" class="button admin-menu">
                 </form>
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
                 </form>
-            </div>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">PROJECT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">TYPE:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">DEPARTMENT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['department']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">NAME:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">OBJECTIVE:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">TASKS:</div>
-                </div>
-            </div>
+            </div> <?php
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension small admin"></div>
                 <div class="header small">
@@ -679,40 +611,13 @@ if (isset($_SESSION['account'])) {
                     <a class="button admin-menu disabled"></a>
                 </form>
                 <form id="objective" name="objective" method="post" class="container-button">
-                    <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                    <input type="submit" name="submit" value="NEXT" class="button admin-menu">
                 </form>
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
                 </form>
-            </div>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">PROJECT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">TYPE:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">DEPARTMENT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['department']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">NAME:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['title']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">OBJECTIVE:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">TASKS:</div>
-                </div>
-            </div>
+            </div> <?php
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension medium admin"></div>
                 <div class="header medium">
@@ -739,37 +644,8 @@ if (isset($_SESSION['account'])) {
                 <form method="post" class="container-button">
                     <input type="submit" name="submit" value="SAVE" class="button admin-menu">
                 </form>
-            </div>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">PROJECT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['project']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">TYPE:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['type']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">DEPARTMENT:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['department']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">NAME:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['title']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">OBJECTIVE:</div>
-                    <div class="content"><?php echo $_SESSION['new-assignment']['objective']; ?></div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage active">TASKS:</div>
-                    <div class="content"><?php if (isset($_SESSION['new-assignment']['tasks'])) echo count($_SESSION['new-assignment']['tasks']); else echo "0"; ?></div>
-                </div>
-            </div>
+            </div> <?php
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension admin"></div>
                 <div class="header">
@@ -781,7 +657,7 @@ if (isset($_SESSION['account'])) {
                 <div class="header-extension admin"></div>
             </div>
             </div> <?php
-            if (isset($_SESSION['new-assignment']['tasks'])) { ?>
+            if (is_array($_SESSION['new-assignment']['tasks'])) { ?>
                 <div class="table admin"> <?php
                     foreach ($_SESSION['new-assignment']['tasks'] as $num => $task) { ?>
                         <form method="post" class="row">

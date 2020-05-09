@@ -1,0 +1,88 @@
+@import "colors";
+
+// task page
+
+.objective-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 3.2vh;
+  width: 75vw;
+  margin: 2vh auto 0 auto;
+  background-color: $c35;
+  color: $c1;
+  font-weight: bold;
+  font-size: 0.75vw;
+}
+.objective-body {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  width: 75vw;
+  margin: 0 auto;
+  border: solid 1px $c36;
+  color: $c9;
+  .objective {
+    font-size: 1.05vw;
+    font-weight: bold;
+  }
+  .description {
+    font-size: 0.95vw;
+  }
+}
+
+.link-section {
+  margin: 4vh 12.5vw 0 12.5vw;
+  display: flex;
+  justify-content: space-between;
+  .link-type {
+    display: flex;
+    flex-direction: column;
+    .link-title {
+      display: flex;
+      background-color: $c35;
+      color: $c1;
+      font-weight: bold;
+      font-size: 0.75vw;
+      width: 24vw;
+      height: 3.2vh;
+      user-select: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .link {
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      cursor: pointer;
+      border: solid 1px $c11;
+      margin-top: 1.6vh;
+      height: 9.6vh;
+      justify-content: center;
+      text-decoration: none;
+      &:hover {
+        background-color: $c37;
+        border: solid 1px $c2;
+        span {
+          color: $c1;
+        }
+      }
+      span {
+        align-self: center;
+        color: $c9;
+        &.id {
+          font-size: 0.75vw;
+        }
+        &.title {
+          font-size: 1.05vw;
+          margin: 0.75vh 0;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+        &.description {
+          font-size: 0.6vw;
+        }
+      }
+    }
+  }
+}

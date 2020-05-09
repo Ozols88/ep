@@ -9,6 +9,8 @@ if (isset($_SESSION['account'])) {
     }
     if (!isset($_SESSION['num']['new-task']))
         $_SESSION['num']['new-task'] = 1;
+    if (!isset($_SESSION['new-task']['objective']))
+        $_SESSION['new-task']['objective'] = ""; // Info bar fix
 
     require_once "includes/header.php";
 
@@ -20,6 +22,8 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-task']['objective'] = substr($_POST['objective'], 0, 10) . "...";
 
             $_SESSION['new-task']['stage'] = '2';
+            if (!isset($_SESSION['new-task']['description']))
+                $_SESSION['new-task']['description'] = ""; // Info bar fix
         }
         elseif ($_SESSION['new-task']['stage'] == '2') {
             $_SESSION['new-task']['fields']['description'] = $_POST['description'];
@@ -28,6 +32,8 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-task']['description'] = substr($_POST['description'], 0, 10) . "...";
 
             $_SESSION['new-task']['stage'] = '3';
+            if (!isset($_SESSION['new-task']['action']))
+                $_SESSION['new-task']['action'] = ""; // Info bar fix
         }
         elseif ($_SESSION['new-task']['stage'] == '3') {
             $_SESSION['new-task']['fields']['actionid'] = $_POST['action'];
@@ -36,6 +42,8 @@ if (isset($_SESSION['account'])) {
                 $_SESSION['new-task']['action'] = substr($_SESSION['new-task']['action'], 0, 10) . "...";
 
             $_SESSION['new-task']['stage'] = '4';
+            if (!isset($_SESSION['new-task']['links']))
+                $_SESSION['new-task']['links'] = ""; // Info bar fix
         }
         elseif ($_SESSION['new-task']['stage'] == '4') {
             if (isset($_POST['new-link']))
@@ -45,10 +53,13 @@ if (isset($_SESSION['account'])) {
                 unset($_SESSION['new-task']['links'][$_POST['del-link']]);
 
             if ($_POST['submit'] == "SAVE") {
+                if ($_SESSION['new-assignment']['tasks'] == "")
+                    $_SESSION['new-assignment']['tasks'] = null;
                 $_SESSION['new-assignment']['tasks'][$_SESSION['num']['new-task']]['fields'] = [
                     'objective' => $_SESSION['new-task']['fields']['objective'],
                     'description' => $_SESSION['new-task']['fields']['description'],
-                    'actionid' => $_SESSION['new-task']['fields']['actionid']
+                    'actionid' => $_SESSION['new-task']['fields']['actionid'],
+                    'presetid' => null
                 ];
                 $_SESSION['new-assignment']['tasks'][$_SESSION['num']['new-task']++]['action'] = Task::selectAction($_SESSION['new-task']['fields']['actionid'])['title'];
                 unset($_SESSION['new-assignment']['new-task']);
@@ -56,7 +67,16 @@ if (isset($_SESSION['account'])) {
                 header('Location: new-assignment.php');
             }
         }
+
+        if (empty($_SESSION['new-task']['objective'])) $_SESSION['new-task']['stage'] = '1';
+        elseif (empty($_SESSION['new-task']['description'])) $_SESSION['new-task']['stage'] = '2';
+        elseif (empty($_SESSION['new-task']['action'])) $_SESSION['new-task']['stage'] = '3';
+        else $_SESSION['new-task']['stage'] = '4';
     }
+    if (isset($_POST['stage1'])) $_SESSION['new-task']['stage'] = '1';
+    if (isset($_POST['stage2'])) $_SESSION['new-task']['stage'] = '2';
+    if (isset($_POST['stage3'])) $_SESSION['new-task']['stage'] = '3';
+    if (isset($_POST['stage4'])) $_SESSION['new-task']['stage'] = '4';
 
     if ($account->type == 1) { ?>
         <div class="menu"> <?php
@@ -69,30 +89,13 @@ if (isset($_SESSION['account'])) {
                     <a class="button admin-menu disabled"></a>
                 </form>
                 <form id="objective" name="objective" method="post" class="container-button">
-                    <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                    <input type="submit" name="submit" value="NEXT" class="button admin-menu">
                 </form>
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
                 </form>
-            </div>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Task::selectNextNewID('task')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">OBJECTIVE:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">DESCRIPTION:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">ACTION:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">LINKS:</div>
-                </div>
-            </div>
+            </div> <?php
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension medium admin"></div>
                 <div class="header medium">
@@ -116,31 +119,13 @@ if (isset($_SESSION['account'])) {
                     <a class="button admin-menu disabled"></a>
                 </form>
                 <form id="description" name="description" method="post" class="container-button">
-                    <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                    <input type="submit" name="submit" value="NEXT" class="button admin-menu">
                 </form>
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
                 </form>
-            </div>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Task::selectNextNewID('task')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">OBJECTIVE:</div>
-                    <div class="content"><?php echo $_SESSION['new-task']['objective']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">DESCRIPTION:</div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">ACTION:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">LINKS:</div>
-                </div>
-            </div>
+            </div> <?php
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension medium admin"></div>
                 <div class="header medium">
@@ -163,40 +148,21 @@ if (isset($_SESSION['account'])) {
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
                 </form>
-                <form id="estimated" name="estimated" method="post" class="container-button">
-                    <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                <form class="container-button disabled">
+                    <a class="button admin-menu disabled"></a>
                 </form>
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
                 </form>
-            </div>
-            <div class="info-bar extended">
-                <div class="section line-right">
-                    <div class="stage admin">№:</div>
-                    <div class="content"><?php echo "#" . sprintf('%04d', Task::selectNextNewID('task')); ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">OBJECTIVE:</div>
-                    <div class="content"><?php echo $_SESSION['new-task']['objective']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage admin">DESCRIPTION:</div>
-                    <div class="content"><?php echo $_SESSION['new-task']['description']; ?></div>
-                </div>
-                <div class="section">
-                    <div class="stage active">ACTION:</div>
-                </div>
-                <div class="section line-left">
-                    <div class="stage admin">LINKS:</div>
-                </div>
-            </div>
+            </div> <?php
+            include_once "includes/info-bar.php"; ?>
             <div class="table-header-container">
                 <div class="header-extension admin"></div>
                 <div class="header">
                     <div class="head admin" style="width: 7.5%">№</div>
                     <div class="head admin" style="width: 35%">Task Action</div>
                     <div class="head admin" style="width: 50%">Description</div>
-                    <div class="head admin" style="width: 7.5%">Add</div>
+                    <div class="head admin" style="width: 7.5%">Select</div>
                 </div>
                 <div class="header-extension admin"></div>
             </div>
@@ -209,7 +175,7 @@ if (isset($_SESSION['account'])) {
                             <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%02d', $action['id']); ?>" class="content"></div>
                             <div class="cell" style="width: 35%"><input type="submit" name="submit" value="<?php echo $action['title']; ?>" class="content"></div>
                             <div class="cell" style="width: 50%"><input type="submit" name="submit" value="<?php echo $action['description']; ?>" class="content"></div>
-                            <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                            <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
                             <input type="hidden" name="action" value="<?php echo $action['id']; ?>">
                         </form> <?php
                     } ?>
@@ -232,28 +198,8 @@ if (isset($_SESSION['account'])) {
                     <form method="post" class="container-button">
                         <input type="submit" name="submit" value="SAVE" class="button admin-menu">
                     </form>
-                </div>
-                <div class="info-bar extended">
-                    <div class="section line-right">
-                        <div class="stage admin">№:</div>
-                        <div class="content"><?php echo "#" . sprintf('%04d', Task::selectNextNewID('task')); ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">OBJECTIVE:</div>
-                        <div class="content"><?php echo $_SESSION['new-task']['objective']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">DESCRIPTION:</div>
-                        <div class="content"><?php echo $_SESSION['new-task']['description']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="stage admin">ACTION:</div>
-                        <div class="content"><?php echo $_SESSION['new-task']['action']; ?></div>
-                    </div>
-                    <div class="section line-left">
-                        <div class="stage active">LINKS:</div>
-                    </div>
-                </div>
+                </div> <?php
+                include_once "includes/info-bar.php"; ?>
                 <div class="table-header-container">
                     <div class="header-extension admin"></div>
                     <div class="header">
@@ -266,7 +212,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension admin"></div>
                 </div>
                 </div> <?php
-                if (isset($_SESSION['new-task']['links'])) { ?>
+                if (is_countable($_SESSION['new-task']['links'])) { ?>
                     <div class="table admin"> <?php
                         foreach ($_SESSION['new-task']['links'] as $num => $link) { ?>
                             <form method="post" class="row">
@@ -324,7 +270,7 @@ if (isset($_SESSION['account'])) {
                             </form>
                             <form method="post" class="container-button">
                                 <input type="hidden" name="new-custom-link">
-                                <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                                <input type="submit" name="submit" value="SAVE " class="button admin-menu">
                             </form>
                             <form method="post" class="container-button disabled">
                                 <input class="button admin-menu disabled">

@@ -36,6 +36,9 @@
         <div class="link-container">
             <a href="epvideos">ep videos</a>
         </div>
+        <div class="link-container">
+            <a href="epjoinery">ep joinery</a>
+        </div>
     </nav>
     <img class="logo-header" src="/ep/img/logo.svg" alt="ep" style="visibility: hidden">
 </div>
@@ -57,6 +60,11 @@
         <div class="container-button">
             <a href="epvideos" class="button">
                 <span>ep videos</span>
+            </a>
+        </div>
+        <div class="container-button">
+            <a href="epjoinery" class="button">
+                <span>ep joinery</span>
             </a>
         </div>
     </div>

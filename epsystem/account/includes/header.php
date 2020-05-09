@@ -28,7 +28,12 @@
 if ($_SESSION['account']->type == 1) { ?>
     <div class="container-header system">
         <img class="logo-header" src="/ep/epsystem/account/img/logo-member.svg" alt="ep"> <?php
-        if (basename($_SERVER['PHP_SELF']) == 'projects.php' && isset($_GET['p'])) {
+        if (isset($_GET['preview2'])) {
+            $showLinks = false;
+            $exitTitle = "Close";
+            $exitLink = null;
+        }
+        elseif (basename($_SERVER['PHP_SELF']) == 'projects.php' && isset($_GET['p'])) {
             $showLinks = false;
             if (isset($_POST['new-client']) || isset($_SESSION['add-client']['new-client'])) {
                 $exitTitle = "Cancel Client";
@@ -175,8 +180,11 @@ elseif ($_SESSION['account']->type == 2) { ?>
     </div> <?php
 }
 
-if (isset($_POST['exit']) && isset($exitLink)) {
-    if (basename($_SERVER['PHP_SELF']) == 'projects.php') {
+if (isset($_POST['exit'])) {
+    if (isset($_GET['preview2'])) {
+        echo "<script>window.close();</script>";
+    }
+    elseif (basename($_SERVER['PHP_SELF']) == 'projects.php') {
         if (isset($_SESSION['add-client']['new-client']))
             unset($_SESSION['add-client']['new-client']);
         unset($_SESSION['new-manager']);

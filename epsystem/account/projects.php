@@ -14,60 +14,30 @@ if (isset($_SESSION['account'])) {
         if (!isset($_GET['p'])) {
             if (isset($_GET['l1']) && $_GET['l1'] == "active") {
                 $projects = Project::selectProjectListByStatus(1); ?>
-                <form class="info-bar">
-                    <div class="section">
-                        <div class="stage">LAST</div>
-                        <button type="button" class="hours-button">12h</button>
-                        <button type="button" class="hours-button active">24h</button>
-                        <button type="button" class="hours-button">48h</button>
+                <form class="search-bar">
+                    <input onchange="searchTable()" type="text" name="id" class="input-id" placeholder="Enter №">
+                    <input onchange="searchTable()" type="text" name="name" class="input-name" placeholder="Enter Project Name">
+                    <div class="custom-select input-division">
+                        <select onchange="searchTable()" name="division" class="input-division" required>
+                            <option value="">All Divisions</option>
+                            <option value="Animated Video">ep animations</option>
+                            <option value="Animated Video">ep system</option>
+                        </select>
                     </div>
-                    <div class="section">
-                        <div class="stage">NEW</div>
-                        <div class="content active">1</div>
-                        <div class="space"></div>
-                        <div class="stage">ACTIVATED</div>
-                        <div class="content active">1</div>
-                        <div class="space"></div>
-                        <div class="stage">PAUSED</div>
-                        <div class="content active">0</div>
+                    <div class="custom-select input-preset">
+                        <select onchange="searchTable()" name="preset" class="input-preset" required>
+                            <option value="">All Presets</option>
+                        </select>
                     </div>
-                    <div class="section">
-                    </div>
-                </form> <?php
-                if (!isset($menu) || $menu['level-1']['ACTIVE']['count'] > 10) { ?>
-                    <hr>
-                    <form class="search-bar">
-                        <div class="section">
-                            <input type="text" name="id" class="input-id" placeholder="Enter №">
-                            <input type="text" name="name" class="input-name" placeholder="Enter Project Name">
-                            <div class="custom-select">
-                                <select name="type" class="input-type" required>
-                                    <option value="">All</option>
-                                    <option value="Animated Video">Animated Video</option>
-                                </select>
-                            </div>
-                            <input type="text" name="client" class="input-client" placeholder="Enter Client Name">
-                            <button type="button" onclick="searchTable()" class="search-button"></button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="filter-button">PRIORITIZE</button>
-                            <button type="button" class="filter-button">FILTER OPTION 2</button>
-                            <button type="button" class="filter-button">FILTER OPTION 3</button>
-                            <button type="button" class="filter-button">FILTER OPTION 4</button>
-                        </div>
-                        <div class="section">
-                            <button type="button" class="reset-button"></button>
-                        </div>
-                    </form> <?php
-                } ?>
+                </form>
                 <div class="table-header-container">
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head" style="width: 7.5%">№</div>
                         <div class="head" style="width: 20%">Project Name</div>
-                        <div class="head" style="width: 15%">Project Preset</div>
-                        <div class="head" style="width: 15%">Client</div>
-                        <div class="head" style="width: 15%">Completed Assignments</div>
+                        <div class="head" style="width: 15%">Division</div>
+                        <div class="head" style="width: 15%">Preset</div>
+                        <div class="head" style="width: 15%">Tasks</div>
                         <div class="head" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
                         <div class="head" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Value</div>
                         <div class="head" style="width: 7.5%">Open</div>
@@ -80,11 +50,11 @@ if (isset($_SESSION['account'])) {
                         foreach ($projects as $row) { ?>
                             <div class="row">
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $_SERVER['PHP_SELF'] . "?p=" . $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
-                                <div class="cell" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
-                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
-                                <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['client_username']; ?></a></div>
+                                <div class="cell name" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                                <div class="cell division" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo ""; ?></a></div>
+                                <div class="cell preset" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
                                 <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['completed_assignments'] . " / " . $row['total_assignments']; ?></a></div>
-                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo ""; ?> Hours</a></div>
+                                <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "0"; ?> Hours</a></div>
                                 <div class="cell" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content">€<span><?php echo $row['price']; ?></span></a></div>
                                 <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                             </div> <?php
@@ -326,7 +296,7 @@ if (isset($_SESSION['account'])) {
         }
         else {
             if (isset($_GET['l4'])) {
-                if ($_GET['l4'] == "summary") {
+                if ($_GET['l4'] == "assignment") {
                     if (isset($_POST['delete'])) {
                         Assignment::remove('assignment', $_GET['l3'], "projects.php?p=" . $_GET['p'] . "&l1=" . $_GET['l1']);
                     } ?>
@@ -337,25 +307,108 @@ if (isset($_SESSION['account'])) {
                     </form> <?php
                 }
                 else {
-                    if (isset($_POST['delete'])) {
-                    Task::remove('task', $_GET['l4'], "projects.php?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=summary");
-                    } ?>
+                    $task = Task::selectTask($_GET['l4']);
+                    if ($task) {
+                        if (isset($_POST['delete']))
+                            Task::remove('task', $_GET['l4'], "projects.php?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=assignment"); ?>
 
-                    </div>
-                    <form method="post" class="decision-bar">
-                        <input type="hidden" name="delete">
-                        <input type="submit" name="submit" value="DELETE TASK" class="button">
-                    </form> <?php
+                        </div>
+                        <div class="info-bar extended">
+                            <div class="section">
+                                <div class="stage">STATUS:</div>
+                                <div class="content"><?php echo $task['status']; ?></div>
+                            </div>
+                            <div class="section">
+                                <div class="stage">ACTION:</div>
+                                <div class="content"><?php echo $task['action']; ?></div>
+                            </div>
+                            <div class="section">
+                                <div class="stage">TIME:</div>
+                                <div class="content"><?php echo $task['estimated-min']; ?></div>
+                            </div>
+                        </div>
+                        
+                        <div class="objective-header">Objective</div>
+                        <div class="objective-body">
+                            <span class="objective"><?php echo strtoupper($task['objective']); ?></span>
+                            <span class="description"><?php echo $task['description']; ?></span>
+                        </div>
+
+                        <div class="link-section">
+                            <div class="link-type">
+                                <div class="link-title">Info</div> <?php
+                                $linksInfo = Task::selectTaskLinks($_GET['l4'], 1);
+                                foreach ($linksInfo as $link) {
+                                    if ($link['link'] != null) {
+                                        $link['link'] = "?p=" . $_GET['p'] . $link['link'];
+                                        $link['custom'] = "ep system link";
+                                    }
+                                    else {
+                                        $link['link'] = $link['custom-link'];
+                                        $link['custom'] = "custom link";
+                                    } ?>
+
+                                    <a class="link" href="<?php echo $link['link']; ?>" target="_blank">
+                                        <span class="id"><?php echo $link['custom']; ?></span>
+                                        <span class="title"><?php echo $link['title']; ?></span>
+                                        <span class="description">Find info about the project here</span>
+                                    </a> <?php
+                                } ?>
+                            </div>
+                            <div class="link-type">
+                                <div class="link-title">Resources</div> <?php
+                                $linksRes = Task::selectTaskLinks($_GET['l4'], 2);
+                                if ($linksRes)
+                                foreach ($linksRes as $link) {
+                                    if ($link['link'] != null) {
+                                        $link['link'] = "?p=" . $_GET['p'] . $link['link'];
+                                        $link['custom'] = "ep system link";
+                                    }
+                                    else {
+                                        $link['link'] = $link['custom-link'];
+                                        $link['custom'] = "custom link";
+                                    } ?>
+
+                                    <a class="link" href="<?php echo $link['link']; ?>" target="_blank">
+                                        <span class="id"><?php echo $link['custom']; ?></span>
+                                        <span class="title"><?php echo $link['title']; ?></span>
+                                        <span class="description">Upload & download files here</span>
+                                    </a> <?php
+                                } ?>
+                            </div>
+                            <div class="link-type">
+                                <div class="link-title">Research & Development</div> <?php
+                                $linksRnD = Task::selectTaskLinks($_GET['l4'], 3);
+                                if ($linksRnD)
+                                foreach ($linksRnD as $link) {
+                                    if ($link['link'] != null) {
+                                        $link['link'] = "?p=" . $_GET['p'] . $link['link'];
+                                        $link['custom'] = "ep system link";
+                                    }
+                                    else {
+                                        $link['link'] = $link['custom-link'];
+                                        $link['custom'] = "custom link";
+                                    } ?>
+
+                                    <a class="link" href="?p=<?php echo $_GET['p'] . $link['link']; ?>" target="_blank">
+                                        <span class="id"><?php echo $link['custom']; ?></span>
+                                        <span class="title"><?php echo $link['title']; ?></span>
+                                        <span class="description">Learn how to complete the task here</span>
+                                    </a> <?php
+                                } ?>
+                            </div>
+                        </div>
+
+                        <form method="post" class="decision-bar">
+                            <input type="hidden" name="delete">
+                            <input type="submit" name="submit" value="DELETE TASK" class="button">
+                        </form> <?php
+                    }
                 }
             }
-            if (isset($_GET['l1']) && $_GET['l1'] == "info") {
-                if (isset($_GET['l2']) && $_GET['l2'] == "summary") { ?>
-                    </div> <?php
-                }
-                elseif (isset($_GET['l2']) && $_GET['l2'] == "production") { ?>
-                    </div> <?php
-                }
-                elseif (isset($_GET['l2']) && $_GET['l2'] == "product") { ?>
+
+            if (isset($_GET['l1']) && $_GET['l1'] == "project") {
+                if (isset($_GET['l2']) && $_GET['l2'] == "overview") { ?>
                     </div> <?php
                 }
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "client") {
@@ -593,10 +646,64 @@ if (isset($_SESSION['account'])) {
                         </div> <?php
                     }
                 }
+                else { ?>
+                    </div> <?php
+                }
+            }
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "assignments") {
+                if (isset($_GET['l3'])) {
+                    $assignments = Assignment::selectProjectAssignmentsByTypeAndDepartment($_GET['p'], $_GET['l2'], $_GET['l3']); ?>
+                    <form class="search-bar">
+                    </form>
+                    <div class="table-header-container">
+                        <div class="header-extension"></div>
+                        <div class="header">
+                            <div class="head" style="width: 7.5%">№</div>
+                            <div class="head" style="width: 35%">Assignment Name</div>
+                            <div class="head" style="width: 15%">Status</div>
+                            <div class="head" style="width: 15%">Tasks</div>
+                            <div class="head" style="width: 10%">Time</div>
+                            <div class="head" style="width: 10%">Earn</div>
+                            <div class="head" style="width: 7.5%">Open</div>
+                        </div>
+                        <div class="header-extension"></div>
+                    </div>
+                    </div>
+                    <div class="table"> <?php
+                        if ($assignments) {
+                            foreach ($assignments as $row) { ?>
+                                <div class="row">
+                                    <div class="cell" style="width: 7.5%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content"><?php echo "#" . sprintf('%05d', $row['assignment_id']); ?></a></div>
+                                    <div class="cell" style="width: 35%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content"><?php echo $row['assignment_title']; ?></a></div>
+                                    <div class="cell" style="width: 15%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content"><?php echo $row['status']; ?></a></div>
+                                    <div class="cell" style="width: 15%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content"><?php echo "?"; ?></a></div>
+                                    <div class="cell" style="width: 10%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content"><?php echo "?"; ?></a></div>
+                                    <div class="cell" style="width: 10%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content"><?php echo "?"; ?></span></a></div>
+                                    <div class="cell" style="width: 7.5%"><a href="assignments.php?a=<?php echo $row['assignment_id']; ?>" class="content open-button">Open</a></div>
+                                </div> <?php
+                            }
+                        } ?>
+                    </div> <?php
+                }
+                else { ?>
+                    </div> <?php
+                }
+            }
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "info") {
+                if (isset($_GET['l2']) && $_GET['l2'] == "product") { ?>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "style") { ?>
+                    </div> <?php
+                }
+                else { ?>
+                    </div> <?php
+                }
             }
             else { ?>
                 </div> <?php
             }
+
             if (isset($_GET['preview'])) { ?>
                 <div class="decision-bar">
                     <div class="button">MAYBE LATER</div>

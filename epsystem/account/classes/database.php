@@ -128,6 +128,13 @@ class Database
         else
             return "-";
     }
+    public static function datetimeToMinutes($value)
+    {
+        if ($value)
+            return date('i', strtotime($value));
+        else
+            return "-";
+    }
 
     public static function selectMembers() {
         $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account` WHERE `account`.`type` = '1'");

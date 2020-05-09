@@ -3,6 +3,12 @@ require_once "database.php";
 
 class Assignment extends Database
 {
+    public static function selectAssignmentByID($id) {
+        $rows = self::selectStatic(array($id), "SELECT * FROM `assignment` WHERE `id` = ?");
+        if ($rows[0]) return $rows[0];
+        else return null;
+    }
+
     public static function selectPresets() {
         $rows = self::selectStatic(null, "SELECT `preset-assignment`.`id`, `preset-assignment`.`title`, `department`.`title` AS `department`, `preset-assignment`.`objective`, ( SELECT COUNT(*) FROM `preset-task` WHERE `preset-assignmentid` = `preset-assignment`.`id` ) AS `task_count` FROM `preset-assignment` INNER JOIN `department` ON `department`.`id` = `preset-assignment`.`departmentid`");
         if ($rows) return $rows;
@@ -56,6 +62,12 @@ class Assignment extends Database
             }
             return $rows;
         }
+        else return null;
+    }
+
+    public static function selectProjectAssignmentsByTypeAndDepartment($projectID, $typeID, $departmentID) {
+        $rows = self::selectStatic(array($projectID, $typeID, $departmentID), "SELECT `assignment`.`id` AS `assignment_id`, `assignment`.`title` AS `assignment_title`, `status`.`title` AS `status` FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` INNER JOIN `status` ON `status`.`id` = `assignment_status`.`statusid` WHERE `assignment`.`projectid` = ? AND `assignment`.`type` = ? AND `assignment`.`departmentid` = ?");
+        if ($rows) return $rows;
         else return null;
     }
 }

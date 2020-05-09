@@ -20,7 +20,8 @@
 .header-extension {
   width: 12.5vw;
   height: 3vh;
-  background: #F8F7F5;
+  //background: #F8F7F5;
+  background: #FEFBF4;
   border-left: 1px solid #FFFFFF;
   border-right: 1px solid #FFFFFF;
   &.small {
@@ -39,7 +40,8 @@
   text-align: center;
   line-height: 3vh;
   user-select: none;
-  background: $c10;
+  //background: $c10;
+  background: $c35;
   color: $c1;
   font-size: 0.75vw;
   font-weight: bold;
@@ -114,7 +116,8 @@
   background: none;
   font-size: 0.9vw;
   color: $c9;
-  border: 1px solid $c11;
+  //border: 1px solid $c11;
+  border: 1px solid $c37;
   cursor: pointer;
   line-height: inherit;
 }
@@ -122,7 +125,8 @@
   content: "\00a0";
 }
 .cell.id .content {
-  background: $c11;
+  //background: $c11;
+  background: $c37;
 }
 .cell:first-child .content {
   border-top-left-radius: 5px;
@@ -135,6 +139,7 @@
 .row:hover .cell .content {
   border: 1px solid $c2;
   color: $c1;
+  background-color: $c37;
 }
 .row:hover .cell.id .content {
   background: $c2;
@@ -142,7 +147,8 @@
 }
 
 .cell .open-button {
-   background-color: $c11;
+   //background-color: $c11;
+   background-color: $c37;
    background-image: url("../epsystem/account/img/open-button.svg");
    background-repeat: no-repeat;
    background-size: 100% 100%;
@@ -159,7 +165,8 @@
   background-image: url("../epsystem/account/img/open-button-hl.svg");
 }
 .cell .add-button {
-  background-color: $c11;
+  //background-color: $c11;
+  background-color: $c37;
   background-image: url("../epsystem/account/img/add-button.svg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -174,6 +181,24 @@
 .row:hover .cell .add-button {
   background-color: $c2;
   background-image: url("../epsystem/account/img/add-button-hl.svg");
+}
+.cell .select-button {
+  //background-color: $c11;
+  background-color: $c37;
+  background-image: url("../epsystem/account/img/select-button.svg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  height: 100%;
+  width: 100%;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.row:hover .cell .select-button {
+  background-color: $c2;
+  background-image: url("../epsystem/account/img/select-button-hl.svg");
 }
 
 .sub-table {
@@ -254,6 +279,14 @@
   .row:hover .cell .add-button {
     background-color: $c2;
     background-image: url("../epsystem/account/img/add-button-hl.svg");
+  }
+  .cell .select-button {
+    background-image: url("../epsystem/account/img/select-button-admin.svg");
+    background-color: $c63;
+  }
+  .row:hover .cell .select-button {
+    background-color: $c2;
+    background-image: url("../epsystem/account/img/select-button-hl.svg");
   }
   .cell.id .content {
     background-color: $c63;

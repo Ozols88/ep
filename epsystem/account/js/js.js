@@ -40,27 +40,28 @@ function sortTable(tr, td) {
     document.querySelector(tr).style.background = '#F5B82E';
     window.scrollTo(0, 0);
 }
+
 function searchTable() {
     var rows, inputId, inputProject, inputType, inputClient;
     rows = document.getElementsByClassName("row");
     inputId = document.querySelector(".search-bar .input-id").value;
     inputProject = document.querySelector(".search-bar .input-name").value;
-    inputType = document.querySelector(".search-bar .custom-select .input-type").value;
-    inputClient = document.querySelector(".search-bar .input-client").value;
+    inputDivision = document.querySelector(".search-bar .custom-select.input-division .input-division").value;
+    inputPreset = document.querySelector(".search-bar .custom-select.input-preset .input-preset").value;
 
     console.log(rows);
     for (i = 0; i < rows.length; i++) {
         id = rows[i].querySelector(".cell.id");
         project = rows[i].querySelector(".cell.name");
-        type = rows[i].querySelector(".cell.type");
-        client = rows[i].querySelector(".cell.client");
+        division = rows[i].querySelector(".cell.division");
+        preset = rows[i].querySelector(".cell.preset");
 
         txtValueId = id.textContent || id.innerText;
         txtValueProject = project.textContent || project.innerText;
-        txtValueType = type.textContent || type.innerText;
-        txtValueClient = client.textContent || client.innerText;
+        txtValueDivision = division.textContent || division.innerText;
+        txtValuePreset = preset.textContent || preset.innerText;
 
-        if (txtValueId.indexOf(inputId) > -1 && txtValueProject.indexOf(inputProject) > -1 && txtValueType.indexOf(inputType) > -1 && txtValueClient.indexOf(inputClient) > -1) {
+        if (txtValueId.indexOf(inputId) > -1 && txtValueProject.indexOf(inputProject) > -1 && txtValueDivision.indexOf(inputDivision) > -1 && txtValuePreset.indexOf(inputPreset) > -1) {
             rows[i].style.display = "";
         } else {
             rows[i].style.display = "none";

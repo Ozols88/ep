@@ -9,8 +9,13 @@ elseif (basename($_SERVER['SCRIPT_FILENAME']) == "projects.php") {
     else
         require "menu/project.php";
 }
-elseif (basename($_SERVER['SCRIPT_FILENAME']) == "assignments.php")
-    require "menu/assignments.php";
+
+elseif (basename($_SERVER['SCRIPT_FILENAME']) == "assignments.php") {
+    if (!isset($_GET['a']))
+        require "menu/assignments.php";
+    else
+        require "menu/assignment.php";
+}
 
 elseif (basename($_SERVER['SCRIPT_FILENAME']) == "resources.php")
     require "menu/resources.php";
@@ -84,6 +89,8 @@ if (isset($menu) && isset($menu['level-1'])) {
         else {
             if (isset($_GET['p']))
                 $href = "?p=" . $_GET['p'] . "&l1=" . $menuLvl1Item['default-link'];
+            elseif (isset($_GET['a']))
+                $href = "?a=" . $_GET['a'] . "&l1=" . $menuLvl1Item['default-link'];
             else
                 $href = "?l1=" . $menuLvl1Item['default-link'];
             if (isset($_GET['preview']))
@@ -91,9 +98,9 @@ if (isset($menu) && isset($menu['level-1'])) {
         } ?>
 
         <div class="container-button">
-            <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if (isset($menuLvl1Item['page'])) echo " page"; if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['l1']) && $_GET['l1'] == $menuLvl1Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
+            <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if (isset($menuLvl1Item['page'])) echo " page"; if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['l1']) && $_GET['l1'] == $menuLvl1Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
                 <span><?php echo $menuLvl1ItemName; ?></span> <?php
-                if ($locked) { ?>
+                if ($locked || (isset($_GET['l1']) && $_GET['l1'] != $menuLvl1Item['link']) && isset($_GET['preview2'])) { ?>
                     <div class="lock"></div> <?php
                 }
                 elseif (isset($menuLvl1Item['count']) && $menuLvl1Item['count']) { ?>
@@ -158,6 +165,8 @@ if (isset($menu) && isset($menu['level-1'])) {
                     else {
                         if (isset($_GET['p']))
                             $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                        elseif (isset($_GET['a']))
+                            $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
                         else
                             $href = "?l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
                         if (isset($_GET['preview']))
@@ -165,9 +174,9 @@ if (isset($menu) && isset($menu['level-1'])) {
                     } ?>
 
                     <div class="container-button">
-                        <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl2Item['admin']) echo " admin-menu"; if (isset($_GET['l2']) && $_GET['l2'] == $menuLvl2Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
+                        <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl2Item['admin']) echo " admin-menu"; if (isset($_GET['l2']) && $_GET['l2'] == $menuLvl2Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
                             <span><?php echo $menuLvl2ItemName; ?></span> <?php
-                            if ($locked) { ?>
+                            if ($locked || (isset($_GET['l2']) && $_GET['l2'] != $menuLvl2Item['link']) && isset($_GET['preview2'])) { ?>
                                 <div class="lock"></div> <?php
                             }
                             elseif (isset($menuLvl2Item['count']) && $menuLvl2Item['count']) { ?>
@@ -228,7 +237,7 @@ if (isset($menu) && isset($menu['level-1'])) {
                     }
 
                     foreach ($menuLvl3 as $menuLvl3ItemName => $menuLvl3Item) {
-                        if (isset($menuLvl3Item['locked']) || isset($_GET['preview']) && $menuLvl3ItemName != "Color Palette")
+                        if (isset($menuLvl3Item['locked']) || isset($_GET['preview']) && $menuLvl3ItemName != "Colors")
                             $locked = true;
                         else
                             $locked = false;
@@ -237,6 +246,8 @@ if (isset($menu) && isset($menu['level-1'])) {
                         else {
                             if (isset($_GET['p']))
                                 $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
+                            elseif (isset($_GET['a']))
+                                $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
                             else
                                 $href = "?l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
                             if (isset($_GET['preview']))
@@ -244,9 +255,9 @@ if (isset($menu) && isset($menu['level-1'])) {
                         } ?>
 
                         <div class="container-button">
-                            <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl3Item['admin']) echo " admin-menu"; if (isset($_GET['l3']) && $_GET['l3'] == $menuLvl3Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
+                            <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl3Item['admin']) echo " admin-menu"; if (isset($_GET['l3']) && $_GET['l3'] == $menuLvl3Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
                                 <span><?php echo $menuLvl3ItemName; ?></span> <?php
-                                if ($locked) { ?>
+                                if ($locked || (isset($_GET['l3']) && $_GET['l3'] != $menuLvl3Item['link']) && isset($_GET['preview2'])) { ?>
                                     <div class="lock"></div> <?php
                                 }
                                 elseif (isset($menuLvl3Item['count']) && $menuLvl3Item['count']) { ?>
@@ -308,7 +319,7 @@ if (isset($menu) && isset($menu['level-1'])) {
                         }
 
                         foreach ($menuLvl4 as $menuLvl4ItemName => $menuLvl4Item) {
-                            if (isset($menuLvl4Item['locked']) || isset($_GET['preview']) && $menuLvl4ItemName != "SUMMARY")
+                            if (isset($menuLvl4Item['locked']) || isset($_GET['preview']) && $menuLvl4ItemName != "ASSIGNMENT")
                                 $locked = true;
                             else
                                 $locked = false;
@@ -317,6 +328,8 @@ if (isset($menu) && isset($menu['level-1'])) {
                             else {
                                 if (isset($_GET['p']))
                                     $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=" . $menuLvl4Item['default-link'];
+                                elseif (isset($_GET['a']))
+                                    $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=" . $menuLvl4Item['default-link'];
                                 else
                                     $href = "?l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=" . $menuLvl4Item['default-link'];
                                 if (isset($_GET['preview']))
@@ -324,9 +337,9 @@ if (isset($menu) && isset($menu['level-1'])) {
                             } ?>
 
                             <div class="container-button">
-                                <a<?php if (!$locked) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl4Item['admin']) echo " admin-menu"; if (isset($_GET['l4']) && $_GET['l4'] == $menuLvl4Item['link']) echo " active-menu"; if ($locked) echo " locked"; ?>">
+                                <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>"<?php } ?> class="button<?php if ($menuLvl4Item['admin']) echo " admin-menu"; if (isset($_GET['l4']) && $_GET['l4'] == $menuLvl4Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
                                     <span><?php echo $menuLvl4ItemName; ?></span> <?php
-                                    if ($locked) { ?>
+                                    if ($locked || (isset($_GET['l4']) && $_GET['l4'] != $menuLvl4Item['link']) && isset($_GET['preview2'])) { ?>
                                         <div class="lock"></div> <?php
                                     }
                                     elseif (isset($menuLvl4Item['count']) && $menuLvl4Item['count']) { ?>

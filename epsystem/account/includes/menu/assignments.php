@@ -96,11 +96,11 @@ $menu = [
                         "note" => ""
                     ]
                 ],
-                "APPROVAL" => [
+                "REVIEW" => [
                     "admin" => false,
-                    "link" => "approval",
-                    "default-link" => "approval",
-                    "hud" => "Available Approval Assignments",
+                    "link" => "review",
+                    "default-link" => "review",
+                    "hud" => "Available Review Assignments",
                     "home" => [
                         "title" => "",
                         "description" => "",

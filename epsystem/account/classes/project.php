@@ -97,9 +97,9 @@ class Project extends Database
         else return null;
     }
 
-    public static function selectProjectAssignmentsTasks($projectID, $type)
+    public static function selectProjectDepartments($projectID, $type)
     {
-        $rows = self::selectStatic(array($projectID, $type), "SELECT `department`.`id` AS `depart_id`, `department`.`title` AS `depart_title`, `assignment`.`id` AS `assignment_id`, `assignment`.`title` AS `assignment_title`, `task`.`id` AS `task_id`, `task`.`number` AS `task_number` FROM `assignment` INNER JOIN `department` ON `department`.`id` = `assignment`.`departmentid` LEFT JOIN `task` ON `task`.`assignmentid` = `assignment`.`id` WHERE `assignment`.`projectid` = ? AND `assignment`.`type` = ? ORDER BY `department`.`id`, `assignment`.`id`, `task`.`id`");
+        $rows = self::selectStatic(array($projectID, $type), "SELECT `department`.`id` AS `depart_id`, `department`.`title` AS `depart_title`, COUNT(*) AS `assignment_count` FROM `department` LEFT JOIN `assignment` ON `department`.`id` = `assignment`.`departmentid` WHERE `assignment`.`projectid` = ? AND `assignment`.`type` = ? GROUP BY `department`.`id` ORDER BY `department`.`id`");
         if ($rows) return $rows;
         else return null;
     }

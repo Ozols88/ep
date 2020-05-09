@@ -1,13 +1,16 @@
 <?php
 
+$assignment = Assignment::selectAssignmentByID($_GET['a']);
+
 $menu = [
-    "hud" => "Resources",
+    "hud" => "",
     "level-1" => [
-        "TEMP FILES" => [
+        "+ New" => [
             "admin" => false,
-            "link" => "temp-files",
-            "default-link" => "temp-files",
-            "hud" => "Temporary Files",
+            "link" => "",
+            "default-link" => "",
+            "page" => "new-task",
+            "hud" => "",
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -23,11 +26,11 @@ $menu = [
                 "note" => ""
             ]
         ],
-        "TEMPLATES" => [
+        "ASSIGNMENT" => [
             "admin" => false,
-            "link" => "templates",
-            "default-link" => "templates",
-            "hud" => "Templates",
+            "link" => "assignment",
+            "default-link" => "assignment",
+            "hud" => "",
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -43,11 +46,11 @@ $menu = [
                 "note" => ""
             ]
         ],
-        "LIBRARY" => [
+        "TASKS" => [
             "admin" => false,
-            "link" => "library",
-            "default-link" => "library",
-            "hud" => "Library",
+            "link" => "tasks",
+            "default-link" => "tasks",
+            "hud" => "",
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -63,11 +66,11 @@ $menu = [
                 "note" => ""
             ]
         ],
-        "ARCHIVE" => [
+        "OPTIONS" => [
             "admin" => false,
-            "link" => "archive",
-            "default-link" => "archive",
-            "hud" => "Archive",
+            "link" => "options",
+            "default-link" => "options",
+            "hud" => "",
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -82,6 +85,34 @@ $menu = [
                 "link" => "",
                 "note" => ""
             ]
-        ]
+        ],
     ]
 ];
+
+if (isset($_GET['l1']) && $_GET['l1'] == "tasks") {
+    $tasks = Task::selectAssignmentTasks($_GET['a']);
+    if ($tasks) {
+        foreach ($tasks as $task) {
+            $menu['level-1']['TASKS']['level-2']["#" . $task['id']] = [
+                "admin" => false,
+                "link" => $task['id'],
+                "default-link" => $task['id'],
+                "hud" => "",
+                "home" => [
+                    "title" => "",
+                    "description" => "",
+                    "total" => [
+                        "name" => "",
+                        "count" => ""
+                    ],
+                    "last-hours" => [
+                        "title" => "",
+                        "details" => []
+                    ],
+                    "link" => "",
+                    "note" => ""
+                ]
+            ];
+        }
+    }
+}

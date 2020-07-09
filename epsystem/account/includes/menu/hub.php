@@ -41,10 +41,10 @@ $menu = [
                 "note" => ""
             ]
         ],
-        "My Membership" => [
+        "My Numbers" => [
             "admin" => false,
-            "page" => "member.php?l1=membership",
-            "hud" => "My Membership",
+            "page" => "numbers.php",
+            "hud" => "My Numbers",
             "home" => [
                 "title" => "",
                 "description" => "",

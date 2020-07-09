@@ -3,7 +3,7 @@
 $menu = [
     "hud" => "Assignments",
     "level-1" => [
-        "+ New" => [
+        "+ New Assignment" => [
             "admin" => false,
             "link" => "new",
             "default-link" => "new",
@@ -29,11 +29,12 @@ $menu = [
                 "note" => "Note"
             ]
         ],
-        "AVAILABLE" => [
+        "TO DO" => [
             "admin" => false,
-            "link" => "available",
-            "default-link" => "available&l2=production",
-            "hud" => "Available Assignments",
+            "count" => Assignment::selectAssignmentCountByStatus(2),
+            "link" => "to-do",
+            "default-link" => "to-do",
+            "hud" => "To Do Assignments",
             "home" => [
                 "title" => "Title",
                 "description" => "Description",
@@ -52,96 +53,12 @@ $menu = [
                 ],
                 "link" => "List",
                 "note" => "Note"
-            ],
-            "level-2" => [
-                "PRODUCTION" => [
-                    "admin" => false,
-                    "count" => Assignment::selectAvailableAssignmentCount(true),
-                    "link" => "production",
-                    "default-link" => "production",
-                    "hud" => "Available Production Assignments",
-                    "home" => [
-                        "title" => "",
-                        "description" => "",
-                        "total" => [
-                            "name" => "",
-                            "count" => ""
-                        ],
-                        "last-hours" => [
-                            "title" => "",
-                            "details" => []
-                        ],
-                        "link" => "",
-                        "note" => ""
-                    ]
-                ],
-                "CUSTOM" => [
-                    "admin" => false,
-                    "count" => Assignment::selectAvailableAssignmentCount(false),
-                    "link" => "custom",
-                    "default-link" => "custom",
-                    "hud" => "Available Custom Assignments",
-                    "home" => [
-                        "title" => "",
-                        "description" => "",
-                        "total" => [
-                            "name" => "",
-                            "count" => ""
-                        ],
-                        "last-hours" => [
-                            "title" => "",
-                            "details" => []
-                        ],
-                        "link" => "",
-                        "note" => ""
-                    ]
-                ],
-                "REVIEW" => [
-                    "admin" => false,
-                    "link" => "review",
-                    "default-link" => "review",
-                    "hud" => "Available Review Assignments",
-                    "home" => [
-                        "title" => "",
-                        "description" => "",
-                        "total" => [
-                            "name" => "",
-                            "count" => ""
-                        ],
-                        "last-hours" => [
-                            "title" => "",
-                            "details" => []
-                        ],
-                        "link" => "",
-                        "note" => ""
-                    ]
-                ],
-                "MANAGEMENT" => [
-                    "admin" => false,
-                    "link" => "management",
-                    "default-link" => "management",
-                    "hud" => "Available Management Assignments",
-                    "home" => [
-                        "title" => "",
-                        "description" => "",
-                        "total" => [
-                            "name" => "",
-                            "count" => ""
-                        ],
-                        "last-hours" => [
-                            "title" => "",
-                            "details" => []
-                        ],
-                        "link" => "",
-                        "note" => ""
-                    ]
-                ]
             ]
         ],
-        "MINE" => [
+        "MY ASSIGNMENTS" => [
             "admin" => false,
-            "link" => "mine",
-            "default-link" => "mine&l2=active",
+            "link" => "my",
+            "default-link" => "my&l2=active",
             "hud" => "My Assignments",
             "home" => [
                 "title" => "Title",
@@ -165,6 +82,7 @@ $menu = [
             "level-2" => [
                 "PENDING" => [
                     "admin" => false,
+                    "count" => Assignment::selectAssignmentCountByStatusAndAccount(4, $account->id),
                     "link" => "pending",
                     "default-link" => "pending",
                     "hud" => "My Pending Assignments",
@@ -185,7 +103,7 @@ $menu = [
                 ],
                 "ACTIVE" => [
                     "admin" => false,
-                    "count" => 1,
+                    "count" => Assignment::selectAssignmentCountByStatusAndAccount(3, $account->id),
                     "link" => "active",
                     "default-link" => "active",
                     "hud" => "My Active Assignments",
@@ -206,6 +124,7 @@ $menu = [
                 ],
                 "COMPLETED" => [
                     "admin" => false,
+                    "count" => Assignment::selectAssignmentCountByStatusAndAccount(5, $account->id),
                     "link" => "completed",
                     "default-link" => "completed",
                     "hud" => "My Completed Assignments",
@@ -226,10 +145,10 @@ $menu = [
                 ]
             ]
         ],
-        "ALL" => [
+        "ALL ASSIGNMENTS" => [
             "admin" => false,
             "link" => "all",
-            "default-link" => "all",
+            "default-link" => "all&l2=new",
             "hud" => "All Assignments",
             "home" => [
                 "title" => "Title",
@@ -249,6 +168,113 @@ $menu = [
                 ],
                 "link" => "List",
                 "note" => "Note"
+            ],
+            "level-2" => [
+                "NEW" => [
+                    "admin" => false,
+                    "count" => Assignment::selectCurrentProjectAssignmentCountByStatus(1),
+                    "link" => "new",
+                    "default-link" => "new",
+                    "hud" => "All New Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ],
+                "AVAILABLE" => [
+                    "admin" => false,
+                    "count" => Assignment::selectCurrentProjectAssignmentCountByStatus(2),
+                    "link" => "available",
+                    "default-link" => "available",
+                    "hud" => "All Available Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ],
+                "IN PROGRESS" => [
+                    "admin" => false,
+                    "count" => Assignment::selectCurrentProjectAssignmentCountByStatus(3),
+                    "link" => "active",
+                    "default-link" => "active",
+                    "hud" => "All Active Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ],
+                "PENDING" => [
+                    "admin" => false,
+                    "count" => Assignment::selectCurrentProjectAssignmentCountByStatus(4),
+                    "link" => "pending",
+                    "default-link" => "pending",
+                    "hud" => "All Pending Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ],
+                "COMPLETED" => [
+                    "admin" => false,
+                    "count" => Assignment::selectCurrentProjectAssignmentCountByStatus(5),
+                    "link" => "completed",
+                    "default-link" => "completed",
+                    "hud" => "All Completed Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ]
             ]
         ]
     ]

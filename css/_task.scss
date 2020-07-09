@@ -2,60 +2,84 @@
 
 // task page
 
-.objective-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 3.2vh;
-  width: 75vw;
-  margin: 2vh auto 0 auto;
-  background-color: $c35;
-  color: $c1;
-  font-weight: bold;
-  font-size: 0.75vw;
-}
-.objective-body {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
+.objective-container {
   width: 75vw;
   margin: 0 auto;
-  border: solid 1px $c36;
-  color: $c9;
+  &:hover .objective {
+    background-color: $c2;
+  }
+  &:hover .description {
+    background-color: $c37;
+    border: solid 1px $c2;
+    color: $c1;
+  }
   .objective {
-    font-size: 1.05vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3.2vh;
+    background-color: $c35;
+    color: $c1;
     font-weight: bold;
+    font-size: 0.75vw;
+    user-select: none;
   }
   .description {
-    font-size: 0.95vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    height: 6.4vh;
+    border: solid 1px $c36;
+    color: $c9;
+    cursor: default;
   }
 }
 
 .link-section {
-  margin: 4vh 12.5vw 0 12.5vw;
+  margin: 4vh 12.5vw 4vh 12.5vw;
   display: flex;
   justify-content: space-between;
   .link-type {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    margin: 0 1vw;
+    &:first-child {
+      margin-left: 0;
+    }
+    &:last-child {
+      margin-right: 0;
+    }
+    &:hover .link-title {
+      background-color: $c2;
+    }
     .link-title {
       display: flex;
       background-color: $c35;
       color: $c1;
       font-weight: bold;
       font-size: 0.75vw;
-      width: 24vw;
-      height: 3.2vh;
+      min-height: 3.2vh;
       user-select: none;
       justify-content: center;
       align-items: center;
+      &:hover ~ .link {
+        background-color: $c37;
+        border: solid 1px $c2;
+        span {
+          color: $c1;
+        }
+      }
     }
     .link {
       display: flex;
+      flex: 1;
       flex-direction: column;
       user-select: none;
       cursor: pointer;
       border: solid 1px $c11;
+      border-radius: 5px;
       margin-top: 1.6vh;
       height: 9.6vh;
       justify-content: center;
@@ -84,5 +108,54 @@
         }
       }
     }
+  }
+}
+
+.comment-container {
+  width: 75vw;
+  margin: 0 auto 3.5vh auto;
+  &:hover .comment-header {
+    background-color: $c2;
+    span {
+      color: $c1;
+    }
+  }
+  &:hover .comment-body {
+    background-color: $c37;
+    border: solid 1px $c2;
+    color: $c1;
+  }
+  .comment-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3.2vh;
+    background-color: $c35;
+    color: $c1;
+    font-size: 0.75vw;
+    user-select: none;
+    .align-helper {
+      margin-right: auto;
+      margin-left: 0.65vw;
+      visibility: hidden;
+    }
+    .title {
+      font-weight: bold;
+    }
+    .added {
+      margin-left: auto;
+      margin-right: 0.65vw;
+      color: $c9;
+    }
+  }
+  .comment-body {
+    display: flex;
+    height: 3.2vh;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    border: solid 1px $c36;
+    color: $c9;
+    cursor: default;
   }
 }

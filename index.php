@@ -26,20 +26,17 @@
 <body>
 <div class="container-header">
     <img class="logo-header" src="/ep/img/logo.svg" alt="ep">
-    <nav class="menu-header">
-        <div class="link-container">
-            <a href="epanimations">ep animations</a>
-        </div>
-        <div class="link-container">
-            <a href="epsystem">ep system</a>
-        </div>
+    <!--<nav class="menu-header">
         <div class="link-container">
             <a href="epvideos">ep videos</a>
         </div>
         <div class="link-container">
-            <a href="epjoinery">ep joinery</a>
+            <a href="epexplainers">ep explainers</a>
         </div>
-    </nav>
+        <div class="link-container">
+            <a href="epsystem">ep system</a>
+        </div>
+    </nav>-->
     <img class="logo-header" src="/ep/img/logo.svg" alt="ep" style="visibility: hidden">
 </div>
 <div class="menu">
@@ -48,8 +45,13 @@
     </div>
     <div class="navbar level-1">
         <div class="container-button">
-            <a href="epanimations" class="button">
-                <span>ep animations</span>
+            <a href="epexplainers" class="button">
+                <span>ep explainers</span>
+            </a>
+        </div>
+        <div class="container-button">
+            <a href="?l1=enokspriede" class="button">
+                <span>enokspriede</span>
             </a>
         </div>
         <div class="container-button">
@@ -57,16 +59,22 @@
                 <span>ep system</span>
             </a>
         </div>
-        <div class="container-button">
-            <a href="epvideos" class="button">
-                <span>ep videos</span>
-            </a>
-        </div>
-        <div class="container-button">
-            <a href="epjoinery" class="button">
-                <span>ep joinery</span>
-            </a>
-        </div>
     </div>
+    <?php if (isset($_GET['l1']) && $_GET['l1'] == "enokspriede") { ?>
+        <div class="navbar level-2">
+            <div class="container-button disabled">
+                <a class="button disabled"></a>
+            </div>
+            <div class="container-button">
+                <a class="button">
+                    <span>Button 1</span>
+                </a>
+            </div>
+            <div class="container-button disabled">
+                <a class="button disabled"></a>
+            </div>
+        </div>
+        <?php
+    } ?>
 </body>
 </html>

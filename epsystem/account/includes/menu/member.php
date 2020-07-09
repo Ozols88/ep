@@ -107,6 +107,7 @@ $menu = [
             "admin" => false,
             "link" => "new-account",
             "default-link" => "new-account",
+            "page" => "new-member",
             "hud" => "+ New Account",
             "home" => [
                 "title" => "",
@@ -121,7 +122,7 @@ $menu = [
                 ],
                 "link" => "",
                 "note" => ""
-            ]
+            ],
         ]
     ]
 ];

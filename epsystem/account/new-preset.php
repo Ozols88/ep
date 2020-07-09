@@ -1,5 +1,5 @@
 <?php
-$page = "projects";
+$page = "r&d";
 include "includes/autoloader.php";
 session_start();
 if (isset($_SESSION['account'])) {
@@ -7,13 +7,13 @@ if (isset($_SESSION['account'])) {
 
     require_once "includes/header.php";
 
-    if (!isset($_SESSION['new-project']))
-        $_SESSION['new-project']['stage'] = '1';
-    if (!isset($_SESSION['new-project']['info']['floor']))
-        $_SESSION['new-project']['info']['floor'] = ""; // Info bar fix
+    if (!isset($_SESSION['new-preset']))
+        $_SESSION['new-preset']['stage'] = '1';
+    if (!isset($_SESSION['new-preset']['info']['type']))
+        $_SESSION['new-preset']['info']['type'] = ""; // Info bar fix
 
     if (isset($_POST['submit'])) {
-        if ($_SESSION['new-project']['stage'] == '1') {
+        if ($_SESSION['new-preset']['stage'] == '1') {
 
             $_SESSION['new-project']['fields']['floorid'] = $_POST['floor'];
             $_SESSION['new-project']['info']['floor'] = Project::selectFloorByID($_POST['floor'])['title'];
@@ -32,11 +32,11 @@ if (isset($_SESSION['account'])) {
             unset($_SESSION['new-project']['assignments']);
             unset($_SESSION['new-project']['assignmentPresets']);
 
-            $_SESSION['new-project']['stage'] = '2';
+            $_SESSION['new-project']['stage'] = 2;
             if (!isset($_SESSION['new-project']['info']['preset']))
                 $_SESSION['new-project']['info']['preset'] = ""; // Info bar fix
         }
-        elseif ($_SESSION['new-project']['stage'] == '2') {
+        elseif ($_SESSION['new-preset']['stage'] == '2') {
             if (isset($_POST['new-preset']))
                 $_SESSION['new-project']['new-preset'] = true;
             else {
@@ -71,12 +71,12 @@ if (isset($_SESSION['account'])) {
                 else
                     $_SESSION['new-project']['info']['preset'] = "None";
 
-                $_SESSION['new-project']['stage'] = '3';
+                $_SESSION['new-project']['stage'] = 2;
                 if (!isset($_SESSION['new-project']['info']['client']))
                     $_SESSION['new-project']['info']['client'] = ""; // Info bar fix
             }
         }
-        elseif ($_SESSION['new-project']['stage'] == '3') {
+        elseif ($_SESSION['new-preset']['stage'] == '3') {
             if (isset($_POST['new-client']))
                 $_SESSION['new-project']['new-client'] = true;
             else {
@@ -107,32 +107,66 @@ if (isset($_SESSION['account'])) {
 
                     }
                 }
-                $_SESSION['new-project']['stage'] = '4';
+                $_SESSION['new-project']['stage'] = 3;
                 if (!isset($_SESSION['new-project']['info']['title']))
                     $_SESSION['new-project']['info']['title'] = ""; // Info bar fix
             }
         }
-        elseif ($_SESSION['new-project']['stage'] == '4') {
+        elseif ($_SESSION['new-preset']['stage'] == '4') {
             $_SESSION['new-project']['fields']['title'] = $_POST['title'];
             $_SESSION['new-project']['info']['title'] = $_POST['title'];
             if (strlen($_SESSION['new-project']['info']['title']) > 10)
                 $_SESSION['new-project']['info']['title'] = substr($_SESSION['new-project']['info']['title'], 0, 10) . "...";
 
-            $_SESSION['new-project']['stage'] = '5';
-            if (!isset($_SESSION['new-project']['info']['description']))
-                $_SESSION['new-project']['info']['description'] = ""; // Info bar fix
+            $_SESSION['new-project']['stage'] = 4;
+            if (!isset($_SESSION['new-project']['info']['manager-name']))
+                $_SESSION['new-project']['info']['manager-name'] = ""; // Info bar fix
         }
-        elseif ($_SESSION['new-project']['stage'] == '5') {
-            $_SESSION['new-project']['fields']['description'] = $_POST['description'];
-            $_SESSION['new-project']['info']['description'] = $_POST['description'];
-            if (strlen($_SESSION['new-project']['info']['description']) > 10)
-                $_SESSION['new-project']['info']['description'] = substr($_SESSION['new-project']['info']['description'], 0, 10) . "...";
+        elseif ($_SESSION['new-preset']['stage'] == '5') {
+            if (isset($_POST['manager'])) {
+                $_SESSION['new-project']['manager'] = $_POST['manager'];
+                $_SESSION['new-project']['info']['manager-name'] = Database::selectAccountByID($_POST['manager'])['username'];
+            }
+            else
+                $_SESSION['new-project']['info']['manager-name'] = "Later";
+            if (strlen($_SESSION['new-project']['info']['manager-name']) > 10)
+                $_SESSION['new-project']['info']['manager-name'] = substr($_SESSION['new-project']['info']['manager-name'], 0, 10) . "...";
 
-            $_SESSION['new-project']['stage'] = '6';
-            if (!isset($_SESSION['new-project']['info']['assignments']))
-                $_SESSION['new-project']['info']['assignments'] = ""; // Info bar fix
+            // If project added through new-assignment page complete project adding
+            if (isset($_SESSION['new-assignment']['new-project'])) {
+                // Insert to `project` table and save ID of the new record
+                $_SESSION['new-project']['fields']['projectid'] = Project::insert('project', $_SESSION['new-project']['fields'], true, null);
+
+                $fieldsStatus = [
+                    'projectid' => $_SESSION['new-project']['fields']['projectid'],
+                    'statusid' => 2,
+                    'time' => date("Y-m-d H-i-s"),
+                    'assigned_by' => $account->id,
+                    'note' => "New Project"
+                ];
+                if (isset($_SESSION['new-project']['manager']))
+                    $fieldsStatus['assigned_to'] = $_SESSION['new-project']['manager'];
+
+                $_SESSION['new-assignment']['fields']['projectid'] = $_SESSION['new-project']['fields']['projectid'];
+                // Insert to `project_status` table and save ID of the new record
+                $statusID = Project::insert('project_status', $fieldsStatus, true, null);
+                // Update `project` table record with saved ID status
+                Project::update('project', $_SESSION['new-project']['fields']['projectid'], ["statusid" => $statusID], null);
+
+                unset($_SESSION['new-assignment']['new-project']);
+                unset($_SESSION['new-project']);
+                $_SESSION['new-assignment']['project'] = Project::selectProject($_SESSION['new-assignment']['fields']['projectid'])['title'];
+                $_SESSION['new-assignment']['stage'] = '2';
+                $redirect = "new-assignment";
+                header('Location: ' . $redirect);
+            }
+            else {
+                $_SESSION['new-project']['stage'] = 5;
+                if (!isset($_SESSION['new-project']['info']['assignments']))
+                    $_SESSION['new-project']['info']['assignments'] = ""; // Info bar fix
+            }
         }
-        elseif ($_SESSION['new-project']['stage'] == '6') {
+        elseif ($_SESSION['new-preset']['stage'] == '6') {
             // Open preset list
             if (isset($_POST['add-assignment-page']))
                 $_SESSION['new-project']['add-assignment-page'] = true;
@@ -158,6 +192,8 @@ if (isset($_SESSION['account'])) {
                     'assigned_by' => $account->id,
                     'note' => "New Project"
                 ];
+                if (isset($_SESSION['new-project']['manager']))
+                    $fieldsStatus['assigned_to'] = $_SESSION['new-project']['manager'];
 
                 $redirect = "projects?p=" . $_SESSION['new-project']['fields']['projectid'];
 
@@ -221,25 +257,25 @@ if (isset($_SESSION['account'])) {
             }
         }
 
-        if (empty($_SESSION['new-project']['info']['floor'])) $_SESSION['new-project']['stage'] = '1';
-        elseif (empty($_SESSION['new-project']['info']['preset'])) $_SESSION['new-project']['stage'] = '2';
-        elseif (empty($_SESSION['new-project']['info']['client'])) $_SESSION['new-project']['stage'] = '3';
-        elseif (empty($_SESSION['new-project']['info']['title'])) $_SESSION['new-project']['stage'] = '4';
-        elseif (empty($_SESSION['new-project']['info']['description'])) $_SESSION['new-project']['stage'] = '5';
-        else $_SESSION['new-project']['stage'] = '6';
+        if (empty($_SESSION['new-preset']['info']['type'])) $_SESSION['new-preset']['stage'] = '1';
+        elseif (empty($_SESSION['new-preset']['info'][''])) $_SESSION['new-preset']['stage'] = '2';
+        elseif (empty($_SESSION['new-preset']['info'][''])) $_SESSION['new-preset']['stage'] = '3';
+        elseif (empty($_SESSION['new-preset']['info'][''])) $_SESSION['new-preset']['stage'] = '4';
+        elseif (empty($_SESSION['new-preset']['info'][''])) $_SESSION['new-preset']['stage'] = '5';
+        else $_SESSION['new-preset']['stage'] = '6';
     }
-    if (isset($_POST['stage1'])) $_SESSION['new-project']['stage'] = '1';
-    if (isset($_POST['stage2'])) $_SESSION['new-project']['stage'] = '2';
-    if (isset($_POST['stage3'])) $_SESSION['new-project']['stage'] = '3';
-    if (isset($_POST['stage4'])) $_SESSION['new-project']['stage'] = '4';
-    if (isset($_POST['stage5'])) $_SESSION['new-project']['stage'] = '5';
-    if (isset($_POST['stage6'])) $_SESSION['new-project']['stage'] = '6';
+    if (isset($_POST['stage1'])) $_SESSION['new-preset']['stage'] = '1';
+    if (isset($_POST['stage2'])) $_SESSION['new-preset']['stage'] = '2';
+    if (isset($_POST['stage3'])) $_SESSION['new-preset']['stage'] = '3';
+    if (isset($_POST['stage4'])) $_SESSION['new-preset']['stage'] = '4';
+    if (isset($_POST['stage5'])) $_SESSION['new-preset']['stage'] = '5';
+    if (isset($_POST['stage6'])) $_SESSION['new-preset']['stage'] = '6';
 
     if (isset($_POST['cancel']))
-        unset($_SESSION['new-project']); ?>
+        unset($_SESSION['new-preset']); ?>
 
     <div class="menu"> <?php
-    if ($_SESSION['new-project']['stage'] == '1') { ?>
+    if ($_SESSION['new-preset']['stage'] == '1') { ?>
         <div class="head-up-display-bar">
             <span>+ New Project: Select Floor</span>
         </div>
@@ -255,7 +291,7 @@ if (isset($_SESSION['account'])) {
         </div>
         </div> <?php
     }
-    elseif ($_SESSION['new-project']['stage'] == '2') { ?>
+    elseif ($_SESSION['new-preset']['stage'] == '2') { ?>
         <div class="head-up-display-bar">
             <span>+ New Project: Select Preset</span>
         </div>
@@ -300,7 +336,7 @@ if (isset($_SESSION['account'])) {
             <div class="empty-table">NO PRESETS</div> <?php
         }
     }
-    elseif ($_SESSION['new-project']['stage'] == '3') {
+    elseif ($_SESSION['new-preset']['stage'] == '3') {
         if (!isset($_SESSION['new-project']['new-client'])) { ?>
             <div class="head-up-display-bar">
                 <span>+ New Project: Select Client</span>
@@ -382,7 +418,7 @@ if (isset($_SESSION['account'])) {
                 echo $errorMsg;
         }
     }
-    elseif ($_SESSION['new-project']['stage'] == '4') { ?>
+    elseif ($_SESSION['new-preset']['stage'] == '4') { ?>
         <div class="head-up-display-bar">
             <span>+ New Project: Enter Name</span>
         </div>
@@ -414,16 +450,16 @@ if (isset($_SESSION['account'])) {
         if (isset($errorMsg))
             echo $errorMsg;
     }
-    elseif ($_SESSION['new-project']['stage'] == '5') { ?>
+    elseif ($_SESSION['new-preset']['stage'] == '5') { ?>
         <div class="head-up-display-bar">
-            <span>+ New Project: Enter Description</span>
+            <span>+ New Project: Select Manager</span>
         </div>
         <div class="navbar level-1 unselected">
             <form class="container-button disabled">
                 <a class="button admin-menu disabled"></a>
             </form>
-            <form id="test" name="test" method="post" class="container-button">
-                <input type="submit" name="submit" value="NEXT" class="button admin-menu">
+            <form method="post" class="container-button">
+                <input type="submit" name="submit" value="LATER" class="button admin-menu">
             </form>
             <form class="container-button disabled">
                 <a class="button admin-menu disabled"></a>
@@ -431,22 +467,32 @@ if (isset($_SESSION['account'])) {
         </div> <?php
         include_once "includes/info-bar.php"; ?>
         <div class="table-header-container">
-            <div class="header-extension small admin"></div>
-            <div class="header small">
-                <div class="head admin">Project Description</div>
+            <div class="header-extension admin"></div>
+            <div class="header">
+                <div class="head admin" style="width: 7.5%">№</div>
+                <div class="head admin" style="width: 40%">Member Name</div>
+                <div class="head admin" style="width: 30%">Membership</div>
+                <div class="head admin" style="width: 15%">Managing Projects</div>
+                <div class="head admin" style="width: 7.5%">Select</div>
             </div>
-            <div class="header-extension small admin"></div>
+            <div class="header-extension admin"></div>
         </div>
         </div>
-        <div class="table small">
-            <div class="row">
-                <input form="test" name="description" id="description" class="field admin" placeholder="Enter Project Description Here" value="<?php if (isset($_SESSION['new-project']['fields']['description'])) echo $_SESSION['new-project']['fields']['description']; ?>">
-            </div>
+        <div class="table admin"> <?php
+            $members = Project::selectManagers();
+            foreach ($members as $member) { ?>
+                <form method="post" class="row">
+                    <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $member['id']); ?>" class="content"></div>
+                    <div class="cell" style="width: 40%"><input type="submit" name="submit" value="<?php echo $member['username']; ?>" class="content"></div>
+                    <div class="cell" style="width: 30%"><input type="submit" name="submit" value="<?php echo "?"; ?>" class="content"></div>
+                    <div class="cell" style="width: 15%"><input type="submit" name="submit" value="<?php echo "? Projects"; ?>" class="content"></div>
+                    <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
+                    <input type="hidden" name="manager" value="<?php echo $member['id']; ?>">
+                </form> <?php
+            } ?>
         </div> <?php
-        if (isset($errorMsg))
-            echo $errorMsg;
     }
-    elseif ($_SESSION['new-project']['stage'] == '6') {
+    elseif ($_SESSION['new-preset']['stage'] == '6') {
         if (!isset($_SESSION['new-project']['add-assignment-page'])) { ?>
             <div class="head-up-display-bar">
                 <span>+ New Project: Assignments</span>

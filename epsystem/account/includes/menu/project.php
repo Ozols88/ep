@@ -1,8 +1,8 @@
 <?php
 
-$project = Project::selectAdminProjectStatic($_GET['p']);
+$project = Project::selectProject($_GET['p']);
 if ($project) {
-    $hudInitial = "Project #" . sprintf('%04d', $project['project_id']);
+    $hudInitial = "Project #" . sprintf('%04d', $project['id']);
 }
 else {
     header("Location: projects.php");
@@ -122,6 +122,29 @@ $menu = [
                 ],
                 "link" => "Project List",
                 "note" => "Keep in mind these are only the projects you have accepted or completed a task for"
+            ],
+            "level-2" => [
+                "+ New Assignment" => [
+                    "admin" => false,
+                    "link" => "new",
+                    "default-link" => "new",
+                    "page" => "new-assignment.php?p=" . $_GET['p'],
+                    "hud" => "New Assignment",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ]
             ]
         ],
         "INFO" => [
@@ -235,74 +258,99 @@ if ($project['assigned_to']) {
 }*/
 // Client check
 if (isset($_POST['submit']) && $_POST['submit'] == "Add Client" || isset($_SESSION['add-client']['stage']) && $_SESSION['add-client']['stage'] == 2)
-    $menu['level-1']['INFO']['level-2']['CLIENT']['hud'] = $hudInitial . ": Add Client";
+    $menu['level-1']['PROJECT']['level-2']['CLIENT']['hud'] = $hudInitial . ": Add Client";
 // Manager check
 if (isset($_POST['submit']) && $_POST['submit'] == "Assign Manager" || isset($_SESSION['new-manager']['stage']) && $_SESSION['new-manager']['stage'] == 2) {
-    $menu['level-1']['INFO']['level-2']['OPTIONS']['hud'] = $hudInitial . ": Assign Manager";
+    $menu['level-1']['PROJECT']['level-2']['OPTIONS']['hud'] = $hudInitial . ": Assign Manager";
 }
 // Assignments and tasks check
-$types = [
-    1 => "PRODUCTION",
-    0 => "CUSTOM",
-    3 => "REVIEW",
-    2 => "MANAGEMENT"
-];
 if (isset($_GET['l1']) && $_GET['l1'] == "assignments") {
-    foreach ($types as $typeNum => $typeName) {
-        $menu['level-1']['ASSIGNMENTS']['level-2'][strtoupper($typeName)] = [
-            "admin" => false,
-            "link" => $typeNum,
-            "default-link" => $typeNum,
-            "hud" => $hudInitial . ": " . $typeName . " Assignments",
-            "home" => [
-                "title" => "All Pending Projects",
-                "description" => "Here you can access and view projects that have been paused for reasons such us awaiting approval",
-                "total" => [
-                    "name" => "Total Projects",
-                    "count" => 62
-                ],
-                "last-hours" => [
-                    "title" => "In the last 24h",
-                    "details" => [
-                        [
-                            "name" => "Moved to pending",
-                            "count" => "+5"
-                        ]
-                    ],
-                ],
-                "link" => "Project List",
-                "note" => "Keep in mind these are only the projects you have accepted or completed a task for"
-            ]
-        ];
-        $departments = Project::selectProjectDepartments($_GET['p'], $typeNum);
-        if ($departments) {
-            foreach ($departments as $department)
-            $menu['level-1']['ASSIGNMENTS']['level-2'][strtoupper($typeName)]['level-3'][strtoupper($department['depart_title'])] = [
-                "admin" => false,
-                "count" => $department['assignment_count'],
-                "link" => $department['depart_id'],
-                "default-link" => $department['depart_id'],
-                "hud" => $hudInitial . ": " . $department['depart_title'] . " Assignments",
-                "home" => [
-                    "title" => "All Pending Projects",
-                    "description" => "Here you can access and view projects that have been paused for reasons such us awaiting approval",
-                    "total" => [
-                        "name" => "Total Projects",
-                        "count" => 62
-                    ],
-                    "last-hours" => [
-                        "title" => "In the last 24h",
-                        "details" => [
-                            [
-                                "name" => "Moved to pending",
-                                "count" => "+5"
-                            ]
+    $divisions = Project::selectProjectDivisions($_GET['p']);
+    if ($divisions) {
+        if (count($divisions) < 6) {
+            foreach ($divisions as $division) {
+                $menu['level-1']['ASSIGNMENTS']['level-2'][strtoupper($division['division_title'])] = [
+                    "admin" => false,
+                    "count" => $division['assignment_count'],
+                    "link" => $division['division_id'],
+                    "default-link" => $division['division_id'],
+                    "hud" => $hudInitial . ": " . $division['division_title'] . " Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
                         ],
-                    ],
-                    "link" => "Project List",
-                    "note" => "Keep in mind these are only the projects you have accepted or completed a task for"
-                ]
-            ];
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ];
+                if (count($divisions) == 1 && !isset($_GET['l2'])) header("Location: projects.php?p=" . $project['id'] . "&l1=assignments&l2=" . $division['division_id']);
+            }
+        }
+        else {
+            $groupView = true;
+            $currentGroup = null;
+            foreach ($divisions as $division) {
+                if ($currentGroup != $division['group_id']) {
+                    $currentGroup = $division['group_id'];
+                    $menu['level-1']['ASSIGNMENTS']['level-2'][strtoupper($division['group_title'])] = [
+                        "admin" => false,
+                        "link" => $division['group_id'],
+                        "default-link" => $division['group_id'],
+                        "hud" => $hudInitial . ": " . $division['group_title'] . " Divisions",
+                        "home" => [
+                            "title" => "",
+                            "description" => "",
+                            "total" => [
+                                "name" => "",
+                                "count" => ""
+                            ],
+                            "last-hours" => [
+                                "title" => "",
+                                "details" => []
+                            ],
+                            "link" => "",
+                            "note" => ""
+                        ]
+                    ];
+                }
+                $menu['level-1']['ASSIGNMENTS']['level-2'][strtoupper($division['group_title'])]['level-3'][strtoupper($division['division_title'])] = [
+                    "admin" => false,
+                    "count" => $division['assignment_count'],
+                    "link" => $division['division_id'],
+                    "default-link" => $division['division_id'],
+                    "hud" => $hudInitial . ": " . $division['division_title'] . " Assignments",
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
+                ];
+            }
+            // If current group has only one division, open it
+            if (isset($_GET['l2']) && !isset($_GET['l3']))
+                foreach ($menu['level-1']['ASSIGNMENTS']['level-2'] as $title => $group) {
+                    if ($title == "+ New Assignment") continue;
+
+                    if (count($group['level-3']) == 1 && $_GET['l2'] == $group['link'])
+                        foreach ($group['level-3'] as $division)
+                            header("Location: projects.php?p=" . $_GET['p'] . "&l1=assignments&l2=" . $_GET['l2'] . "&l3=" . $division['link']);
+                }
         }
     }
 }

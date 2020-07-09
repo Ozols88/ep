@@ -137,7 +137,7 @@ class Database
     }
 
     public static function selectMembers() {
-        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account` WHERE `account`.`type` = '1'");
+        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account`");
         if ($rows) {
             foreach ($rows as $key => $value) {
                 $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);
@@ -146,15 +146,18 @@ class Database
         }
         else return null;
     }
-    public static function selectMemberCount() {
-        $rows = self::selectStatic(null, "SELECT COUNT(*) FROM `account` WHERE `account`.`type` = '1'");
-        if ($rows[0][0]) {
-            return $rows[0][0];
+    public static function selectManagers() {
+        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account` WHERE `account`.`manager` = '1'");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);
+            }
+            return $rows;
         }
         else return null;
     }
     public static function selectClients() {
-        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time`, COUNT(`project`.`id`) AS `project_count`, COUNT(`account`.`id`) AS `client_count` FROM `account` LEFT JOIN `project` ON `account`.`id` = `project`.`clientid` WHERE `account`.`type` = '2' GROUP BY `account`.`id`");
+        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time`, COUNT(`project`.`id`) AS `project_count` FROM `account` LEFT JOIN `project` ON `account`.`id` = `project`.`clientid` WHERE `account`.`client` = '1' GROUP BY `account`.`id`");
         if ($rows) {
             foreach ($rows as $key => $value) {
                 $rows[$key]['reg_time_date'] = self::datetimeToDateWithoutSeconds($rows[$key]['reg_time']);

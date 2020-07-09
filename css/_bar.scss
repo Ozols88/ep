@@ -24,13 +24,6 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    // NON-ADMIN COLOR
-    /*&.line-left {
-      border-left: 1px solid $c9;
-    }
-    &.line-right {
-      border-right: 1px solid $c9;
-    }*/
     &.line-left {
       border-left: 1px solid $c61;
     }
@@ -132,104 +125,83 @@ hr {
   user-select: none;
 
   input {
+    box-shadow: none;
     height: 3.2vh;
     background: #FFFFFF;
-    border: 1px solid $c37;
+    border: 1px solid $c11;
     border-radius: 5px;
-    color: $c35;
+    color: $c1;
     text-align: center;
     text-align-last: center;
     font-size: 0.8vw;
-    margin: 0 1px;
-  }
-  input.input-id {
-    width: calc(7.5% - 2px);
-  }
-  input.input-name {
-    width: calc(20% - 2px);
-  }
-  .custom-select.input-division {
-    width: calc(15% - 2px);
-  }
-  .custom-select.input-preset {
-    width: calc(15% - 2px);
+    margin: 0 4px;
+    &:focus {
+      border: 1px solid $c2;
+      &::placeholder {
+        color: transparent;
+      }
+    }
+    &:valid {
+      border: 1px solid $c2;
+    }
   }
   ::placeholder {
-    color: $c35;
+    color: $c11;
     font-size: 0.8vw;
     opacity: 1;
   }
   :-ms-input-placeholder {
-    color: $c35;
+    color: $c11;
     font-size: 0.8vw;
   }
   ::-ms-input-placeholder {
-    color: $c35;
+    color: $c11;
     font-size: 0.8vw;
   }
 
   select {
+    box-shadow: none;
     height: 3.2vh;
     width: 100%;
-    border: 1px solid $c37;
+    border: 1px solid $c11;
     border-radius: 5px;
     text-align: center;
     text-align-last: center;
     font-size: 0.8vw;
-    color: $c35;
+    color: $c1;
     cursor: pointer;
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
     -webkit-border-radius: 5px;
     background: transparent;
+    &:focus {
+      border: 1px solid $c2;
+    }
+  }
+  select:valid {
+    border: 1px solid $c2;
   }
   select:invalid {
-    color: $c35;
+    color: $c11;
   }
   select option {
-    color: $c35;
+    color: $c1;
+  }
+  select::-ms-expand {
+    display: none;
   }
 
   .custom-select {
-    margin: 0 1px;
+    margin: 0 4px;
     border-radius: 5px;
     background-image: url("../epsystem/account/img/dropdown-menu-button.svg");
     background-repeat: no-repeat;
     background-position: right top;
+    background-position-x: right;
+    background-position-y: top;
   }
-  .custom-select:hover {
+  .custom-select:hover, .custom-select:focus-within, .custom-select.active {
     background-image: url("../epsystem/account/img/dropdown-menu-button-hl.svg");
-  }
-}
-
-
-/* DECISION BAR*/
-
-
-.decision-bar {
-  width: 100%;
-  display: flex;
-  margin: 5vh 0 5vh 0;
-  user-select: none;
-
-   .button:nth-of-type(even) {
-    background: $c112;
-  }
-  .button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    background: $c37;
-    color: $c1;
-    font-weight: bold;
-    font-size: 0.7vw;
-    flex: 1;
-    height: 3vh;
-    text-align: center;
-    &:hover {
-      background: $c4;
-    }
   }
 }

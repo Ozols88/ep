@@ -3,7 +3,7 @@
 $menu = [
     "hud" => "Projects",
     "level-1" => [
-        "+ New" => [
+        "+ New Project" => [
             "admin" => false,
             "link" => "new",
             "default-link" => "new",
@@ -12,7 +12,7 @@ $menu = [
         ],
         "PENDING" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(2),
+            "count" => Project::getProjectCountByStatus(4) + Project::getProjectCountByStatus(1),
             "link" => "pending",
             "default-link" => "pending",
             "hud" => "Pending Projects",
@@ -38,7 +38,7 @@ $menu = [
         ],
         "ACTIVE" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(1),
+            "count" => Project::getProjectCountByStatus(3),
             "link" => "active",
             "default-link" => "active",
             "hud" => "Active Projects",
@@ -68,7 +68,7 @@ $menu = [
         ],
         "COMPLETED" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(3),
+            "count" => Project::getProjectCountByStatus(5),
             "link" => "completed",
             "default-link" => "completed",
             "hud" => "Completed Projects",
@@ -94,7 +94,7 @@ $menu = [
         ],
         "CANCELED" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(4),
+            "count" => Project::getProjectCountByStatus(6),
             "link" => "canceled",
             "default-link" => "canceled",
             "hud" => "Canceled Projects",

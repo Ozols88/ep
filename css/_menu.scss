@@ -23,7 +23,7 @@
   line-height: 12vh;
   font-size: 2.8vw;
   font-weight: bold;
-  color: $c11;
+  color: $c10;
   text-transform: uppercase;
 }
 
@@ -47,14 +47,14 @@
       height: 6vh;
       font-size: 1.3vw;
       padding-top: 1px;
-    }
-    .count {
-      height: 50%;
-      padding-top: 1px;
-    }
-    .lock {
-      height: 50%;
-      width: 1.6vw;
+      .count {
+        height: 50%;
+        padding-top: 1px;
+      }
+      .lock {
+        height: 50%;
+        width: 1.6vw;
+      }
     }
   }
   &.level-2 {
@@ -66,14 +66,14 @@
       height: 4.5vh;
       font-size: 0.90vw;
       padding-top: 2px;
-    }
-    .count {
-      height: 50%;
-      padding-top: 2px;
-    }
-    .lock {
-      height: 50%;
-      width: 1.3vw;
+      .count {
+        height: 50%;
+        padding-top: 2px;
+      }
+      .lock {
+        height: 50%;
+        width: 1.3vw;
+      }
     }
   }
   &.level-3 {
@@ -84,12 +84,12 @@
     .button {
       height: 3.5vh;
       font-size: 0.80vw;
-    }
-    .count, .lock {
-      height: 60%;
-    }
-    .lock {
-      width: 1.3vw;
+      .count, .lock {
+        height: 60%;
+      }
+      .lock {
+        width: 1.3vw;
+      }
     }
   }
   &.level-4 {
@@ -121,6 +121,7 @@
       align-items: center;
       cursor: pointer;
       border: none;
+      border-radius: 0;
       .count {
         display: flex;
         justify-content: center;
@@ -213,6 +214,10 @@
   }
 }
 
+.navbar.level-2 .container-button .button.page:hover {
+  color: $c1;
+  background: $c2;
+}
 .navbar.level-2 .container-button {
   &:nth-of-type(even) .button {
     background: #BA8F2E;
@@ -592,4 +597,39 @@
 .navbar.unselected .container-button:hover .button.admin-menu {
   color: $c1;
   background: $c2;
+}
+
+.navbar.level-1.unselected .container-button {
+  .button .count {
+  }
+  &:hover .button .count {
+    background: $c1;
+    color: $c2;
+  }
+}
+
+.navbar.level-2.unselected .container-button {
+  .button .count {
+    background: $c13;
+  }
+  &:hover .button .count {
+    background: $c1;
+    color: $c2;
+  }
+}
+
+.navbar.level-3.unselected .container-button {
+  .button {
+    color: $c2;
+  }
+  .button .count {
+    background: $c2;
+  }
+  &:hover .button {
+    color: $c1;
+  }
+  &:hover .button .count {
+    background: $c1;
+    color: $c2;
+  }
 }

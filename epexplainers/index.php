@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-    <title>ep videos</title>
+    <title>ep explainers</title>
     <!--realfavicongenerator.net-->
     <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32x32.png">
@@ -25,13 +25,13 @@
 </head>
 <body>
 <div class="container-header">
-    <img class="logo-header" src="/ep/epvideos/img/logo.svg" alt="ep">
+    <img class="logo-header" src="/ep/epexplainers/img/logo.svg" alt="ep">
     <form method="post" class="exit-form">
         <input type="submit" name="exit" value="Go to ep home" class="exit-button">
     </form></div>
 <div class="menu">
     <div class="head-up-display-bar">
-        <span>Welcome to ep videos</span>
+        <span>Welcome to ep explainers</span>
     </div>
     <div class="navbar level-1">
         <div class="container-button disabled">

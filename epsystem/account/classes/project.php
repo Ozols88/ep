@@ -14,7 +14,7 @@ class Project extends Database
     }
 
     public static function selectProjectListByStatus($statusID) {
-        $rows = self::selectStatic(array($statusID), "SELECT `project`.`id` AS `project_id`, `status`.`title` AS `status`, `username` AS `client_username`, `floor`.`title` AS `project_floor`, `preset-project`.`title` AS `project_preset`, `project`.`title` AS `project_title`, `price`, `time`, `note`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` WHERE `task_status`.`statusid` = '3' AND `assignment`.`projectid` = `project`.`id` ) AS `completed_tasks`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id` ) AS `total_tasks`, (SELECT SUM(`task`.`estimated`) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_time`, ( SELECT SUM(`task`.`value`) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_value` FROM `project` LEFT JOIN `account` ON `account`.`id` = `project`.`clientid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `floor` ON `floor`.`id` = `project`.`floorid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN `status` ON `status`.`id` = `project_status`.`statusid` WHERE `project_status`.`statusid` = ?");
+        $rows = self::selectStatic(array($statusID), "SELECT `project`.`id` AS `project_id`, `status`.`title` AS `status`, `username` AS `client_username`, `floor`.`title` AS `project_floor`, `preset-project`.`title` AS `project_preset`, `project`.`title` AS `project_title`, `price`, `time`, `note`, ( SELECT COUNT(*) FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`statusid` = '7' AND `assignment`.`projectid` = `project`.`id` ) AS `completed_assignments`, ( SELECT COUNT(*) FROM `assignment` WHERE `assignment`.`projectid` = `project`.`id` ) AS `total_assignments`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` WHERE `assignment`.`projectid` = `project`.`id` AND (`task_status`.`statusid` = '1' OR `task_status`.`statusid` = '5' OR `task_status`.`statusid` = '6')) AS `pending_tasks`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` WHERE `task_status`.`statusid` = '7' AND `assignment`.`projectid` = `project`.`id` ) AS `completed_tasks`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id` ) AS `total_tasks`, (SELECT SUM(`task`.`estimated`) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_time`, ( SELECT SUM(`task`.`value`) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_value` FROM `project` LEFT JOIN `account` ON `account`.`id` = `project`.`clientid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `floor` ON `floor`.`id` = `project`.`floorid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN `status` ON `status`.`id` = `project_status`.`statusid` WHERE `project_status`.`statusid` = ?");
         if ($rows) {
             foreach ($rows as $key => $value) {
                 if (!$rows[$key]['project_preset'])
@@ -38,19 +38,6 @@ class Project extends Database
                     $rows[$key]['task_time'] = "0min";
                     $rows[$key]['task_sum'] = "0€";
                 }
-            }
-            return $rows;
-        }
-        else return null;
-    }
-
-    public static function selectProjectList() {
-        $rows = self::selectStatic(null, "SELECT `project`.`id` AS `project_id`, `status`.`title` AS `status`, `username` AS `client_username`, `preset-project`.`title` AS `project_preset`, `project`.`title` AS `project_title`, `price`, `time`, `note`, ( SELECT COUNT(*) FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`statusid` = '3' AND `assignment`.`projectid` = `project`.`id` ) AS `completed_assignments`, ( SELECT COUNT(*) FROM `assignment` WHERE `assignment`.`projectid` = `project`.`id` ) AS `total_assignments` FROM `project` LEFT JOIN `account` ON `account`.`id` = `project`.`clientid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN `status` ON `status`.`id` = `project_status`.`statusid`");
-        if ($rows) {
-            foreach ($rows as $key => $value) {
-                if (!$rows[$key]['project_preset'])
-                    $rows[$key]['project_preset'] = "custom";
-                $rows[$key]['date'] = date('d M Y', strtotime($rows[$key]['time']));
             }
             return $rows;
         }
@@ -95,9 +82,80 @@ class Project extends Database
     }
 
     public static function selectPresetsByFloorID($id) {
-        $rows = self::selectStatic(array($id), "SELECT `preset-project`.`id`, `preset-project`.`floorid`, `preset-project`.`title` FROM `preset-project` INNER JOIN `floor` ON `floor`.`id` = `preset-project`.`floorid` WHERE `floor`.`id` = ?");
+        $rows = self::selectStatic(array($id), "SELECT `preset-project`.`id`, `preset-project`.`floorid`, `preset-project`.`title`, `preset-project`.`description` FROM `preset-project` INNER JOIN `floor` ON `floor`.`id` = `preset-project`.`floorid` WHERE `floor`.`id` = ?");
         if ($rows) return $rows;
         else return null;
+    }
+
+    public static function isProjectCancelable($project) {
+        // Function checks if there are any pending(4,5,6) assignments (can't cancel project with those)
+        if ($project['statusid'] == 4 || $project['statusid'] == 6) {
+            $assignments = Assignment::selectProjectAssignments($project['id']);
+            if ($assignments)
+                foreach ($assignments as $assignment)
+                    if ($assignment['statusid'] == 4 || $assignment['statusid'] == 5 || $assignment['statusid'] == 6)
+                        return false;
+            return true;
+        }
+        else return false;
+    }
+
+    public static function isProjectCompletable($project) {
+        // Function checks if all assignments are completed
+        if ($project['statusid'] == 6) {
+            $assignments = Assignment::selectProjectAssignments($project['id']);
+            if ($assignments)
+                foreach ($assignments as $assignment)
+                    if ($assignment['statusid'] != 7)
+                        return false;
+            return true;
+        }
+        else return false;
+    }
+
+    public static function isProjectDeletable($project) {
+        // Function checks if there are any non-1,2 status assignments (can't delete project with those)
+        if ($project['statusid'] == 4 || $project['statusid'] == 6) {
+            $assignments = Assignment::selectProjectAssignments($project['id']);
+            if ($assignments)
+                foreach ($assignments as $assignment)
+                    if ($assignment['statusid'] != 1 || $assignment['statusid'] != 2)
+                        return false;
+            return true;
+        }
+        else return false;
+    }
+
+    public static function projectStatusChanger($projectID, $accountID) {
+        // Function changes project status to active/pending according to assignment statuses
+        $project = self::selectProject($projectID);
+        $assignments = Assignment::selectProjectAssignments($projectID);
+
+        $statusID = 6;
+        if ($assignments)
+            foreach ($assignments as $assignment)
+                if ($assignment['statusid'] == 4) {
+                    $statusID = 4;
+                    break;
+                }
+
+        if ($statusID == 4 && $project['statusid'] == 6) $change = 4;
+        elseif ($statusID == 6 && $project['statusid'] == 4) $change = 6;
+        else $change = null;
+
+        if (!is_null($change)) {
+            $fields = [
+                'projectid' => $projectID,
+                'time' => date("Y-m-d H-i-s"),
+                'assigned_by' => $accountID,
+                'note' => "Assignment status changed"
+            ];
+            if ($change == 4) $fields['statusid'] = 4;
+            elseif ($change == 6) $fields['statusid'] = 6;
+
+            $statusID = Assignment::insert('project_status', $fields, true, false);
+            self::update('project', $projectID, ["statusid" => $statusID], false);
+        }
     }
 
     // Queries for search

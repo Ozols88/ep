@@ -297,6 +297,10 @@
   }
 }
 
+.navbar.level-3 .container-button .button.page:hover {
+  color: $c1;
+  background: $c2;
+}
 .navbar.level-3 .container-button {
   &:nth-of-type(even) .button {
     background: #BA8F2E;

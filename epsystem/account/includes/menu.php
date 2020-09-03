@@ -1,6 +1,6 @@
 <?php
 
-if (basename($_SERVER['SCRIPT_FILENAME']) == "index.php")
+if (basename($_SERVER['REQUEST_URI']) == "account")
     require "menu/hub.php";
 
 elseif (basename($_SERVER['SCRIPT_FILENAME']) == "projects.php") {
@@ -11,7 +11,7 @@ elseif (basename($_SERVER['SCRIPT_FILENAME']) == "projects.php") {
 }
 
 elseif (basename($_SERVER['SCRIPT_FILENAME']) == "assignments.php") {
-    if (!isset($_GET['a']))
+    if (!isset($_GET['a']) && !isset($_GET['t']))
         require "menu/assignments.php";
     else
         require "menu/assignment.php";
@@ -21,6 +21,9 @@ elseif (basename($_SERVER['SCRIPT_FILENAME']) == "resources.php")
     require "menu/resources.php";
 
 elseif (basename($_SERVER['SCRIPT_FILENAME']) == "r&d.php")
+    require "menu/r&d.php";
+
+elseif ($_SERVER['PHP_SELF'] == "/ep/epsystem/account/new-r&d/index.php")
     require "menu/r&d.php";
 
 elseif (basename($_SERVER['SCRIPT_FILENAME']) == "numbers.php")
@@ -63,20 +66,17 @@ elseif (isset($menu)) $hud = $menu['hud']; ?>
 </div> <?php
 
 // LEVEL 1
-if (isset($menu) && isset($menu['level-1'])) {
-    // Check for disabled buttons
-    if (count($menu['level-1']) == 1) $singleButton = true;
-    else $singleButton = false; ?>
+if (isset($menu) && isset($menu['level-1'])) { ?>
 
     <div class="navbar level-1<?php if (!isset($_GET['l1'])) echo " current"; if (!isset($_GET['l1'])) echo " unselected"; ?>"> <?php
 
-    if ($singleButton) { ?>
-        <div class="container-button disabled">
-            <a class="button disabled"></a>
-        </div> <?php
-    }
-
     foreach ($menu['level-1'] as $menuLvl1ItemName => $menuLvl1Item) {
+        // Hide manager buttons from non-managers
+        if (isset($menuLvl1Item['manager']) && $menuLvl1Item['manager'] == true && $_SESSION['account']->manager != 1) {
+            unset($menu['level-1'][$menuLvl1ItemName]);
+            continue;
+        }
+
         // Lock check
         if (isset($menuLvl1Item['locked']) || isset($_GET['preview']) && $menuLvl1ItemName != "INFO" && $menuLvl1ItemName != "PRODUCTION")
             $locked = true;
@@ -87,10 +87,26 @@ if (isset($menu) && isset($menu['level-1'])) {
             $href = $menuLvl1Item['page'];
         // Link check
         else {
-            if (isset($_GET['p']))
-                $href = "?p=" . $_GET['p'] . "&l1=" . $menuLvl1Item['default-link'];
-            elseif (isset($_GET['a']))
-                $href = "?a=" . $_GET['a'] . "&l1=" . $menuLvl1Item['default-link'];
+            if (isset($_GET['p'])) {
+                if (!isset($_GET['options']))
+                    $href = "?p=" . $_GET['p'] . "&l1=" . $menuLvl1Item['default-link'];
+                else
+                    $href = "?p=" . $_GET['p'] . "&options&l1=" . $menuLvl1Item['default-link'];
+            }
+            elseif (isset($_GET['a'])) {
+                if (!isset($_GET['options']))
+                    $href = "?a=" . $_GET['a'] . "&l1=" . $menuLvl1Item['default-link'];
+                else
+                    $href = "?a=" . $_GET['a'] . "&options&l1=" . $menuLvl1Item['default-link'];
+            }
+            elseif (isset($_GET['f']))
+                $href = "?f=" . $_GET['f'] . "&l1=" . $menuLvl1Item['default-link'];
+            elseif (isset($_GET['t'])) {
+                if (!isset($_GET['options']))
+                    $href = "?t=" . $_GET['t'] . "&l1=" . $menuLvl1Item['default-link'];
+                else
+                    $href = "?t=" . $_GET['t'] . "&options&l1=" . $menuLvl1Item['default-link'];
+            }
             else
                 $href = "?l1=" . $menuLvl1Item['default-link'];
             if (isset($_GET['preview']))
@@ -99,7 +115,31 @@ if (isset($menu) && isset($menu['level-1'])) {
         if (isset($menuLvl1Item['new-tab']))
             $target = "_blank";
         else
-            $target = "_self"; ?>
+            $target = "_self";
+
+        // Check for disabled buttons
+        if (count($menu['level-1']) == 1) {
+            $singleButton = true;
+            $button = current($menu['level-1']);
+            if ($button['admin'] == true)
+                $admin = true;
+            else
+                $admin = false;
+        }
+        else $singleButton = false;
+
+        if ($singleButton) {
+            if ($admin == false) { ?>
+                <div class="container-button disabled">
+                    <a class="button disabled"></a>
+                </div> <?php
+            }
+            else { ?>
+                <div class="container-button disabled">
+                    <a class="button admin-menu disabled"></a>
+                </div> <?php
+            }
+        } ?>
 
         <div class="container-button">
             <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>" target="<?php echo $target; ?>"<?php } ?> class="button<?php if (isset($menuLvl1Item['page'])) echo " page"; if ($menuLvl1Item['admin']) echo " admin-menu"; if (isset($_GET['l1']) && $_GET['l1'] == $menuLvl1Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
@@ -137,10 +177,17 @@ if (isset($menu) && isset($menu['level-1'])) {
         </div> <?php
     }
 
-    if ($singleButton) { ?>
-        <div class="container-button disabled">
-            <a class="button disabled"></a>
-        </div> <?php
+    if (isset($singleButton) && $singleButton) {
+        if ($admin == false) { ?>
+            <div class="container-button disabled">
+                <a class="button disabled"></a>
+            </div> <?php
+        }
+        else { ?>
+            <div class="container-button disabled">
+                <a class="button admin-menu disabled"></a>
+            </div> <?php
+        }
     } ?>
     </div> <?php
     // LEVEL 2
@@ -160,6 +207,12 @@ if (isset($menu) && isset($menu['level-1'])) {
                 }
 
                 foreach ($menuLvl1Item['level-2'] as $menuLvl2ItemName => $menuLvl2Item) {
+                    // Hide manager buttons from non-managers
+                    if (isset($menuLvl2Item['manager']) && $menuLvl2Item['manager'] == true && $_SESSION['account']->manager != 1) {
+                        unset($menu['level-2'][$menuLvl2ItemName]);
+                        continue;
+                    }
+
                     if (isset($menuLvl2Item['locked']) || isset($_GET['preview']) && $menuLvl2ItemName != "OPERATIONS")
                         $locked = true;
                     else
@@ -167,10 +220,26 @@ if (isset($menu) && isset($menu['level-1'])) {
                     if (isset($menuLvl2Item['page']))
                         $href = $menuLvl2Item['page'];
                     else {
-                        if (isset($_GET['p']))
-                            $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
-                        elseif (isset($_GET['a']))
-                            $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                        if (isset($_GET['p'])) {
+                            if (!isset($_GET['options']))
+                                $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                            else
+                                $href = "?p=" . $_GET['p'] . "&options&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                        }
+                        elseif (isset($_GET['a'])) {
+                            if (!isset($_GET['options']))
+                                $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                            else
+                                $href = "?a=" . $_GET['a'] . "&options&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                        }
+                        elseif (isset($_GET['f']))
+                            $href = "?f=" . $_GET['f'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                        elseif (isset($_GET['t'])) {
+                            if (!isset($_GET['options']))
+                                $href = "?t=" . $_GET['t'] . "&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                            else
+                                $href = "?t=" . $_GET['t'] . "&options&l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
+                        }
                         else
                             $href = "?l1=" . $_GET['l1'] . "&l2=" . $menuLvl2Item['default-link'];
                         if (isset($_GET['preview']))
@@ -236,6 +305,12 @@ if (isset($menu) && isset($menu['level-1'])) {
                     <div class="navbar level-3<?php if (!isset($_GET['l3'])) echo " current"; if (!isset($_GET['l3'])) echo " unselected"; if ($isAdminMenu) echo " admin"; ?>"> <?php
 
                     foreach ($menuLvl3 as $menuLvl3ItemName => $menuLvl3Item) {
+                        // Hide manager buttons from non-managers
+                        if (isset($menuLvl3Item['manager']) && $menuLvl3Item['manager'] == true && $_SESSION['account']->manager != 1) {
+                            unset($menu['level-3'][$menuLvl3ItemName]);
+                            continue;
+                        }
+
                         if (isset($menuLvl3Item['locked']) || isset($_GET['preview']) && $menuLvl3ItemName != "Colors")
                             $locked = true;
                         else
@@ -247,6 +322,10 @@ if (isset($menu) && isset($menu['level-1'])) {
                                 $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
                             elseif (isset($_GET['a']))
                                 $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
+                            elseif (isset($_GET['f']))
+                                $href = "?f=" . $_GET['f'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
+                            elseif (isset($_GET['t']))
+                                $href = "?t=" . $_GET['t'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
                             else
                                 $href = "?l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $menuLvl3Item['default-link'];
                             if (isset($_GET['preview']))
@@ -258,7 +337,7 @@ if (isset($menu) && isset($menu['level-1'])) {
                             $target = "_self"; ?>
 
                         <div class="container-button">
-                            <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>" target="<?php echo $target; ?>"<?php } ?> class="button<?php if ($menuLvl3Item['admin']) echo " admin-menu"; if (isset($_GET['l3']) && $_GET['l3'] == $menuLvl3Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
+                            <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>" target="<?php echo $target; ?>"<?php } ?> class="button<?php if (isset($menuLvl3Item['page'])) echo " page"; if ($menuLvl3Item['admin']) echo " admin-menu"; if (isset($_GET['l3']) && $_GET['l3'] == $menuLvl3Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
                                 <span><?php echo $menuLvl3ItemName; ?></span> <?php
                                 if ($locked || (isset($_GET['l3']) && $_GET['l3'] != $menuLvl3Item['link']) && isset($_GET['preview2'])) { ?>
                                     <div class="lock"></div> <?php
@@ -299,62 +378,6 @@ if (isset($menu) && isset($menu['level-1'])) {
                                 else $isAdminMenu = false;
                             }
                     } ?>
-
-                    </div> <?php
-                }
-                if (isset($_GET['l3']) && isset($menuLvl4)) {
-
-                    if (count($menuLvl4) == 1) $singleButton = true;
-                    else $singleButton = false; ?>
-
-                    <div class="navbar level-4<?php if ($isAdminMenu) echo " admin"; ?>"> <?php
-
-                        if ($singleButton) { ?>
-                            <div class="container-button disabled">
-                                <a class="button disabled"></a>
-                            </div> <?php
-                        }
-
-                        foreach ($menuLvl4 as $menuLvl4ItemName => $menuLvl4Item) {
-                            if (isset($menuLvl4Item['locked']) || isset($_GET['preview']) && $menuLvl4ItemName != "ASSIGNMENT")
-                                $locked = true;
-                            else
-                                $locked = false;
-                            if (isset($menuLvl4Item['page']))
-                                $href = $menuLvl4Item['page'];
-                            else {
-                                if (isset($_GET['p']))
-                                    $href = "?p=" . $_GET['p'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=" . $menuLvl4Item['default-link'];
-                                elseif (isset($_GET['a']))
-                                    $href = "?a=" . $_GET['a'] . "&l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=" . $menuLvl4Item['default-link'];
-                                else
-                                    $href = "?l1=" . $_GET['l1'] . "&l2=" . $_GET['l2'] . "&l3=" . $_GET['l3'] . "&l4=" . $menuLvl4Item['default-link'];
-                                if (isset($_GET['preview']))
-                                    $href .= "&preview";
-                            }
-                            if (isset($menuLvl1Item['new-tab']))
-                                $target = "_blank";
-                            else
-                                $target = "_self"; ?>
-
-                            <div class="container-button">
-                                <a<?php if (!$locked && !isset($_GET['preview2'])) { ?> href="<?php echo $href; ?>" target="<?php echo $target; ?>"<?php } ?> class="button<?php if ($menuLvl4Item['admin']) echo " admin-menu"; if (isset($_GET['l4']) && $_GET['l4'] == $menuLvl4Item['link']) echo " active-menu"; elseif (isset($_GET['preview2'])) echo " locked"; elseif ($locked) echo " locked"; ?>">
-                                    <span><?php echo $menuLvl4ItemName; ?></span> <?php
-                                    if ($locked || (isset($_GET['l4']) && $_GET['l4'] != $menuLvl4Item['link']) && isset($_GET['preview2'])) { ?>
-                                        <div class="lock"></div> <?php
-                                    }
-                                    elseif (isset($menuLvl4Item['count']) && $menuLvl4Item['count']) { ?>
-                                        <div class="count"><?php echo $menuLvl4Item['count']; ?></div> <?php
-                                    } ?>
-                                </a>
-                            </div> <?php
-                        }
-
-                        if ($singleButton) { ?>
-                            <div class="container-button disabled">
-                                <a class="button disabled"></a>
-                            </div> <?php
-                        } ?>
 
                     </div> <?php
                 }

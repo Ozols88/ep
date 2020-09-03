@@ -10,13 +10,13 @@ class Task extends Database
     }
 
     public static function selectAssignmentPresetTasks($presetID) {
-        $rows = self::selectStatic(array($presetID), "SELECT * FROM `preset-task` WHERE `preset-task`.`preset-assignmentid` = ?");
+        $rows = self::selectStatic(array($presetID), "SELECT `preset-task`.`id`, `preset-task`.`preset-assignmentid`, `preset-task`.`objective`, `preset-task`.`description`, `preset-task`.`estimated`, `action`.`title` AS `action` FROM `preset-task` INNER JOIN `action` ON `action`.`id` = `preset-task`.`actionid` WHERE `preset-task`.`preset-assignmentid` = ?");
         if ($rows) return $rows;
         else return null;
     }
 
     public static function selectAssignmentTasks($assignmentID) {
-        $rows = self::selectStatic(array($assignmentID), "SELECT * FROM `task` WHERE `task`.`assignmentid` = ?");
+        $rows = self::selectStatic(array($assignmentID), "SELECT `task`.`id`, `task`.`assignmentid`, `task`.`presetid`, `task`.`objective`, `task`.`description`, `task`.`actionid`, `task`.`number`, `task`.`estimated`, `task`.`value`, `task_status`.`statusid`, `task_status`.`time`, `task_status`.`assigned_by`, `task_status`.`note` FROM `task` INNER JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` WHERE `task`.`assignmentid` = ?");
         if ($rows) return $rows;
         else return null;
     }
@@ -28,11 +28,8 @@ class Task extends Database
     }
 
     public static function selectTask($taskID) {
-        $rows = self::selectStatic(array($taskID), "SELECT *, `action`.`title` AS `action`, `status`.`title` AS `status` FROM `task` INNER JOIN `action` ON `action`.`id` = `task`.`actionid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` LEFT JOIN `status` ON `status`.`id` = `task_status`.`statusid` WHERE `task`.`id` = ?");
-        if ($rows[0]) {
-            $rows[0]['estimated-min'] = self::datetimeToMinutes($rows[0]['estimated']) . " min";
-            return $rows[0];
-        }
+        $rows = self::selectStatic(array($taskID), "SELECT `task`.`id`, `task`.`assignmentid`, `task`.`presetid`, `task`.`objective`, `task`.`description`, `task`.`number`, `task`.`estimated`, `task`.`value`, `task_status`.`statusid`, `task_status`.`time`, `task_status`.`assigned_by`, `task_status`.`note`, `action`.id AS `actionid`, `action`.`title` AS `action`, `status`.`title` AS `status`, `status`.`title2` AS `status2` FROM `task` INNER JOIN `action` ON `action`.`id` = `task`.`actionid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` LEFT JOIN `status` ON `status`.`id` = `task_status`.`statusid` WHERE `task`.`id` = ?");
+        if ($rows[0]) return $rows[0];
         else return null;
     }
 
@@ -54,8 +51,8 @@ class Task extends Database
         else return null;
     }
 
-    public static function RenumberTasksInProject($projectID) {
-        $rows = self::selectStatic(array($projectID), "SELECT `task`.`id`, `task`.`number` FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = ? ORDER BY `task`.`id`");
+    public static function RenumberTasksInAssignment($assignmentID) {
+        $rows = self::selectStatic(array($assignmentID), "SELECT `task`.`id`, `task`.`number` FROM `task` WHERE `task`.`assignmentid` = ? ORDER BY `task`.`id`");
         if ($rows) {
             $nextTaskNum = count($rows) + 1;
             foreach ($rows as $num => $task) {

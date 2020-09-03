@@ -105,6 +105,7 @@ $menu = [
         ],
         "+ New" => [
             "admin" => false,
+            "manager" => true,
             "link" => "new-account",
             "default-link" => "new-account",
             "page" => "new-member",

@@ -7,6 +7,8 @@ class Account extends Database
     public $id;
     public $username;
     private $password;
+    public $manager;
+    public $client;
 
     public function __construct($fields)
     {
@@ -14,7 +16,7 @@ class Account extends Database
             $this->loginStatus = 3;
         }
         else {
-            $stmt = $this->connect()->prepare("SELECT `id`, `username`, `password` FROM `account` WHERE `username` = :username");
+            $stmt = $this->connect()->prepare("SELECT * FROM `account` WHERE `username` = :username");
             $stmt->bindParam(':username', $fields['user']);
             $stmt->execute();
             if ($stmt->rowCount() == 1) {
@@ -24,6 +26,8 @@ class Account extends Database
                     $this->id = $userData['id'];
                     $this->username = $userData['username'];
                     $this->password = $userData['password'];
+                    $this->manager = $userData['manager'];
+                    $this->client = $userData['client'];
                     $this->loginStatus = 1;
                 }
                 else $this->loginStatus = 2;

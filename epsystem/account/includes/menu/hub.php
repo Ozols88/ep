@@ -24,7 +24,7 @@ $menu = [
         ],
         "My Assignments" => [
             "admin" => false,
-            "page" => "assignments.php?l1=mine&l2=active",
+            "page" => "assignments.php?l1=my&l2=active",
             "hud" => "My Assignments",
             "home" => [
                 "title" => "",

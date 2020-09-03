@@ -42,29 +42,70 @@
             $exitTitle = "Cancel Client";
             $exitLink = "/ep/epsystem/account/projects.php?p=" . $_GET['p'] . "&l1=info&l2=client";
         }
+        elseif (isset($_GET['options'])) {
+            $exitTitle = "Exit Project Options";
+            $exitLink = "/ep/epsystem/account/projects.php?p=" . $_GET['p'] . "&l1=project";
+        }
         else {
             $exitTitle = "Exit Project #" . sprintf('%04d', $_GET['p']);
             $exitLink = "/ep/epsystem/account/projects.php?l1=active";
-            if (isset($_SESSION['backPage']))
-                $exitLink = $_SESSION['backPage'];
+            if (isset($_SESSION['backPage']['1']))
+                $exitLink = $_SESSION['backPage']['1'];
         }
     }
-    elseif (basename($_SERVER['PHP_SELF']) == 'assignments.php' && isset($_GET['a'])) {
+    elseif (basename($_SERVER['PHP_SELF']) == 'assignments.php' && (isset($_GET['a']) || isset($_GET['t']))) {
         $showLinks = false;
-        $exitTitle = "Exit Assignment #" . sprintf('%05d', $_GET['a']);
-        $exitLink = "/ep/epsystem/account/assignments.php?l1=my&l2=active";
-        if (isset($_SESSION['backPage2']))
-            $exitLink = $_SESSION['backPage2'];
-        elseif (isset($_SESSION['backPage']))
-            $exitLink = $_SESSION['backPage'];
+        if (isset($_GET['options']) && isset($_GET['a'])) {
+            $exitTitle = "Exit Assignment Options";
+            $exitLink = "/ep/epsystem/account/assignments.php?a=" . $_GET['a'] . "&l1=assignment";
+        }
+        elseif (isset($_GET['options']) && isset($_GET['t'])) {
+            $assignmentID = Task::selectTask($_GET['t'])['assignmentid'];
+            $exitTitle = "Exit Task Options";
+            $exitLink = "/ep/epsystem/account/assignments.php?a=" . $assignmentID . "&l1=tasks&l2=" . $_GET['t'];
+        }
+        else {
+            $exitTitle = "Exit Assignment #" . sprintf('%05d', $_GET['a']);
+            $exitLink = "/ep/epsystem/account/assignments.php?l1=my&l2=active";
+            if (isset($_SESSION['backPage']['2']))
+                $exitLink = $_SESSION['backPage']['2'];
+            elseif (isset($_SESSION['backPage']['1']))
+                $exitLink = $_SESSION['backPage']['1'];
+        }
+    }
+    elseif (basename($_SERVER['PHP_SELF']) == 'r&d.php' && (isset($_GET['f']) || isset($_GET['p']) || isset($_GET['a']) || isset($_GET['t']))) {
+        $showLinks = false;
+        if (isset($_GET['f'])) {
+            $exitTitle = "Exit R&D";
+            $exitLink = "r&d";
+        }
+        if (isset($_GET['p'])) {
+            $exitTitle = "Exit Preset #" . sprintf('%03d', Project::selectPresetByID($_GET['p'])['id']);
+            $exitLink = "r&d";
+        }
+        if (isset($_GET['a'])) {
+            $exitTitle = "Exit Preset #" . sprintf('%03d', Assignment::selectPresetByID($_GET['a'])['id']);
+            $exitLink = "r&d";
+        }
+        if (isset($_GET['t'])) {
+            $exitTitle = "Exit Preset #" . sprintf('%05d', Task::selectTaskPreset($_GET['t'])['id']);
+            $exitLink = "r&d";
+        }
+
+        if (isset($_GET['p']))
+            $exitLink = $_SESSION['backPageR&D']['1'];
+        elseif (isset($_GET['a']) && !isset($_SESSION['backPageR&D']['2a']) && isset($_SESSION['backPageR&D']['1']))
+            $exitLink = $_SESSION['backPageR&D']['1'];
+        elseif (isset($_GET['a']) && isset($_SESSION['backPageR&D']['2a']))
+            $exitLink = $_SESSION['backPageR&D']['2a'];
+        elseif (isset($_GET['t']) && isset($_SESSION['backPageR&D']['3a']))
+            $exitLink = $_SESSION['backPageR&D']['3a'];
+        elseif (isset($_GET['t']) && isset($_SESSION['backPageR&D']['2b']))
+            $exitLink = $_SESSION['backPageR&D']['2b'];
     }
     elseif (basename($_SERVER['PHP_SELF']) == 'new-project.php') {
         $showLinks = false;
-        if (isset($_POST['new-client']) || isset($_SESSION['new-project']['new-client'])) {
-            $exitTitle = "Cancel New Client";
-            $exitLink = "/ep/epsystem/account/new-project.php";
-        }
-        elseif (isset($_POST['add-assignment-page']) || isset($_SESSION['new-project']['add-assignment-page'])) {
+        if (isset($_POST['add-assignment-page']) || isset($_SESSION['new-project']['add-assignment-page'])) {
             $exitTitle = "Cancel Add Assignment";
             $exitLink = "/ep/epsystem/account/new-project.php";
         }
@@ -98,10 +139,6 @@
             $exitTitle = "Cancel New Link";
             $exitLink = "/ep/epsystem/account/new-task.php";
         }
-        elseif (isset($_SESSION['new-assignment']['stage'])) {
-            $exitTitle = "Cancel New Task";
-            $exitLink = "/ep/epsystem/account/new-assignment.php";
-        }
         elseif (isset($_GET['a'])) {
             if (isset($_POST['add-task-page']) || isset($_SESSION['new-task']['add-task-page'])) {
                 $exitTitle = "Cancel Add Task";
@@ -111,6 +148,10 @@
                 $exitTitle = "Cancel New Task";
                 $exitLink = "/ep/epsystem/account/assignments.php?a=" . $_GET['a'];
             }
+        }
+        elseif (isset($_SESSION['new-assignment']['stage'])) {
+            $exitTitle = "Cancel New Task";
+            $exitLink = "/ep/epsystem/account/new-assignment.php";
         }
         else {
             $exitTitle = "Cancel New Task";
@@ -126,6 +167,40 @@
         else {
             $exitTitle = "Cancel New Member";
             $exitLink = "member.php";
+        }
+    }
+    elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/index.php') {
+        $showLinks = false;
+        $exitTitle = "Cancel New R&D";
+        $exitLink = "../r&d?f=" . $_GET['f'];
+    }
+    elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/project.php') {
+        $showLinks = false;
+        if (isset($_POST['add-assignment-page']) || isset($_SESSION['new-project']['add-assignment-page'])) {
+            $exitTitle = "Cancel Add Assignment";
+            $exitLink = "project?f=" . $_GET['f'];
+        }
+        else {
+            $exitTitle = "Cancel New Project Preset";
+            $exitLink = "../r&d?f=" . $_GET['f'];
+        }
+    }
+    elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/assignment.php') {
+        $showLinks = false;
+        if (isset($_POST['add-task-page']) || isset($_SESSION['new-assignment']['add-task-page'])) {
+            $exitTitle = "Cancel Add Task";
+            $exitLink = "assignment?f=" . $_GET['f'];
+        }
+        else {
+            $exitTitle = "Cancel New Assignment Preset";
+            $exitLink = "../r&d?f=" . $_GET['f'];
+        }
+    }
+    elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/task.php') {
+        $showLinks = false;
+        if (isset($_SESSION['new-assignment']['stage'])) {
+            $exitTitle = "Cancel New Task";
+            $exitLink = "assignment.php?f=" . $_GET['f'];
         }
     }
     else {
@@ -182,10 +257,18 @@ if (isset($_POST['exit'])) {
             unset($_SESSION['add-client']['new-client']);
         unset($_SESSION['new-manager']);
     }
+    elseif (basename($_SERVER['PHP_SELF']) == 'r&d.php') {
+        if (isset($_GET['f']))
+            unset($_SESSION['backPageR&D']['1']);
+        if (isset($_GET['p']))
+            unset($_SESSION['backPageR&D']['2a']);
+        if (isset($_GET['a'])) {
+            unset($_SESSION['backPageR&D']['2b']);
+            unset($_SESSION['backPageR&D']['3a']);
+        }
+    }
     elseif (basename($_SERVER['PHP_SELF']) == 'new-project.php') {
-        if (isset($_SESSION['new-project']['new-client']))
-            unset($_SESSION['new-project']['new-client']);
-        elseif (isset($_SESSION['new-project']['add-assignment-page']))
+        if (isset($_SESSION['new-project']['add-assignment-page']))
             unset($_SESSION['new-project']['add-assignment-page']);
         else {
             unset($_SESSION['new-assignment']['new-project']);
@@ -215,7 +298,19 @@ if (isset($_POST['exit'])) {
         else
             unset($_SESSION['new-member']);
     }
+    elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/project.php') {
+        if (isset($_SESSION['new-project']['add-assignment-page']))
+            unset($_SESSION['new-project']['add-assignment-page']);
+        else
+            unset($_SESSION['new-project']);
+    }
+    elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/assignment.php') {
+        if (isset($_SESSION['new-assignment']['add-task-page']))
+            unset($_SESSION['new-assignment']['add-task-page']);
+        else
+            unset($_SESSION['new-assignment']);
+    }
 
-    unset($_SESSION['backPage2']);
+    unset($_SESSION['backPage']['2']);
     header("Location: " . $exitLink);
 }

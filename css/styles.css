@@ -510,6 +510,11 @@ body {
   background-color: #F5B82E;
 }
 
+.navbar.level-3 .container-button .button.page:hover {
+  color: #705D34;
+  background: #F5B82E;
+}
+
 .navbar.level-3 .container-button:nth-of-type(even) .button {
   background: #BA8F2E;
 }
@@ -1027,6 +1032,9 @@ hr {
 .header.medium {
   width: 40vw;
 }
+.header.large {
+  width: 60vw;
+}
 
 .header-extension {
   width: 12.5vw;
@@ -1040,6 +1048,9 @@ hr {
 }
 .header-extension.medium {
   width: 30vw;
+}
+.header-extension.large {
+  width: 20vw;
 }
 
 .header-extension.admin {
@@ -1098,6 +1109,9 @@ hr {
 }
 .table.medium {
   width: 40vw;
+}
+.table.large {
+  width: 60vw;
 }
 
 .empty-table {

@@ -15,6 +15,9 @@
   &.medium {
     width: 40vw;
   }
+  &.large {
+    width: 60vw;
+  }
 }
 
 .header-extension {
@@ -28,6 +31,9 @@
   }
   &.medium {
     width: 30vw;
+  }
+  &.large {
+    width: 20vw;
   }
 }
 .header-extension.admin {
@@ -83,6 +89,9 @@
   }
   &.medium {
     width: 40vw;
+  }
+  &.large {
+    width: 60vw;
   }
 }
 

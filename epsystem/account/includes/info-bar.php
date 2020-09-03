@@ -83,9 +83,10 @@ if (basename($_SERVER['PHP_SELF']) == 'new-project.php') {
         </div> <?php
     }
 }
+
 elseif (basename($_SERVER['PHP_SELF']) == 'new-assignment.php') {
     if (!empty($_SESSION['new-assignment']['info']['division'])) {
-        if (is_null($_SESSION['new-assignment']['divisionid'])) { ?>
+        if ($_SESSION['new-assignment']['divisionid'] == "1") { ?>
             <div class="info-bar extended">
                 <div class="section line-right">
                     <div class="stage admin">№:</div>
@@ -189,13 +190,13 @@ elseif (basename($_SERVER['PHP_SELF']) == 'new-assignment.php') {
                         </div> <?php
                     }
                     if (isset($_SESSION['new-assignment']['tasks'])) { ?>
-                        <form method="post" class="section">
+                        <form method="post" class="section line-left">
                             <input type="submit" name="stage4" class="stage<?php if ($_SESSION['new-assignment']['stage'] == '4') echo " active"; else echo " admin"; ?>" value="TASKS:">
                             <div class="content"><?php if (is_countable($_SESSION['new-assignment']['tasks'])) echo count($_SESSION['new-assignment']['tasks']); else echo "0"; ?></div>
                         </form> <?php
                     }
                     else { ?>
-                        <div class="section">
+                        <div class="section line-left">
                             <div class="stage<?php if ($_SESSION['new-assignment']['stage'] == '4') echo " active"; else echo " admin"; ?>">TASKS:</div>
                         </div> <?php
                     } ?>
@@ -215,7 +216,7 @@ elseif (basename($_SERVER['PHP_SELF']) == 'new-assignment.php') {
         <div class="info-bar extended">
             <div class="section line-right">
                 <div class="stage admin">№:</div>
-                <div class="content"><?php echo "#" . sprintf('%04d', Assignment::selectNextNewID('assignment')); ?></div>
+                <div class="content"><?php echo "#" . sprintf('%05d', Assignment::selectNextNewID('assignment')); ?></div>
             </div> <?php
             if (isset($_SESSION['new-assignment']['info']['project'])) { ?>
                 <form method="post" class="section">
@@ -245,6 +246,7 @@ elseif (basename($_SERVER['PHP_SELF']) == 'new-assignment.php') {
         </div> <?php
     }
 }
+
 elseif (basename($_SERVER['PHP_SELF']) == 'new-task.php') {
     if ($_SESSION['new-task']['stage'] != '1') { ?>
         <div class="info-bar extended">
@@ -318,6 +320,7 @@ elseif (basename($_SERVER['PHP_SELF']) == 'new-task.php') {
         </div> <?php
     }
 }
+
 elseif (basename($_SERVER['PHP_SELF']) == 'new-member.php') { ?>
     <div class="info-bar extended">
         <div class="section line-right">
@@ -366,6 +369,101 @@ elseif (basename($_SERVER['PHP_SELF']) == 'new-member.php') { ?>
         else { ?>
             <div class="section">
                 <div class="stage<?php if ($_SESSION['new-member']['stage'] == '4') echo " active"; else echo " admin"; ?>">USERNAME:</div>
+            </div> <?php
+        } ?>
+    </div> <?php
+}
+
+elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/project.php') { ?>
+    <div class="info-bar extended">
+        <div class="section line-right">
+            <div class="stage admin">№:</div>
+            <div class="content"><?php echo "#" . sprintf('%03d', Database::selectNextNewID('preset-project')); ?></div>
+        </div> <?php
+        if (isset($_SESSION['new-project']['info']['title'])) { ?>
+            <form method="post" class="section">
+                <input type="submit" name="stage1" class="stage<?php if ($_SESSION['new-project']['stage'] == '1') echo " active"; else echo " admin"; ?>" value="NAME:">
+                <div class="content"><?php echo $_SESSION['new-project']['info']['title']; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section">
+                <div class="stage<?php if ($_SESSION['new-project']['stage'] == '1') echo " active"; else echo " admin"; ?>">NAME:</div>
+            </div> <?php
+        }
+        if (isset($_SESSION['new-project']['info']['description'])) { ?>
+            <form method="post" class="section">
+                <input type="submit" name="stage2" class="stage<?php if ($_SESSION['new-project']['stage'] == '2') echo " active"; else echo " admin"; ?>" value="DESCRIPTION:">
+                <div class="content"><?php echo $_SESSION['new-project']['info']['description']; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section">
+                <div class="stage<?php if ($_SESSION['new-project']['stage'] == '2') echo " active"; else echo " admin"; ?>">DESCRIPTION:</div>
+            </div> <?php
+        }
+        if (isset($_SESSION['new-project']['assignments'])) { ?>
+            <form method="post" class="section line-left">
+                <input type="submit" name="stage3" class="stage<?php if ($_SESSION['new-project']['stage'] == '3') echo " active"; else echo " admin"; ?>" value="ASSIGNMENTS:">
+                <div class="content"><?php if (is_countable($_SESSION['new-project']['assignments'])) echo count($_SESSION['new-project']['assignments']); else echo "0"; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section line-left">
+                <div class="stage<?php if ($_SESSION['new-project']['stage'] == '3') echo " active"; else echo " admin"; ?>">ASSIGNMENTS:</div>
+            </div> <?php
+        } ?>
+    </div> <?php
+}
+
+elseif ($_SERVER['PHP_SELF'] == '/ep/epsystem/account/new-r&d/assignment.php') { ?>
+    <div class="info-bar extended">
+        <div class="section line-right">
+            <div class="stage admin">№:</div>
+            <div class="content"><?php echo "#" . sprintf('%03d', Database::selectNextNewID('preset-assignment')); ?></div>
+        </div> <?php
+        if (isset($_SESSION['new-assignment']['info']['title'])) { ?>
+            <form method="post" class="section">
+                <input type="submit" name="stage1" class="stage<?php if ($_SESSION['new-assignment']['stage'] == '1') echo " active"; else echo " admin"; ?>" value="NAME:">
+                <div class="content"><?php echo $_SESSION['new-assignment']['info']['title']; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section">
+                <div class="stage<?php if ($_SESSION['new-assignment']['stage'] == '1') echo " active"; else echo " admin"; ?>">NAME:</div>
+            </div> <?php
+        }
+        if (isset($_SESSION['new-assignment']['info']['division'])) { ?>
+            <form method="post" class="section">
+                <input type="submit" name="stage2" class="stage<?php if ($_SESSION['new-assignment']['stage'] == '2') echo " active"; else echo " admin"; ?>" value="DIVISION:">
+                <div class="content"><?php echo $_SESSION['new-assignment']['info']['division']; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section">
+                <div class="stage<?php if ($_SESSION['new-assignment']['stage'] == '2') echo " active"; else echo " admin"; ?>">DIVISION:</div>
+            </div> <?php
+        }
+        if (isset($_SESSION['new-assignment']['info']['objective'])) { ?>
+            <form method="post" class="section">
+                <input type="submit" name="stage3" class="stage<?php if ($_SESSION['new-assignment']['stage'] == '3') echo " active"; else echo " admin"; ?>" value="OBJECTIVE:">
+                <div class="content"><?php echo $_SESSION['new-assignment']['info']['objective']; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section">
+                <div class="stage<?php if ($_SESSION['new-assignment']['stage'] == '3') echo " active"; else echo " admin"; ?>">OBJECTIVE:</div>
+            </div> <?php
+        }
+        if (isset($_SESSION['new-project']['tasks'])) { ?>
+            <form method="post" class="section line-left">
+                <input type="submit" name="stage4" class="stage<?php if ($_SESSION['new-project']['stage'] == '4') echo " active"; else echo " admin"; ?>" value="TASKS:">
+                <div class="content"><?php if (is_countable($_SESSION['new-assignment']['tasks'])) echo count($_SESSION['new-assignment']['tasks']); else echo "0"; ?></div>
+            </form> <?php
+        }
+        else { ?>
+            <div class="section line-left">
+                <div class="stage<?php if ($_SESSION['new-assignment']['stage'] == '4') echo " active"; else echo " admin"; ?>">TASKS:</div>
             </div> <?php
         } ?>
     </div> <?php

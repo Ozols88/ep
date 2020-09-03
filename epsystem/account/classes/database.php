@@ -135,9 +135,29 @@ class Database
         else
             return "-";
     }
+    public static function datetimeToTimeAgo($value) {
+        $value = strtotime($value);
+        $time = time() - $value;
+        $time = ($time<1)? 1 : $time;
+        $tokens = array (
+            31536000 => 'year',
+            2592000 => 'month',
+            604800 => 'week',
+            86400 => 'day',
+            3600 => 'hour',
+            60 => 'minute',
+            1 => 'second'
+        );
+
+        foreach ($tokens as $unit => $text) {
+            if ($time < $unit) continue;
+            $numberOfUnits = floor($time / $unit);
+            return $numberOfUnits . ' ' . $text. (($numberOfUnits>1)?'s':'') . ' ago';
+        }
+    }
 
     public static function selectMembers() {
-        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account`");
+        $rows = self::selectStatic(null, "SELECT * FROM `account`");
         if ($rows) {
             foreach ($rows as $key => $value) {
                 $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);

@@ -3,47 +3,7 @@
 $menu = [
     "hud" => "Resources",
     "level-1" => [
-        "TEMP FILES" => [
-            "admin" => false,
-            "page" => "https://drive.google.com/",
-            "new-tab" => true,
-            "hud" => "Temporary Files",
-            "home" => [
-                "title" => "",
-                "description" => "",
-                "total" => [
-                    "name" => "",
-                    "count" => ""
-                ],
-                "last-hours" => [
-                    "title" => "",
-                    "details" => []
-                ],
-                "link" => "",
-                "note" => ""
-            ]
-        ],
-        "TEMPLATES" => [
-            "admin" => false,
-            "page" => "https://drive.google.com/",
-            "new-tab" => true,
-            "hud" => "Templates",
-            "home" => [
-                "title" => "",
-                "description" => "",
-                "total" => [
-                    "name" => "",
-                    "count" => ""
-                ],
-                "last-hours" => [
-                    "title" => "",
-                    "details" => []
-                ],
-                "link" => "",
-                "note" => ""
-            ]
-        ],
-        "LIBRARY" => [
+        "Library" => [
             "admin" => false,
             "page" => "https://drive.google.com/",
             "new-tab" => true,
@@ -63,11 +23,31 @@ $menu = [
                 "note" => ""
             ]
         ],
-        "ARCHIVE" => [
+        "Projects" => [
             "admin" => false,
             "page" => "https://drive.google.com/",
             "new-tab" => true,
-            "hud" => "Archive",
+            "hud" => "Projects",
+            "home" => [
+                "title" => "",
+                "description" => "",
+                "total" => [
+                    "name" => "",
+                    "count" => ""
+                ],
+                "last-hours" => [
+                    "title" => "",
+                    "details" => []
+                ],
+                "link" => "",
+                "note" => ""
+            ]
+        ],
+        "Templates" => [
+            "admin" => false,
+            "page" => "https://drive.google.com/",
+            "new-tab" => true,
+            "hud" => "Templates",
             "home" => [
                 "title" => "",
                 "description" => "",

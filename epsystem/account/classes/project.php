@@ -5,38 +5,52 @@ class Project extends Database
 {
     public static function selectProject($projectID)
     {
-        $rows = self::selectStatic(array($projectID), "SELECT `project`.`id` AS `id`, `username` AS `client`, `project`.`floorid` AS `floorid`, `preset-project`.`title` AS `preset`, `project`.`title` AS `title`, `deadline`, `price`, `project_status`.`statusid`, `assigned_by`, `note` FROM `project` LEFT JOIN `account` ON `account`.`id` = `project`.`clientid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` WHERE `project`.`id` = ?");
+        $rows = self::selectStatic(array($projectID), "SELECT `project`.`id` AS `id`, `project`.`productid` AS `productid`, `preset-project`.`title` AS `preset`, `product`.`title` AS `product`, `project`.`title` AS `title`, `project`.`description` AS `description`, `project_status`.`statusid`, `assigned_by`, `note`, ( SELECT COUNT(*) FROM `assignment` WHERE `assignment`.`projectid` = `project`.`id` ) AS `asgCount` FROM `project` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN `product` ON `product`.`id` = `project`.`productid` WHERE `project`.`id` = ?");
         if (isset($rows[0])) {
-            $rows[0]['date'] = date('d M Y', strtotime($rows[0]['deadline']));
+            if (!$rows[0]['product'])
+                $rows[0]['product'] = "None";
+            if (!$rows[0]['preset'])
+                $rows[0]['preset'] = "None";
             return $rows[0];
         }
         else return null;
     }
 
-    public static function selectProjectListByStatus($statusID) {
-        $rows = self::selectStatic(array($statusID), "SELECT `project`.`id` AS `project_id`, `status`.`title` AS `status`, `username` AS `client_username`, `floor`.`title` AS `project_floor`, `preset-project`.`title` AS `project_preset`, `project`.`title` AS `project_title`, `price`, `time`, `note`, ( SELECT COUNT(*) FROM `assignment` LEFT JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`statusid` = '7' AND `assignment`.`projectid` = `project`.`id` ) AS `completed_assignments`, ( SELECT COUNT(*) FROM `assignment` WHERE `assignment`.`projectid` = `project`.`id` ) AS `total_assignments`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` WHERE `assignment`.`projectid` = `project`.`id` AND (`task_status`.`statusid` = '1' OR `task_status`.`statusid` = '5' OR `task_status`.`statusid` = '6')) AS `pending_tasks`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` WHERE `task_status`.`statusid` = '7' AND `assignment`.`projectid` = `project`.`id` ) AS `completed_tasks`, ( SELECT COUNT(*) FROM `task` INNER JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id` ) AS `total_tasks`, (SELECT SUM(`task`.`estimated`) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_time`, ( SELECT SUM(`task`.`value`) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_value` FROM `project` LEFT JOIN `account` ON `account`.`id` = `project`.`clientid` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `floor` ON `floor`.`id` = `project`.`floorid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN `status` ON `status`.`id` = `project_status`.`statusid` WHERE `project_status`.`statusid` = ?");
-        if ($rows) {
+    public static function selectProjectDetails($projectID)
+    {
+        $rows = self::selectStatic(array($projectID), "SELECT `project`.`id` AS `id`, `project`.`productid`, `product`.`title` AS `product`, `project`.`presetid`, `preset-project`.`title` AS `preset`, `project`.`title` AS `title`, `project`.`description` AS `description`, `project_status`.`statusid`, `status`.`title` AS `status`, `project_status`.`time` AS `status_time`, `assigned_by`, `note`, ( SELECT COUNT(*) FROM assignment LEFT JOIN `assignment_status` ON `assignment_status`.`id` = assignment.`statusid` WHERE assignment.`projectid` = `project`.`id` AND (`assignment_status`.`statusid` = '1' OR `assignment_status`.`statusid` = '2' OR `assignment_status`.`statusid` = '5' OR `assignment_status`.`statusid` = '6') ) AS `asgPending`, ( SELECT COUNT(*) FROM assignment LEFT JOIN `assignment_status` ON `assignment_status`.`id` = assignment.`statusid` WHERE assignment.`projectid` = `project`.`id` AND `assignment_status`.`statusid` = '3' ) AS `asgAvailable`, ( SELECT COUNT(*) FROM assignment LEFT JOIN `assignment_status` ON `assignment_status`.`id` = assignment.`statusid` WHERE assignment.`projectid` = `project`.`id` AND `assignment_status`.`statusid` = '4' ) AS `asgActive`, ( SELECT COUNT(*) FROM assignment LEFT JOIN `assignment_status` ON `assignment_status`.`id` = assignment.`statusid` WHERE assignment.`projectid` = `project`.`id` AND `assignment_status`.`statusid` = '7' ) AS `asgCompleted`, ( SELECT COUNT(*) FROM assignment LEFT JOIN `assignment_status` ON `assignment_status`.`id` = assignment.`statusid` WHERE assignment.`projectid` = `project`.`id` ) AS `asgTotal`, ( SELECT COUNT(*) FROM task LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` LEFT JOIN assignment ON assignment.id = task.`assignmentid` WHERE assignment.`projectid` = `project`.`id` AND (`task_status`.`statusid` = '1' OR `task_status`.`statusid` = '5' OR `task_status`.`statusid` = '6') ) AS `tasksPending`, ( SELECT COUNT(*) FROM task LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` LEFT JOIN assignment ON assignment.id = task.`assignmentid` WHERE assignment.`projectid` = `project`.`id` AND `task_status`.`statusid` = '4' ) AS `tasksActive`, ( SELECT COUNT(*) FROM task LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` LEFT JOIN assignment ON assignment.id = task.`assignmentid` WHERE assignment.`projectid` = `project`.`id` AND `task_status`.`statusid` = '7' ) AS `tasksCompleted`, ( SELECT COUNT(*) FROM task LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` LEFT JOIN assignment ON assignment.id = task.`assignmentid` WHERE assignment.`projectid` = `project`.`id` ) AS `tasksTotal`, ( SELECT COUNT(*) FROM `project_infopage` WHERE `project_infopage`.`projectid` = `project`.`id` ) AS `links`, ( SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(`estimated`))) FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = `project`.`id`) AS `task_time` FROM `project` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN product ON product.`id` = `project`.productid LEFT JOIN `status` ON `status`.id = `project_status`.`statusid` WHERE `project`.`id` = ?");
+        if (isset($rows[0])) {
+            if (!$rows[0]['product'])
+                $rows[0]['product'] = "None";
+            if (!$rows[0]['preset'])
+                $rows[0]['preset'] = "None";
+            if (!$rows[0]['task_time'])
+                $rows[0]['task_time'] = "00:00:00";
+            if (isset($rows[0]['status_time'])) {
+                $rows[0]['time_ago'] = Database::datetimeToTimeAgo($rows[0]['status_time']);
+                if (strtotime($rows[0]['status_time']) < strtotime('-7 days'))
+                    $rows[0]['time2'] = date('d M Y', strtotime($rows[0]['status_time']));
+                else
+                    $rows[0]['time2'] = $rows[0]['time_ago'];
+                $rows[0]['time'] = date('d M Y', strtotime($rows[0]['status_time']));
+            }
+            return $rows[0];
+        }
+        else return null;
+    }
+
+    public static function selectProjectHistory($projectID)
+    {
+        $rows = self::selectStatic(array($projectID), "SELECT * FROM `project_status` WHERE `project_status`.`projectid` = ? ORDER BY `project_status`.`time`");
+        if (isset($rows)) {
             foreach ($rows as $key => $value) {
-                if (!$rows[$key]['project_preset'])
-                    $rows[$key]['project_preset'] = "custom";
-
-                $rows[$key]['date'] = date('d M Y', strtotime($rows[$key]['time']));
-
-                if (!$rows[$key]['task_value'])
-                    $rows[$key]['task_value'] = 0;
-
-                if ($rows[$key]['task_time']) {
-                    $rows[$key]['task_sum'] = $rows[$key]['task_value'] + ($rows[$key]['task_time'] * 0.15) . "€";
-                    if ($rows[$key]['task_time'] > 59) {
-                        $rows[$key]['task_time'] = floor($rows[$key]['task_time'] / 60) . "h " . $rows[$key]['task_time'] % 60 . "min";
-                    }
-                    else {
-                        $rows[$key]['task_time'] .= "min";
-                    }
-                }
-                else {
-                    $rows[$key]['task_time'] = "0min";
-                    $rows[$key]['task_sum'] = "0€";
+                if (isset($value['time'])) {
+                    $rows[$key]['time_ago'] = Database::datetimeToTimeAgo($value['time']);
+                    if (strtotime($value['time']) < strtotime('-7 days'))
+                        $rows[$key]['time2'] = date('d M Y', strtotime($rows[$key]['time']));
+                    else
+                        $rows[$key]['time2'] = $rows[$key]['time_ago'];
+                    $rows[$key]['time'] = date('d M Y', strtotime($rows[$key]['time']));
                 }
             }
             return $rows;
@@ -44,57 +58,117 @@ class Project extends Database
         else return null;
     }
 
-    public static function getProjectCountByStatus($statusID) {
-        $rows = self::selectStatic(array($statusID), "SELECT count(*) AS `count` FROM `project` LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` INNER JOIN `status` ON `status`.`id` = `project_status`.`statusid` WHERE `status`.`id` = ?");
-        if ($rows[0]['count']) return $rows[0]['count'];
-        else return 0;
+    public static function selectProjectsByStatus($statusID, $account) {
+        $rows = self::selectStatic(array($statusID), "SELECT `project`.`id` AS `project_id`, `status`.`title` AS `status`, product.`title` AS `project_product`, `preset-project`.`title` AS `project_preset`, `project`.`title` AS `project_title`, `time` AS `status_time`, `note`, ( SELECT COUNT(*) FROM assignment LEFT JOIN `assignment_status` ON `assignment_status`.`id` = assignment.`statusid` WHERE `assignment_status`.`statusid` = '7' AND assignment.`projectid` = `project`.`id` ) AS `completed_assignments`, ( SELECT COUNT(*) FROM assignment WHERE assignment.`projectid` = `project`.`id` ) AS `total_assignments`, ( SELECT COUNT(*) FROM task INNER JOIN assignment ON assignment.`id` = task.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` WHERE assignment.`projectid` = `project`.`id` AND (`task_status`.`statusid` = '1' OR `task_status`.`statusid` = '5' OR `task_status`.`statusid` = '6')) AS `pending_tasks`, ( SELECT COUNT(*) FROM task INNER JOIN assignment ON assignment.`id` = task.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` WHERE `task_status`.`statusid` = '7' AND assignment.`projectid` = `project`.`id` ) AS `completed_tasks`, ( SELECT COUNT(*) FROM task INNER JOIN assignment ON assignment.`id` = task.`assignmentid` WHERE assignment.`projectid` = `project`.`id` ) AS `total_tasks`, ( SELECT SEC_TO_TIME(SUM(time_to_sec(task.`estimated`))) FROM task LEFT JOIN assignment ON assignment.`id` = task.`assignmentid` LEFT JOIN `task_status` ON `task_status`.`id` = task.`statusid` WHERE assignment.`projectid` = `project`.`id` AND `task_status`.`statusid` = '7') AS `task_time` FROM `project` LEFT JOIN `preset-project` ON `preset-project`.`id` = `project`.`presetid` LEFT JOIN product ON product.`id` = `project`.productid LEFT JOIN `project_status` ON `project_status`.`id` = `project`.`statusid` LEFT JOIN `status` ON `status`.`id` = `project_status`.`statusid` WHERE `project_status`.`statusid` = ?");
+        if ($rows) {
+            // Remove projects where member doesn't participate
+            if ($account->manager != 1) {
+                foreach ($rows as $num => $project) {
+                    $assignments = Assignment::selectProjectAssignments($project['project_id']);
+                    if ($assignments) {
+                        foreach ($assignments as $assignment) {
+                            if ($assignment['assigned_to'] == $account->id) {
+                                $participate = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!isset($participate))
+                        unset($rows[$num]);
+                }
+                if (!$rows)
+                    return null;
+            }
+
+            foreach ($rows as $key => $value) {
+                if (!$rows[$key]['project_product'])
+                    $rows[$key]['project_product'] = "None";
+
+                if (!$rows[$key]['project_preset'])
+                    $rows[$key]['project_preset'] = "None";
+
+                if (isset($value['status_time'])) {
+                    $rows[$key]['status_time_ago'] = Database::datetimeToTimeAgo($value['status_time']);
+                    if (strtotime($value['status_time']) < strtotime('-7 days'))
+                        $rows[$key]['status_time2'] = date('d M Y', strtotime($rows[$key]['status_time']));
+                    else
+                        $rows[$key]['status_time2'] = $rows[$key]['status_time_ago'];
+                    $rows[$key]['status_time'] = date('d M Y', strtotime($rows[$key]['status_time']));
+                }
+
+                if (!$rows[$key]['task_time']) {
+                    $rows[$key]['task_time'] = "00:00:00";
+                    $rows[$key]['task_min'] = 0;
+                }
+            }
+            return $rows;
+        }
+        else return null;
     }
 
-    public static function selectProjectDivisions($projectID)
-    {
-        $rows = self::selectStatic(array($projectID, $projectID), "SELECT `division_id`, `division_title`, `group_id`, `group_title`, `assignment_count` FROM ( SELECT IF(COUNT(*)>0, `division`.`id`, '') AS `division_id`, IF(COUNT(*)>0, `division`.`title`, '') AS `division_title`, IF(COUNT(*)>0, `division_group`.`id`, '') AS `group_id`, IF(COUNT(*)>0, `division_group`.`title`, '') AS `group_title`, IF(COUNT(*)>0, COUNT(*), '') AS `assignment_count` FROM `division` LEFT JOIN `preset-assignment` ON `division`.id = `preset-assignment`.`divisionid` LEFT JOIN `assignment` ON `assignment`.`presetid` = `preset-assignment`.`id` LEFT JOIN `division_group` ON `division_group`.`id` = `division`.`groupid` WHERE `assignment`.`projectid` = ? GROUP BY `division`.`id` HAVING IF(COUNT(*)>0, COUNT(*), '') <> '' UNION SELECT '' AS `division_id`, IF(COUNT(*)>0, 'Custom', '') AS `division_title`, IF(COUNT(*)>0, '1', '') AS `group_id`, IF(COUNT(*)>0, 'when', '') AS `group_title`, IF(COUNT(*)>0, COUNT(*), '') AS `assignment_count` FROM `assignment` WHERE `assignment`.`projectid` = ? AND `assignment`.`presetid` IS NULL HAVING IF(COUNT(*)>0, 'Custom', '') <> '' ) `t` ORDER BY `group_id`");
+    public static function selectProducts() {
+        $rows = self::selectStatic(null, "SELECT product.`id`, product.`title`, product.`description` FROM product");
         if ($rows) return $rows;
         else return null;
     }
 
-    public static function selectFloors() {
-        $rows = self::selectStatic(null, "SELECT * FROM `floor`");
-        if ($rows) return $rows;
-        else return null;
-    }
-
-    public static function selectFloorByID($id) {
-        $rows = self::selectStatic(array($id), "SELECT * FROM `floor` WHERE `id` = ?");
+    public static function selectProductByID($id) {
+        $rows = self::selectStatic(array($id), "SELECT * FROM product WHERE `id` = ?");
         if ($rows[0]) return $rows[0];
         else return null;
     }
 
     public static function selectPresets() {
-        $rows = self::selectStatic(null, "SELECT * FROM `preset-project`");
-        if ($rows) return $rows;
+        $rows = self::selectStatic(null, "SELECT `preset-project`.`id`, `preset-project`.`title`, `preset-project`.`productid`, `preset-project`.`description`, `product`.`title` AS `product`, ( SELECT COUNT(*) FROM `preset-project_assignment` WHERE `preset-project_assignment`.`projectid` = `preset-project`.`id` ) AS `assignments` FROM `preset-project` LEFT JOIN `product` ON `product`.`id` = `preset-project`.`productid`");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                if (!$rows[$key]['product'])
+                    $rows[$key]['product'] = "none";
+            }
+            return $rows;
+        }
         else return null;
     }
 
     public static function selectPresetByID($id) {
-        $rows = self::selectStatic(array($id), "SELECT * FROM `preset-project` WHERE `id` = ?");
-        if ($rows[0]) return $rows[0];
+        $rows = self::selectStatic(array($id), "SELECT `preset-project`.`id`, `preset-project`.`productid`, `product`.`title` AS `product`, `preset-project`.`title`, `preset-project`.`description`, ( SELECT COUNT(*) FROM `preset-project_assignment` WHERE `preset-project_assignment`.`projectid` = `preset-project`.`id` ) AS `assignments` FROM `preset-project` LEFT JOIN `product` ON `product`.`id` = `preset-project`.`productid` WHERE `preset-project`.`id` = ?");
+        if (isset($rows[0])) {
+            if (!$rows[0]['product'])
+                $rows[0]['product'] = "None";
+            return $rows[0];
+        }
         else return null;
     }
 
-    public static function selectPresetsByFloorID($id) {
-        $rows = self::selectStatic(array($id), "SELECT `preset-project`.`id`, `preset-project`.`floorid`, `preset-project`.`title`, `preset-project`.`description` FROM `preset-project` INNER JOIN `floor` ON `floor`.`id` = `preset-project`.`floorid` WHERE `floor`.`id` = ?");
+    public static function selectPresetsByProductID($id) {
+        $rows = self::selectStatic(array($id), "SELECT `preset-project`.`id`, `preset-project`.productid, `preset-project`.`title`, `preset-project`.`description`, ( SELECT COUNT(*) FROM `preset-project_assignment` WHERE `preset-project_assignment`.`projectid` = `preset-project`.`id` ) AS `assignments` FROM `preset-project` INNER JOIN product ON product.`id` = `preset-project`.productid WHERE product.`id` = ?");
         if ($rows) return $rows;
         else return null;
+    }
+
+    public static function isProjectDeletable($project) {
+        // Function checks if there are any non-1,2 status assignments (can't delete project with those)
+        if ($project['statusid'] == 4 || $project['statusid'] == 6) {
+            $assignments = Assignment::selectProjectAssignments($project['id']);
+            if ($assignments)
+                foreach ($assignments as $assignment)
+                    if ($assignment['statusid'] != 1 && $assignment['statusid'] != 2)
+                        return false;
+            return true;
+        }
+        else return false;
     }
 
     public static function isProjectCancelable($project) {
         // Function checks if there are any pending(4,5,6) assignments (can't cancel project with those)
         if ($project['statusid'] == 4 || $project['statusid'] == 6) {
             $assignments = Assignment::selectProjectAssignments($project['id']);
-            if ($assignments)
+            if ($assignments) {
                 foreach ($assignments as $assignment)
                     if ($assignment['statusid'] == 4 || $assignment['statusid'] == 5 || $assignment['statusid'] == 6)
                         return false;
+            }
+            else return false;
             return true;
         }
         else return false;
@@ -104,23 +178,12 @@ class Project extends Database
         // Function checks if all assignments are completed
         if ($project['statusid'] == 6) {
             $assignments = Assignment::selectProjectAssignments($project['id']);
-            if ($assignments)
+            if ($assignments) {
                 foreach ($assignments as $assignment)
-                    if ($assignment['statusid'] != 7)
+                    if ($assignment['statusid'] != 7 && $assignment['statusid'] != 9)
                         return false;
-            return true;
-        }
-        else return false;
-    }
-
-    public static function isProjectDeletable($project) {
-        // Function checks if there are any non-1,2 status assignments (can't delete project with those)
-        if ($project['statusid'] == 4 || $project['statusid'] == 6) {
-            $assignments = Assignment::selectProjectAssignments($project['id']);
-            if ($assignments)
-                foreach ($assignments as $assignment)
-                    if ($assignment['statusid'] != 1 || $assignment['statusid'] != 2)
-                        return false;
+            }
+            else return false;
             return true;
         }
         else return false;
@@ -158,10 +221,25 @@ class Project extends Database
         }
     }
 
-    // Queries for search
-    public static function selectProjectPresetsByFloorTitle($floorTitle) {
-        $rows = self::selectStatic(array($floorTitle), "SELECT * FROM `project-preset` INNER JOIN `floor` ON `floor`.`id` WHERE `floor`.`title` = ?");
-        if ($rows) return $rows;
+    public static function selectProjectInfoPages($projectID) {
+        $rows = self::selectStatic(array($projectID), "SELECT `project_infopage`.`id`, `project_infopage`.`projectid`, `project_infopage`.`presetid`, `preset-infopage`.`groupid`, `infopage_group`.`title` AS `group`, `project_infopage`.`title`, `project_infopage`.`description`, `project_infopage`.`link` FROM `project_infopage` LEFT JOIN `preset-infopage` ON `preset-infopage`.`id` = `project_infopage`.`presetid` LEFT JOIN `infopage_group` ON `infopage_group`.`id` = `preset-infopage`.`groupid` WHERE `project_infopage`.`projectid` = ? ORDER BY `preset-infopage`.`groupid`");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                if (!$rows[$key]['group'])
+                    $rows[$key]['group'] = "None";
+                if ($rows[$key]['link'])
+                    $rows[$key]['hasLink'] = "Yes";
+                else
+                    $rows[$key]['hasLink'] = "No";
+            }
+            return $rows;
+        }
+        else return null;
+    }
+
+    public static function selectProjectInfoPage($infoID) {
+        $rows = self::selectStatic(array($infoID), "SELECT `project_infopage`.`id`, `project_infopage`.`projectid`, `project_infopage`.`presetid`, `preset-infopage`.`groupid`, `infopage_group`.`title` AS `group`, `project_infopage`.`title`, `project_infopage`.`description`, `project_infopage`.`link` FROM `project_infopage` LEFT JOIN `preset-infopage` ON `preset-infopage`.`id` = `project_infopage`.`presetid` LEFT JOIN `infopage_group` ON `infopage_group`.`id` = `preset-infopage`.`groupid` WHERE `project_infopage`.`id` = ? ORDER BY `preset-infopage`.`groupid`");
+        if ($rows[0]) return $rows[0];
         else return null;
     }
 }

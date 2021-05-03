@@ -17,27 +17,30 @@
   text-align: center;
   background: $c37;
   user-select: none;
-}
-
-.head-up-display-bar span {
-  line-height: 12vh;
-  font-size: 2.8vw;
-  font-weight: bold;
-  color: $c10;
-  text-transform: uppercase;
+  span {
+    line-height: 12vh;
+    font-size: 2.8vw;
+    font-weight: bold;
+    color: $c10;
+    text-transform: uppercase;
+    display: block;
+    margin: 0 5vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 
 /* NAVBAR */
 
-
 .navbar {
   display: flex;
   flex: 0 0 auto;
   background: $c2;
-  &.admin {
-    background: $c2; // Line color for admin
-  }
+  //&.admin {
+  //  background: $c2; // Line color for admin
+  //}
   &.level-1 {
     &.current {
       height: calc(100vh - 8vh - 12vh - 5.5vh);
@@ -50,10 +53,6 @@
       .count {
         height: 50%;
         padding-top: 1px;
-      }
-      .lock {
-        height: 50%;
-        width: 1.6vw;
       }
     }
   }
@@ -70,10 +69,6 @@
         height: 50%;
         padding-top: 2px;
       }
-      .lock {
-        height: 50%;
-        width: 1.3vw;
-      }
     }
   }
   &.level-3 {
@@ -84,11 +79,8 @@
     .button {
       height: 3.5vh;
       font-size: 0.80vw;
-      .count, .lock {
+      .count {
         height: 60%;
-      }
-      .lock {
-        width: 1.3vw;
       }
     }
   }
@@ -99,18 +91,18 @@
       height: 3vh;
       font-size: 0.7vw;
     }
-    .count, .lock {
+    .count {
       height: 60%;
-    }
-    .lock {
-      width: 1.2vw;
     }
   }
   .container-button {
     display: flex;
     flex-direction: column;
-    flex: 1;
     background: #FFFFFF;
+    flex: 1;
+    &.active {
+      flex: 1.4;
+    }
     &.disabled {
       pointer-events: none;
     }
@@ -132,12 +124,6 @@
         background: #FFFFFF;
         border-radius: 5px;
       }
-      .lock {
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-        margin: 0 0.4vw;
-        border-radius: 5px;
-      }
     }
   }
 }
@@ -152,15 +138,13 @@
   &:nth-of-type(even) .button {
     background: #6C5A32;
   }
-  &:nth-of-type(even) .button.admin-menu {
-    background: #5E7A67;
-  }
+  //&:nth-of-type(even) .button.admin-menu {
+  //  background: #5E7A67;
+  //}
   .button {
     font-weight: bold;
     background: $c1;
     color: $c13;
-  }
-  .button.locked {
   }
   &:hover .button {
     color: $c2;
@@ -170,18 +154,25 @@
     background: $c2;
     color: $c1;
   }
-  .button.admin-menu {
-    background: $c83;
-    color: $c79;
-  }
-  &:hover .button.admin-menu {
-    color: $c2;
-  }
-  .button.admin-menu.active-menu {
+  //.button.admin-menu {
+  //  background: $c83;
+  //  color: $c79;
+  //}
+  //&:hover .button.admin-menu {
+  //  color: $c2;
+  //}
+  //&:hover .button.page.admin-menu {
+  //  background: $c2;
+  //  color: $c1;
+  //}
+  //.button.admin-menu.active-menu {
+  //  background: $c2;
+  //  color: $c1;
+  //}
+  .button.h-menu.active-menu {
     background: $c2;
     color: $c1;
   }
-
 
   &:nth-of-type(odd) .button .count {
     color: $c1;
@@ -189,9 +180,18 @@
   &:nth-of-type(even) .button .count {
     color: #6C5A32;
   }
+  //&:nth-of-type(odd) .button.admin-menu .count {
+  //  color: $c83;
+  //}
+  //&:nth-of-type(even) .button.admin-menu .count {
+  //  color: #5E7A67;
+  //}
   .button .count {
     background: $c13;
   }
+  //.button.admin-menu .count {
+  //  background: $c79;
+  //}
   &:hover .button .count {
     background: $c2;
   }
@@ -201,17 +201,10 @@
     color: $c2;
   }
 
-  .button.admin-menu .count {
-  }
-
-
-  .lock {
-    background-image: url("../epsystem/account/img/lock-icon-lvl1.svg");
-    background-color: $c13;
-  }
-  &:hover .lock {
-    background-color: $c2;
-  }
+  //.button.admin-menu.active-menu .count {
+  //  background: $c1;
+  //  color: $c2;
+  //}
 }
 
 .navbar.level-2 .container-button .button.page:hover {
@@ -222,34 +215,31 @@
   &:nth-of-type(even) .button {
     background: #BA8F2E;
   }
-  &:nth-of-type(even) .button.admin-menu {
-    background: #719A7E;
-  }
+  //&:nth-of-type(even) .button.admin-menu {
+  //  background: #719A7E;
+  //}
   .button {
     font-weight: bold;
     background: $c56;
     color: $c1;
   }
-  .button.locked {
-    color: $c15;
-  }
   &:hover .button {
     color: $c2;
   }
 
-  .button.admin-menu {
-    background: $c75;
-  }
+  //.button.admin-menu {
+  //  background: $c75;
+  //}
   .button.active-menu {
     background: $c2;
     color: $c1;
   }
-  &:hover .button.admin-menu {
-  }
-  .button.admin-menu.active-menu {
-    background: $c2;
-    color: $c1;
-  }
+  //&:hover .button.admin-menu {
+  //}
+  //.button.admin-menu.active-menu {
+  //  background: $c2;
+  //  color: $c1;
+  //}
 
 
   &:nth-of-type(odd) .button .count {
@@ -271,30 +261,8 @@
     color: $c2;
   }
 
-  .button.admin-menu .count {
-  }
-
-
-  .lock {
-    background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
-    background-color: $c1;
-  }
-  &:hover .lock {
-    background-color: $c2;
-  }
-  .active-menu .lock {
-    background-color: $c1;
-  }
-  &:hover .active-menu .lock {
-    background-color: $c1;
-  }
-
-  .button.locked .lock {
-    background-color: $c15;
-  }
-  &:hover .button.locked .lock {
-    background-color: $c2;
-  }
+  //.button.admin-menu .count {
+  //}
 }
 
 .navbar.level-3 .container-button .button.page:hover {
@@ -305,34 +273,31 @@
   &:nth-of-type(even) .button {
     background: #BA8F2E;
   }
-  &:nth-of-type(even) .button.admin-menu {
-    background: #719A7E;
-  }
+  //&:nth-of-type(even) .button.admin-menu {
+  //  background: #719A7E;
+  //}
   .button {
     font-weight: bold;
     background: $c1-40bc;
     color: $c2;
   }
-  .button.locked {
-    color: $c15;
-  }
   &:hover .button {
     color: $c1;
   }
 
-  .button.admin-menu {
-    background: $c75;
-  }
+  //.button.admin-menu {
+  //  background: $c75;
+  //}
   .button.active-menu {
     background: $c2;
     color: $c1;
   }
-  &:hover .button.admin-menu {
-  }
-  .button.admin-menu.active-menu {
-    background: $c2;
-    color: $c1;
-  }
+  //&:hover .button.admin-menu {
+  //}
+  //.button.admin-menu.active-menu {
+  //  background: $c2;
+  //  color: $c1;
+  //}
 
 
   &:nth-of-type(odd) .button .count {
@@ -353,75 +318,8 @@
     color: $c2;
   }
 
-  .button.admin-menu .count {
-  }
-
-  .lock {
-    background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
-    background-color: $c2;
-  }
-  &:hover .lock {
-    background-image: url("../epsystem/account/img/lock-icon-lvl2-3.svg");
-    background-color: $c1;
-  }
-  .active-menu .lock {
-    background-color: $c1;
-  }
-  &:hover .active-menu .lock {
-    background-color: $c1;
-  }
-
-  .button.locked .lock {
-    background-color: $c15;
-  }
-  &:hover .button.locked .lock {
-    background-color: $c1;
-  }
-}
-
-.navbar.level-4 .container-button {
-  &:nth-of-type(even) .button {
-    background: #F6F0E3;
-  }
-  .button {
-    font-weight: bold;
-    background: $c37;
-    color: $c1;
-  }
-  .button.locked {
-    color: $c10;
-  }
-  &:hover .button {
-    background: $c2;
-    color: $c1;
-  }
-
-  .button.active-menu {
-    background: $c2;
-    color: $c1;
-  }
-  
-
-  .lock {
-    background-image: url("../epsystem/account/img/lock-icon-lvl4.svg");
-    background-color: $c1;
-  }
-  .active-menu .lock {
-  }
-  &:hover .lock {
-    background-color: $c1;
-  }
-  &:hover .active-menu .lock {
-    background-color: $c1;
-  }
-
-  .button.locked .lock {
-    background-color: $c10;
-  }
-  &:hover .button.locked .lock {
-    background-image: url("../epsystem/account/img/lock-icon-lvl4-hl.svg");
-    background-color: $c1;
-  }
+  //.button.admin-menu .count {
+  //}
 }
 
 
@@ -432,10 +330,17 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  border: 1px solid $c63;
+  border: solid 1px white;
+  background: #F8F7F5;
   padding: 0 1vw;
   user-select: none;
   margin: 0.2vh 0;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 0;
+  &.disabled {
+    cursor: not-allowed;
+  }
 }
 
 .home-menu .title {
@@ -536,14 +441,17 @@
   margin: 0 auto 3vh auto;
 }
 
-
+//.navbar.level-1 .home-menu.admin {
+//  background: $c63;
+//}
+//.container-button:hover .home-menu.admin {
+//  background: $c36;
+//}
 .container-button:hover .home-menu {
-  border: 1px solid #F4AC32;
-  background: #FFFFFF
+  background: $c36;
 }
-.container-button:hover .home-menu.admin {
-  border: 1px solid $c3;
-}
+//.container-button:hover .home-menu.admin {
+//}
 
 .container-button:hover .title {
   color: #F4AC32;
@@ -598,10 +506,10 @@
   color: $c1;
   background: $c2;
 }
-.navbar.unselected .container-button:hover .button.admin-menu {
-  color: $c1;
-  background: $c2;
-}
+//.navbar.unselected .container-button:hover .button.admin-menu {
+//  color: $c1;
+//  background: $c2;
+//}
 
 .navbar.level-1.unselected .container-button {
   .button .count {
@@ -636,4 +544,18 @@
     background: $c1;
     color: $c2;
   }
+}
+
+.hover-text {
+  display: none;
+  position: absolute;
+  font-size: 0.7vw;
+  background: white;
+  border: 1px solid black;
+  padding: 0.5vh 0.5vw;
+}
+.container-button:hover .hover-text {
+  //display: block;
+  position: fixed;
+  overflow: hidden;
 }

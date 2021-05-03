@@ -7,13 +7,16 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: #F1F5DC;
+  background: $c35;
   border-top: 1px solid $c8;
   margin-top: auto;
   min-height: 5.5vh;
-  &.system {
-    background: $c35;
-  }
+  //&.animations {
+  //  background: $c114;
+  //}
+  //&.system {
+  //  background: $c35;
+  //}
 
   .menu-footer {
     display: flex;

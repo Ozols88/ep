@@ -36,9 +36,9 @@
     width: 20vw;
   }
 }
-.header-extension.admin {
-  background: $c63;
-}
+//.header-extension.admin {
+//  background: $c63;
+//}
 
 .head {
   display: table-cell;
@@ -52,30 +52,18 @@
   border-left: 1px solid #FFFFFF;
   border-right: 1px solid #FFFFFF;
 }
-.head.admin {
-  background: $c61;
-}
+//.head.admin {
+//  background: $c61;
+//}
 
-.id, .open, .tasks {
-  //width: 7.5%;
+.empty-table {
+  user-select: none;
+  text-align: center;
+  font-size: 2.8vw;
+  font-weight: bold;
+  color: $c63;
+  line-height: 12vh;
 }
-.time, .value {
-  width: 8%;
-  cursor: pointer;
-}
-.earn {
-  width: 10%;
-}
-.type {
-  width: 12%;
-}
-.client, .date {
-  width: 9%;
-}
-.name {
-  width: 18%;
-}
-
 .table {
   display: table;
   table-layout: fixed;
@@ -93,164 +81,185 @@
   &.large {
     width: 60vw;
   }
-}
+  &.ow {
+    width: 100%;
+  }
 
-.empty-table {
-  user-select: none;
-  text-align: center;
-  font-size: 2.8vw;
-  font-weight: bold;
-  color: $c63;
-  line-height: 12vh;
-}
+  .row {
+    display: table-row;
+    line-height: 3vh;
+  }
+  .row:hover {}
 
-.row {
-  display: table-row;
-  line-height: 3vh;
-}
-.row:hover {}
+  .cell {
+    display: table-cell;
+    //white-space: nowrap;
+    //overflow: hidden;
+  }
 
-.cell {
-  display: table-cell;
-  //white-space: nowrap;
-  //overflow: hidden;
-}
+  .cell .content {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    background: none;
+    font-size: 0.9vw;
+    color: $c10;
+    border: 1px solid $c37;
+    cursor: pointer;
+    line-height: inherit;
+    padding: 0 0 0 0.2vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cell .content:empty::after {
+    content: "\00a0";
+  }
+  .cell.id .content {
+    background: $c37;
+  }
+  .cell:first-child .content {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+  .cell:last-child .content {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .row:hover .cell .content {
+    border: 1px solid $c34;
+    color: $c1;
+    background-color: $c37;
+  }
+  .row:hover .cell.id .content {
+    background: $c34;
+    color: $c1;
+  }
 
-.cell .content {
-  display: block;
-  width: 100%;
-  text-decoration: none;
-  background: none;
-  font-size: 0.9vw;
-  color: $c10;
-  border: 1px solid $c37;
-  cursor: pointer;
-  line-height: inherit;
-}
-.cell .content:empty::after {
-  content: "\00a0";
-}
-.cell.id .content {
-  background: $c37;
-}
-.cell:first-child .content {
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-}
-.cell:last-child .content {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-.row:hover .cell .content {
-  border: 1px solid $c34;
-  color: $c1;
-  background-color: $c37;
-}
-.row:hover .cell.id .content {
-  background: $c34;
-  color: $c1;
-}
+  .cell .empty-button {
+    background-color: $c37;
+  }
+  .row:hover .cell .empty-button {
+    background-color: $c34;
+  }
 
-.cell .open-button {
-   background-color: $c37;
-   background-image: url("../epsystem/account/img/open-button.svg");
-   background-repeat: no-repeat;
-   background-size: 100% 100%;
-   height: 100%;
-   width: 100%;
-   text-indent: 100%;
-   white-space: nowrap;
-   overflow: hidden;
-   border-top-right-radius: 5px;
-   border-bottom-right-radius: 5px;
-}
-.row:hover .cell .open-button {
-  background-color: $c34;
-  background-image: url("../epsystem/account/img/open-button-hl.svg");
-}
-.cell .add-button {
-  background-color: $c37;
-  background-image: url("../epsystem/account/img/add-button.svg");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  height: 100%;
-  width: 100%;
-  text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-.row:hover .cell .add-button {
-  background-color: $c34;
-  background-image: url("../epsystem/account/img/add-button-hl.svg");
-}
-.cell .del-button {
-  background-color: $c37;
-  background-image: url("../epsystem/account/img/add-button.svg");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  height: 100%;
-  width: 100%;
-  text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-.row:hover .cell .del-button {
-  background-color: $c34;
-  background-image: url("../epsystem/account/img/add-button-hl.svg");
-}
-.cell .select-button {
-  background-color: $c37;
-  background-image: url("../epsystem/account/img/select-button.svg");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  height: 100%;
-  width: 100%;
-  text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-.row:hover .cell .select-button {
-  background-color: $c34;
-  background-image: url("../epsystem/account/img/select-button-hl.svg");
-}
+  .cell .open-button {
+    background-color: $c37;
+    background-image: url("../epsystem/account/img/open-button.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: 100%;
+    width: 100%;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .row:hover .cell .open-button {
+    background-color: $c34;
+    background-image: url("../epsystem/account/img/open-button-hl.svg");
+  }
+  .cell .add-button {
+    background-color: $c37;
+    background-image: url("../epsystem/account/img/add-button.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: 100%;
+    width: 100%;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .row:hover .cell .add-button {
+    background-color: $c34;
+    background-image: url("../epsystem/account/img/add-button-hl.svg");
+  }
+  .cell .del-button {
+    background-color: $c37;
+    background-image: url("../epsystem/account/img/del-button.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: 100%;
+    width: 100%;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .row:hover .cell .del-button {
+    background-color: $c34;
+    background-image: url("../epsystem/account/img/del-button-hl.svg");
+  }
+  .cell .edit-button {
+    background-color: $c37;
+    background-image: url("../epsystem/account/img/edit-button.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: 100%;
+    width: 100%;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .row:hover .cell .edit-button {
+    background-color: $c34;
+    background-image: url("../epsystem/account/img/edit-button-hl.svg");
+  }
+  .cell .select-button {
+    background-color: $c37;
+    background-image: url("../epsystem/account/img/select-button.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: 100%;
+    width: 100%;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .row:hover .cell .select-button {
+    background-color: $c34;
+    background-image: url("../epsystem/account/img/select-button-hl.svg");
+  }
 
-.sub-table {
-  display: table;
-  table-layout: fixed;
-  border-spacing: 0;
-  width: 100%;
-}
+  .sub-table {
+    display: table;
+    table-layout: fixed;
+    border-spacing: 0;
+    width: 100%;
+  }
 
-.sub-row {
-  display: table-row;
-}
+  .sub-row {
+    display: table-row;
+  }
 
-.sub-cell {
-  display: table-cell;
-}
+  .sub-cell {
+    display: table-cell;
+  }
 
-.sub-cell .content {
-  border-radius: 0;
-  border-left: none;
-  border-right: 1px solid #F9F1EA;
+  .sub-cell .content {
+    border-radius: 0;
+    border-left: none;
+    border-right: 1px solid #F9F1EA;
+  }
+  .sub-cell:first-child .content {
+    border-left: 1px solid #F9F1EA;
+  }
+  .row:hover .sub-cell .content {
+    border-left: none;
+    border-right: 1px solid #FFD275;
+  }
+  .row:hover .sub-cell:first-child .content {
+    border-left: 1px solid #FFD275;
+  }
 }
-.sub-cell:first-child .content {
-  border-left: 1px solid #F9F1EA;
-}
-.row:hover .sub-cell .content {
-  border-left: none;
-  border-right: 1px solid #FFD275;
-}
-.row:hover .sub-cell:first-child .content {
-  border-left: 1px solid #FFD275;
-}
-
 
 
 
@@ -263,67 +272,92 @@
   border-radius: 5px;
   border: 1px solid $c11;
   text-align: center;
-  color: $c1;
-
+  color: $c10;
 }
-.field.admin {
-  border: 1px solid $c63;
-}
-.field.admin::placeholder {
-  color: $c61;
-}
+//.field.admin {
+//  border: 1px solid $c63;
+//}
+//.field.admin::placeholder {
+//  color: $c61;
+//}
 .field:focus::placeholder {
   color: transparent;
 }
 .field:focus {
+  color: $c1;
   border: 1px solid $c2;
 }
 
 
 
-.table.admin {
-  .cell .content {
-    color: $c10;
-    border: 1px solid $c63;
-  }
-  .row:hover .cell .content {
-    background-color: $c63;
-    color: $c1;
-    border: 1px solid $c61;
-  }
-
-
-  .cell.id .content {
-    background-color: $c63;
-  }
-  .row:hover .cell.id .content {
-    background-color: $c61;
-  }
-
-  .cell .add-button {
-    background-image: url("../epsystem/account/img/add-button-admin.svg");
-    background-color: $c63;
-  }
-  .row:hover .cell .add-button {
-    background-image: url("../epsystem/account/img/add-button-admin-hl.svg");
-    background-color: $c61;
-  }
-
-  .cell .del-button {
-    background-image: url("../epsystem/account/img/del-button-admin.svg");
-    background-color: $c63;
-  }
-  .row:hover .cell .del-button {
-    background-image: url("../epsystem/account/img/del-button-admin-hl.svg");
-    background-color: $c61;
-  }
-
-  .cell .select-button {
-    background-image: url("../epsystem/account/img/select-button-admin.svg");
-    background-color: $c63;
-  }
-  .row:hover .cell .select-button {
-    background-image: url("../epsystem/account/img/select-button-admin-hl.svg");
-    background-color: $c61;
-  }
-}
+//.table.admin {
+//  .cell .content {
+//    color: $c10;
+//    border: 1px solid $c63;
+//  }
+//  .row:hover .cell .content {
+//    background-color: $c37;
+//    color: $c1;
+//    border: 1px solid $c34;
+//  }
+//
+//
+//  .cell.id .content {
+//    background-color: $c63;
+//  }
+//  .row:hover .cell.id .content {
+//    background-color: $c34;
+//  }
+//
+//  .cell .empty-button {
+//    background-color: $c63;
+//  }
+//  .row:hover .cell .empty-button {
+//    background-color: $c34;
+//  }
+//
+//  .cell .open-button {
+//    background-image: url("../epsystem/account/img/open-button-admin.svg");
+//    background-color: $c63;
+//  }
+//  .row:hover .cell .open-button {
+//    background-image: url("../epsystem/account/img/open-button-hl.svg");
+//    background-color: $c34;
+//  }
+//
+//  .cell .add-button {
+//    background-image: url("../epsystem/account/img/add-button-admin.svg");
+//    background-color: $c63;
+//  }
+//  .row:hover .cell .add-button {
+//    background-image: url("../epsystem/account/img/add-button-hl.svg");
+//    background-color: $c34;
+//  }
+//
+//  .cell .del-button {
+//    background-image: url("../epsystem/account/img/del-button-admin.svg");
+//    background-color: $c63;
+//  }
+//  .row:hover .cell .del-button {
+//    background-image: url("../epsystem/account/img/del-button-hl.svg");
+//    background-color: $c34;
+//  }
+//
+//  .cell .edit-button {
+//    background-image: url("../epsystem/account/img/edit-button-admin.svg");
+//    background-color: $c63;
+//  }
+//  .row:hover .cell .edit-button {
+//    background-image: url("../epsystem/account/img/edit-button-hl.svg");
+//    background-color: $c34;
+//  }
+//
+//  .cell .select-button {
+//    background-image: url("../epsystem/account/img/select-button-admin.svg");
+//    background-color: $c63;
+//  }
+//  .row:hover .cell .select-button {
+//    background-image: url("../epsystem/account/img/select-button-hl.svg");
+//    background-color: $c34;
+//  }
+//}

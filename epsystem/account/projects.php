@@ -2,7 +2,6 @@
 ob_start();
 $page = "projects";
 include "includes/autoloader.php";
-session_start();
 if (isset($_SESSION['account'])) {
     $account = $_SESSION['account'];
     // Link for exit button
@@ -15,29 +14,30 @@ if (isset($_SESSION['account'])) {
 
     <div class="menu"> <?php
     require "includes/menu.php";
-    if (!isset($_GET['p'])) {
-        if (isset($_GET['l1']) && $_GET['l1'] == "active") {
-            $projects = Project::selectProjectListByStatus(4);
-            $floors = Project::selectFloors();
+    if (!isset($project)) {
+        if (isset($_GET['l1']) && $_GET['l1'] == "pending") {
+            $products = Project::selectProducts();
             $presets = Project::selectPresets(); ?>
-            <form class="search-bar">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+            <form class="search-bar with-space">
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
-                <div class="custom-select input-floor" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
-                            name="floor" class="input-floor" required>
-                        <option value="">All Floors</option> <?php
-                        foreach ($floors as $floor) { ?>
-                            <option value="<?php echo $floor['title']; ?>"><?php echo $floor['title']; ?></option> <?php
+                <div class="custom-select input-product" style="width: calc(15% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                            name="product" class="input-product" required>
+                        <option value="">All Products</option>
+                        <option value="None">None</option> <?php
+                        foreach ($products as $product) { ?>
+                            <option value="<?php echo $product['title']; ?>"><?php echo $product['title']; ?></option> <?php
                         } ?>
                     </select>
                 </div>
-                <div class="custom-select input-preset" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                <div class="custom-select input-preset" style="width: calc(25% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
                             name="preset" class="input-preset" required>
-                        <option value="">All Presets</option> <?php
+                        <option value="">All Presets</option>
+                        <option value="None">None</option> <?php
                         foreach ($presets as $preset) { ?>
                             <option value="<?php echo $preset['title']; ?>"><?php echo $preset['title']; ?></option> <?php
                         } ?>
@@ -49,27 +49,25 @@ if (isset($_SESSION['account'])) {
                 <div class="header">
                     <div class="head" style="width: 7.5%">№</div>
                     <div class="head" style="width: 20%">Project Name</div>
-                    <div class="head" style="width: 15%">Floor</div>
-                    <div class="head" style="width: 15%">Preset</div>
-                    <div class="head" style="width: 15%">Tasks</div>
-                    <div class="head time" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
-                    <div class="head value" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Sum</div>
+                    <div class="head" style="width: 15%">Product</div>
+                    <div class="head" style="width: 25%">Preset</div>
+                    <div class="head tasks" style="width: 15%" onclick="sortTable('.head.tasks', '.cell.tasks .content')">Pending Tasks</div>
+                    <div class="head time" style="width: 10%" onclick="sortTime('.head.time', '.cell.time .content')">Time Spent</div>
                     <div class="head" style="width: 7.5%">Open</div>
                 </div>
                 <div class="header-extension"></div>
             </div>
             </div>
             <div class="table"> <?php
-                if ($projects) {
-                    foreach ($projects as $row) { ?>
+                if (isset($pending)) {
+                    foreach ($pending as $row) { ?>
                         <div class="row">
-                            <div class="cell id" style="width: 7.5%"><a href="<?php echo $_SERVER['PHP_SELF'] . "?p=" . $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
+                            <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
                             <div class="cell name" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
-                            <div class="cell floor" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_floor']; ?></a></div>
-                            <div class="cell preset" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
-                            <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['completed_tasks'] . " / " . $row['total_tasks']; ?></a></div>
+                            <div class="cell product" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_product']; ?></a></div>
+                            <div class="cell preset" style="width: 25%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                            <div class="cell tasks" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['pending_tasks']; ?></a></div>
                             <div class="cell time" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_time']; ?></a></div>
-                            <div class="cell value" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_sum']; ?></a></div>
                             <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                         </div> <?php
                     }
@@ -79,28 +77,29 @@ if (isset($_SESSION['account'])) {
                 } ?>
             </div> <?php
         }
-        elseif (isset($_GET['l1']) && $_GET['l1'] == "pending") {
-            $projects = Project::selectProjectListByStatus(6);
-            $floors = Project::selectFloors();
+        elseif (isset($_GET['l1']) && $_GET['l1'] == "active") {
+            $products = Project::selectProducts();
             $presets = Project::selectPresets(); ?>
-            <form class="search-bar">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+            <form class="search-bar with-space">
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
-                <div class="custom-select input-floor" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
-                            name="floor" class="input-floor" required>
-                        <option value="">All Floors</option> <?php
-                        foreach ($floors as $floor) { ?>
-                            <option value="<?php echo $floor['title']; ?>"><?php echo $floor['title']; ?></option> <?php
+                <div class="custom-select input-product" style="width: calc(15% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                            name="product" class="input-product" required>
+                        <option value="">All Products</option>
+                        <option value="None">None</option> <?php
+                        foreach ($products as $product) { ?>
+                            <option value="<?php echo $product['title']; ?>"><?php echo $product['title']; ?></option> <?php
                         } ?>
                     </select>
                 </div>
-                <div class="custom-select input-preset" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                <div class="custom-select input-preset" style="width: calc(25% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
                             name="preset" class="input-preset" required>
-                        <option value="">All Presets</option> <?php
+                        <option value="">All Presets</option>
+                        <option value="None">None</option> <?php
                         foreach ($presets as $preset) { ?>
                             <option value="<?php echo $preset['title']; ?>"><?php echo $preset['title']; ?></option> <?php
                         } ?>
@@ -112,27 +111,25 @@ if (isset($_SESSION['account'])) {
                 <div class="header">
                     <div class="head" style="width: 7.5%">№</div>
                     <div class="head" style="width: 20%">Project Name</div>
-                    <div class="head" style="width: 15%">Floor</div>
-                    <div class="head" style="width: 15%">Preset</div>
-                    <div class="head" style="width: 15%">Pending Tasks</div>
-                    <div class="head time" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
-                    <div class="head value" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Sum</div>
+                    <div class="head" style="width: 15%">Product</div>
+                    <div class="head" style="width: 25%">Preset</div>
+                    <div class="head" style="width: 15%">Tasks</div>
+                    <div class="head time" style="width: 10%" onclick="sortTime('.head.time', '.cell.time .content')">Time Spent</div>
                     <div class="head" style="width: 7.5%">Open</div>
                 </div>
                 <div class="header-extension"></div>
             </div>
             </div>
             <div class="table"> <?php
-                if ($projects) {
-                    foreach ($projects as $row) { ?>
+                if (isset($active)) {
+                    foreach ($active as $row) { ?>
                         <div class="row">
-                            <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
+                            <div class="cell id" style="width: 7.5%"><a href="<?php echo $_SERVER['REQUEST_URI'] . "?p=" . $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
                             <div class="cell name" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
-                            <div class="cell floor" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_floor']; ?></a></div>
-                            <div class="cell preset" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
-                            <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['pending_tasks']; ?></a></div>
+                            <div class="cell product" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_product']; ?></a></div>
+                            <div class="cell preset" style="width: 25%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                            <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['completed_tasks'] . " / " . $row['total_tasks']; ?></a></div>
                             <div class="cell time" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_time']; ?></a></div>
-                            <div class="cell value" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_sum']; ?></a></div>
                             <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                         </div> <?php
                     }
@@ -143,27 +140,28 @@ if (isset($_SESSION['account'])) {
             </div> <?php
         }
         elseif (isset($_GET['l1']) && $_GET['l1'] == "completed") {
-            $projects = Project::selectProjectListByStatus(7);
-            $floors = Project::selectFloors();
+            $products = Project::selectProducts();
             $presets = Project::selectPresets(); ?>
-            <form class="search-bar">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+            <form class="search-bar with-space">
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
-                <div class="custom-select input-floor" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
-                            name="floor" class="input-floor" required>
-                        <option value="">All Floors</option> <?php
-                        foreach ($floors as $floor) { ?>
-                            <option value="<?php echo $floor['title']; ?>"><?php echo $floor['title']; ?></option> <?php
+                <div class="custom-select input-product" style="width: calc(15% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                            name="product" class="input-product" required>
+                        <option value="">All Products</option>
+                        <option value="None">None</option> <?php
+                        foreach ($products as $product) { ?>
+                            <option value="<?php echo $product['title']; ?>"><?php echo $product['title']; ?></option> <?php
                         } ?>
                     </select>
                 </div>
-                <div class="custom-select input-preset" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                <div class="custom-select input-preset" style="width: calc(25% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
                             name="preset" class="input-preset" required>
-                        <option value="">All Presets</option> <?php
+                        <option value="">All Presets</option>
+                        <option value="None">None</option> <?php
                         foreach ($presets as $preset) { ?>
                             <option value="<?php echo $preset['title']; ?>"><?php echo $preset['title']; ?></option> <?php
                         } ?>
@@ -175,28 +173,27 @@ if (isset($_SESSION['account'])) {
                 <div class="header">
                     <div class="head" style="width: 7.5%">№</div>
                     <div class="head" style="width: 20%">Project Name</div>
-                    <div class="head" style="width: 15%">Floor</div>
-                    <div class="head" style="width: 15%">Preset</div>
-                    <div class="head" style="width: 15%">Finish Date</div>
-                    <div class="head time" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
-                    <div class="head value" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Sum</div>
+                    <div class="head" style="width: 15%">Product</div>
+                    <div class="head" style="width: 25%">Preset</div>
+                    <div class="head date" style="width: 15%" onclick="sortDates('.head.date', '.cell.date .content', '.finished')">Completed</div>
+                    <div class="head time" style="width: 10%" onclick="sortTime('.head.time', '.cell.time .content')">Time Spent</div>
                     <div class="head" style="width: 7.5%">Open</div>
                 </div>
                 <div class="header-extension"></div>
             </div>
             </div>
             <div class="table"> <?php
-                if ($projects) {
-                    foreach ($projects as $row) { ?>
+                if (isset($completed)) {
+                    foreach ($completed as $row) { ?>
                         <div class="row">
                             <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
-                            <div class="cell title" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
-                            <div class="cell floor" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_floor']; ?></a></div>
-                            <div class="cell preset" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
-                            <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['date']; ?></a></div>
+                            <div class="cell name" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                            <div class="cell product" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_product']; ?></a></div>
+                            <div class="cell preset" style="width: 25%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                            <div class="cell date" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['status_time2']; ?></a></div>
                             <div class="cell time" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_time']; ?></a></div>
-                            <div class="cell value" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_sum']; ?></a></div>
                             <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
+                            <input class="finished" type="hidden" value="<?php echo $row['status_time']; ?>">
                         </div> <?php
                     }
                 }
@@ -206,27 +203,28 @@ if (isset($_SESSION['account'])) {
             </div> <?php
         }
         elseif (isset($_GET['l1']) && $_GET['l1'] == "canceled") {
-            $projects = Project::selectProjectListByStatus(8);
-            $floors = Project::selectFloors();
+            $products = Project::selectProducts();
             $presets = Project::selectPresets(); ?>
-            <form class="search-bar">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+            <form class="search-bar with-space">
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
+                <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'})"
                        type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
-                <div class="custom-select input-floor" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
-                            name="floor" class="input-floor" required>
-                        <option value="">All Floors</option> <?php
-                        foreach ($floors as $floor) { ?>
-                            <option value="<?php echo $floor['title']; ?>"><?php echo $floor['title']; ?></option> <?php
+                <div class="custom-select input-product" style="width: calc(15% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                            name="product" class="input-product" required>
+                        <option value="">All Products</option>
+                        <option value="None">None</option> <?php
+                        foreach ($products as $product) { ?>
+                            <option value="<?php echo $product['title']; ?>"><?php echo $product['title']; ?></option> <?php
                         } ?>
                     </select>
                 </div>
-                <div class="custom-select input-preset" style="width: calc(15% - 8px);">
-                    <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-floor .input-floor':'.cell.floor', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
+                <div class="custom-select input-preset" style="width: calc(25% - 8px);">
+                    <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-preset .input-preset':'.cell.preset'}, this)"
                             name="preset" class="input-preset" required>
-                        <option value="">All Presets</option> <?php
+                        <option value="">All Presets</option>
+                        <option value="None">None</option> <?php
                         foreach ($presets as $preset) { ?>
                             <option value="<?php echo $preset['title']; ?>"><?php echo $preset['title']; ?></option> <?php
                         } ?>
@@ -238,27 +236,25 @@ if (isset($_SESSION['account'])) {
                 <div class="header">
                     <div class="head" style="width: 7.5%">№</div>
                     <div class="head" style="width: 20%">Project Name</div>
-                    <div class="head" style="width: 15%">Floor</div>
-                    <div class="head" style="width: 15%">Preset</div>
+                    <div class="head" style="width: 15%">Product</div>
+                    <div class="head" style="width: 25%">Preset</div>
                     <div class="head" style="width: 15%">Cancellation Reason</div>
-                    <div class="head time" style="width: 10%" onclick="sortTable('.head.time', '.cell.time a')">Time Spent</div>
-                    <div class="head value" style="width: 10%" onclick="sortTable('.head.value', '.cell.value a')">Sum</div>
+                    <div class="head time" style="width: 10%" onclick="sortTime('.head.time', '.cell.time .content')">Time Spent</div>
                     <div class="head" style="width: 7.5%">Open</div>
                 </div>
                 <div class="header-extension"></div>
             </div>
             </div>
             <div class="table"> <?php
-                if ($projects) {
-                    foreach ($projects as $row) { ?>
+                if (isset($canceled)) {
+                    foreach ($canceled as $row) { ?>
                         <div class="row">
                             <div class="cell id" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo "#" . sprintf('%04d', $row['project_id']); ?></a></div>
-                            <div class="cell title" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
-                            <div class="cell floor" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_floor']; ?></a></div>
-                            <div class="cell preset" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
+                            <div class="cell name" style="width: 20%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_title']; ?></a></div>
+                            <div class="cell product" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_product']; ?></a></div>
+                            <div class="cell preset" style="width: 25%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['project_preset']; ?></a></div>
                             <div class="cell" style="width: 15%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['note']; ?></a></div>
                             <div class="cell time" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_time']; ?></a></div>
-                            <div class="cell value" style="width: 10%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content"><?php echo $row['task_sum']; ?></a></div>
                             <div class="cell" style="width: 7.5%"><a href="projects.php?p=<?php echo $row['project_id']; ?>" class="content open-button">Open</a></div>
                         </div> <?php
                     }
@@ -282,19 +278,27 @@ if (isset($_SESSION['account'])) {
                 $query_string = http_build_query($_GET);
                 header('Location: projects.php?' . $query_string);
             }
-            elseif (isset($_POST['cancel']) && isset($canCancel) && $canCancel) {
+            elseif (isset($_POST['delete'])  && isset($canDelete) && $canDelete) {
+                // Delete assignments
+                $assignments = Assignment::selectProjectAssignments($_GET['p']);
+                foreach ($assignments as $assignment)
+                    Assignment::remove('assignment', $assignment['id'], false);
+                // Delete project
+                Project::remove('project', $_GET['p'], "projects.php?l1=active");
+            }
+            elseif ((isset($_POST['cancel1']) || isset($_POST['cancel2']) || isset($_POST['cancel3'])) && isset($canCancel) && $canCancel) {
                 $fields = [
                     'projectid' => $_GET['p'],
                     'statusid' => 8,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
                 ];
-                if ($_GET['l2'] == "1") $fields['note'] = "Canceled by client";
-                if ($_GET['l2'] == "2") $fields['note'] = "Couldn't finish";
-                if ($_GET['l2'] == "3") $fields['note'] = "Don't need";
+                if (isset($_POST['cancel1'])) $fields['note'] = "Canceled by client";
+                if (isset($_POST['cancel2'])) $fields['note'] = "Couldn't finish";
+                if (isset($_POST['cancel3'])) $fields['note'] = "Other";
 
                 $statusID = Project::insert('project_status', $fields, true, false);
-                $redirect = "projects.php?p=" . $_GET['p'] . "&options";
+                $redirect = "projects.php?p=" . $_GET['p'] . "&l1=project";
                 Project::update('project', $_GET['p'], ["statusid" => $statusID], false);
                 $assignments = Assignment::selectProjectAssignments($_GET['p']);
                 // Remove unnecessary(1,2,3) assignments
@@ -313,245 +317,689 @@ if (isset($_SESSION['account'])) {
                 ];
 
                 $statusID = Project::insert('project_status', $fields, true, false);
-                $redirect = "projects.php?p=" . $_GET['p'] . "&options";
+                $redirect = "projects.php?p=" . $_GET['p'] . "&l1=project";
                 Project::update('project', $_GET['p'], ["statusid" => $statusID], $redirect);
             }
-            elseif (isset($_POST['delete'])  && isset($canDelete) && $canDelete) {
-                // Delete assignments
-                $assignments = Assignment::selectProjectAssignments($_GET['p']);
-                foreach ($assignments as $assignment)
-                    Assignment::remove('assignment', $assignment['id'], false);
-                // Delete project
-                Project::remove('project', $_GET['p'], "projects.php?l1=active");
-            }
 
-            if (isset($_GET['l1']) && $_GET['l1'] == "cancel") {
-                if (!isset($canCancel) || !$canCancel) { ?>
-                    <p style="text-align: center">delete sum bad assignments first!</p>
-                    </div> <?php
+            if (isset($_GET['l1']) && $_GET['l1'] == "add") {
+                if (isset($_POST['custom'])) {
+                    $_SESSION['new-assignment']['stage'] = '1c';
+                    $_SESSION['new-assignment']['info']['title'] = "";
+                    header('Location: new-assignment.php?p=' . $_GET['p']);
                 }
-                elseif (isset($_GET['l2']) && $_GET['l2'] == "1") { ?>
-                    <div class="navbar level-2">
+                elseif (isset($_POST['asg'])) {
+                    $preset = Assignment::selectPresetByID($_POST['asg']);
+                    $_SESSION['new-assignment']['fields']['title'] = $preset['title'];
+                    $_SESSION['new-assignment']['fields']['projectid'] = $_GET['p'];
+                    $_SESSION['new-assignment']['fields']['presetid'] = $preset['id'];
+                    $_SESSION['new-assignment']['fields']['divisionid'] = $preset['divisionid'];
+                    $_SESSION['new-assignment']['fields']['objective'] = $preset['objective'];
+                    $asgID = Assignment::insert('assignment', $_SESSION['new-assignment']['fields'], true, false);
+
+                    $fieldsStatus = [
+                        'assignmentid' => $asgID,
+                        'statusid' => 1,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'note' => "New Assignment"
+                    ];
+                    // Insert to `assignment_status` table and save ID of the new record
+                    $statusID = Assignment::insert('assignment_status', $fieldsStatus, true, false);
+                    // Update `assignment` table record with saved ID status
+                    Assignment::update('assignment', $asgID, ["statusid" => $statusID], false);
+
+                    // If project completed/canceled change to pending
+                    $projectStatus = Project::selectProject($_SESSION['new-assignment']['fields']['projectid'])['statusid'];
+                    if ($projectStatus == 7 || $projectStatus == 8) {
+                        $fieldsStatus = [
+                            'projectid' => $_SESSION['new-assignment']['fields']['projectid'],
+                            'statusid' => 6,
+                            'time' => date("Y-m-d H-i-s"),
+                            'assigned_by' => $account->id,
+                            'note' => "Added assignment"
+                        ];
+                        $statusID = Project::insert('project_status', $fieldsStatus, true, false);
+                        Project::update('project', $_SESSION['new-assignment']['fields']['projectid'], ["statusid" => $statusID], false);
+                    }
+
+                    header('Location: projects.php?p=' . $_SESSION['new-assignment']['fields']['projectid'] . '&l1=assignments&l2=pending');
+                    unset($_SESSION['new-assignment']);
+                    exit();
+                } ?>
+
+                <div class="navbar level-2 unselected">
+                    <form method="post" class="container-button">
+                        <input type="hidden" name="custom">
+                        <input type="submit" name="submit" value="+ Custom Assignment" class="button admin-menu">
+                    </form>
+                </div> <?php
+                $divisions = Assignment::selectDivisions();
+                $presets = Assignment::selectPresets();
+                include_once "includes/info-bar.php"; ?>
+                <div class="search-bar admin">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-objective':'.cell.objective'})"
+                           type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-objective':'.cell.objective'})"
+                           type="text" name="name" class="input-name" placeholder="Enter Assignment Name" required style="width: calc(20% - 8px);">
+                    <div class="custom-select input-division" style="width: calc(15% - 8px);">
+                        <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-objective':'.cell.objective'}, this)"
+                                name="division" class="input-division" required>
+                            <option value="">All Divisions</option>
+                            <option value="None">None</option>
+                            <option value="Custom">Custom</option> <?php
+                            foreach ($divisions as $division) { ?>
+                                <option value="<?php echo $division['title']; ?>"><?php echo $division['title']; ?></option> <?php
+                            } ?>
+                        </select>
+                    </div>
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-objective':'.cell.objective'})"
+                           type="text" name="objective" class="input-objective" placeholder="Enter Assignment Objective" required style="width: calc(40% - 8px);">
+                </div>
+                <div class="table-header-container">
+                    <div class="header-extension admin"></div>
+                    <div class="header">
+                        <div class="head admin" style="width: 7.5%">№</div>
+                        <div class="head admin" style="width: 20%">Assignment Preset Name</div>
+                        <div class="head admin" style="width: 15%">Division</div>
+                        <div class="head admin" style="width: 40%">Objective</div>
+                        <div class="head admin tasks" style="width: 10%" onclick="sortTable('.head.tasks', '.cell.tasks .content')">Tasks</div>
+                        <div class="head admin" style="width: 7.5%">Add</div>
+                    </div>
+                    <div class="header-extension admin"></div>
+                </div>
+                </div>
+                <div class="table admin"> <?php
+                    foreach ($presets as $preset) { ?>
+                        <form method="post" class="row">
+                            <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%04d', $preset['id']); ?>" class="content"></div>
+                            <div class="cell name" style="width: 20%"><input type="submit" name="submit" value="<?php echo $preset['title']; ?>" class="content"></div>
+                            <div class="cell division" style="width: 15%"><input type="submit" name="submit" value="<?php echo $preset['div_title']; ?>" class="content"></div>
+                            <div class="cell objective" style="width: 40%"><input type="submit" name="submit" value="<?php echo $preset['objective']; ?>" class="content"></div>
+                            <div class="cell tasks" style="width: 10%"><input type="submit" name="submit" value="<?php echo $preset['task_count']; ?>" class="content"></div>
+                            <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                            <input type="hidden" name="asg" value="<?php echo $preset['id']; ?>">
+                        </form> <?php
+                    } ?>
+                </div> <?php
+            }
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "edit") {
+                if (isset($_GET['l2']) && $_GET['l2'] == "preset") {
+                    if (isset($_POST['preset']))
+                        Database::update('project', $_GET['p'], ["presetid" => $_POST['preset'], "productid" => $_POST['preset-product']], "projects.php?p=" . $_GET['p'] . "&options&l1=edit");
+                    elseif (isset($_POST['none'])) {
+                        Database::update('project', $_GET['p'], ["presetid" => null], false);
+                        Database::update('project', $_GET['p'], ["productid" => null], "projects.php?p=" . $_GET['p'] . "&options&l1=edit");
+                    }
+
+                    $products = Project::selectProducts(); ?>
+                    <div class="navbar level-3 unselected">
                         <form method="post" class="container-button">
-                            <input type="hidden" name="cancel">
-                            <input type="submit" name="submit" value="CONFIRM" class="button admin-menu">
+                            <input type="hidden" name="none">
+                            <input type="submit" name="submit" value="NONE" class="button admin-menu">
                         </form>
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="back">
-                            <input type="submit" name="submit" value="NOT NOW" class="button admin-menu">
-                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="search-bar admin">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-product .input-product':'.cell.product'})"
+                               type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-product .input-product':'.cell.product'})"
+                               type="text" name="name" class="input-name" placeholder="Enter Project Preset Name" required style="width: calc(20% - 8px);">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-product .input-product':'.cell.product'})"
+                               type="text" name="description" class="input-description" placeholder="Enter Project Preset Description" required style="width: calc(50% - 8px);">
+                        <div class="custom-select input-product" style="width: calc(15% - 8px);">
+                            <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-product .input-product':'.cell.product'}, this)"
+                                    name="product" class="input-product" required>
+                                <option value="">All Products</option>
+                                <option value="None">None</option> <?php
+                                foreach ($products as $product) { ?>
+                                    <option value="<?php echo $product['title']; ?>"><?php echo $product['title']; ?></option> <?php
+                                } ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-header-container">
+                        <div class="header-extension admin"></div>
+                        <div class="header">
+                            <div class="head admin" style="width: 7.5%">№</div>
+                            <div class="head admin" style="width: 20%">Project Preset Name</div>
+                            <div class="head admin" style="width: 50%">Project Preset Description</div>
+                            <div class="head admin" style="width: 15%">Product</div>
+                            <div class="head admin" style="width: 7.5%">Select</div>
+                        </div>
+                        <div class="header-extension admin"></div>
                     </div>
                     </div> <?php
+                    $presets = Project::selectPresets();
+                    if ($presets) { ?>
+                        <div class="table admin"> <?php
+                            foreach ($presets as $preset) { ?>
+                                <form method="post" class="row">
+                                    <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $preset['id']); ?>" class="content"></div>
+                                    <div class="cell name" style="width: 20%"><input type="submit" name="submit" value="<?php echo $preset['title']; ?>" class="content"></div>
+                                    <div class="cell description" style="width: 50%"><input type="submit" name="submit" value="<?php echo $preset['description']; ?>" class="content"></div>
+                                    <div class="cell product" style="width: 15%"><input type="submit" name="submit" value="<?php echo $preset['product']; ?>" class="content"></div>
+                                    <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
+                                    <input type="hidden" name="preset" value="<?php echo $preset['id']; ?>">
+                                    <input type="hidden" name="preset-product" value="<?php echo $preset['productid']; ?>">
+                                </form> <?php
+                            } ?>
+                        </div> <?php
+                    }
+                    else { ?>
+                        <div class="empty-table">NO PROJECT PRESETS</div> <?php
+                    }
                 }
-                elseif (isset($_GET['l2']) && $_GET['l2'] == "2") { ?>
-                    <div class="navbar level-2">
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="cancel">
-                            <input type="submit" name="submit" value="CONFIRM" class="button admin-menu">
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "name") {
+                    if (isset($_POST['title']))
+                        Database::update('project', $_GET['p'], ['title' => $_POST['title']], "projects.php?p=" . $_GET['p'] . "&options&l1=edit"); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" id="title" class="container-button">
+                            <input type="hidden" name="title">
+                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
                         </form>
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="back">
-                            <input type="submit" name="submit" value="NOT NOW" class="button admin-menu">
-                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension small admin"></div>
+                        <div class="header small">
+                            <div class="head admin">Project Name</div>
+                        </div>
+                        <div class="header-extension small admin"></div>
                     </div>
+                    </div>
+                    <div class="table small">
+                        <div class="row">
+                            <input form="title" name="title" class="field admin" placeholder="Enter Project Name Here" maxlength="50" value="<?php if (isset($project['title'])) echo htmlentities($project['title']); ?>">
+                        </div>
                     </div> <?php
                 }
-                elseif (isset($_GET['l2']) && $_GET['l2'] == "3") { ?>
-                    <div class="navbar level-2">
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="cancel">
-                            <input type="submit" name="submit" value="CONFIRM" class="button admin-menu">
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "description") {
+                    if (isset($_POST['description']))
+                        Database::update('project', $_GET['p'], ['description' => $_POST['description']], "projects.php?p=" . $_GET['p'] . "&options&l1=edit"); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" id="description" class="container-button">
+                            <input type="hidden" name="description">
+                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
                         </form>
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="back">
-                            <input type="submit" name="submit" value="NOT NOW" class="button admin-menu">
-                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension large admin"></div>
+                        <div class="header large">
+                            <div class="head admin">Project Description</div>
+                        </div>
+                        <div class="header-extension large admin"></div>
                     </div>
+                    </div>
+                    <div class="table large">
+                        <div class="row">
+                            <input form="description" name="description" class="field admin" placeholder="Enter Project Description Here" maxlength="200" value="<?php if (isset($project['description'])) echo htmlentities($project['description']); ?>">
+                        </div>
                     </div> <?php
                 }
             }
-            elseif (isset($_GET['l1']) && $_GET['l1'] == "complete") {
-                if (!isset($canComplete) || !$canComplete) { ?>
-                    <p style="text-align: center">complete or delete sum bad assignments first!</p>
-                    </div> <?php
-                }
-                else { ?>
-                    <div class="navbar level-2">
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="complete">
-                            <input type="submit" name="submit" value="CONFIRM" class="button admin-menu">
-                        </form>
-                        <form method="post" class="container-button">
-                            <input type="hidden" name="back">
-                            <input type="submit" name="submit" value="NOT NOW" class="button admin-menu">
-                        </form>
-                    </div>
-                    </div> <?php
-                }
-            }
-            elseif (isset($_GET['l1']) && $_GET['l1'] == "delete") {
-                if (!isset($canDelete) || !$canDelete) { ?>
-                    <p style="text-align: center">delete sum bad assignments first!</p>
-                    </div> <?php
-                }
-                else { ?>
-                    <div class="navbar level-2">
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "actions") {
+                if (isset($_GET['l2']) && $_GET['l2'] == "delete") { ?>
+                    <div class="navbar level-3 current unselected">
                         <form method="post" class="container-button">
                             <input type="hidden" name="delete">
-                            <input type="submit" name="submit" value="CONFIRM" class="button admin-menu">
+                            <input type="submit" name="submit" value="Confirm Delete" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
                         </form>
                         <form method="post" class="container-button">
                             <input type="hidden" name="back">
-                            <input type="submit" name="submit" value="NOT NOW" class="button admin-menu">
+                            <input type="submit" name="submit" value="Don't Delete" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                    </div>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "cancel") { ?>
+                    <div class="navbar level-3 current unselected">
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="cancel1">
+                            <input type="submit" name="submit" value="Client Cancel" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="cancel2">
+                            <input type="submit" name="submit" value="Can't Finish" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="cancel3">
+                            <input type="submit" name="submit" value="Other" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                    </div>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "complete") { ?>
+                    <div class="navbar level-3 current unselected">
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="complete">
+                            <input type="submit" name="submit" value="Confirm Complete" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="back">
+                            <input type="submit" name="submit" value="Don't Complete" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
                         </form>
                     </div>
                     </div> <?php
                 }
             }
         }
-        elseif (isset($_GET['l1']) && $_GET['l1'] == "project") {
-            if (isset($_GET['l2']) && $_GET['l2'] == "overview") { ?>
-                </div> <?php
-            }
-            elseif (isset($_GET['l2']) && $_GET['l2'] == "client") {
-                if (isset($project) && !$project['client']) {
-
-                    if (!isset($_SESSION['add-client']))
-                        $_SESSION['add-client']['stage'] = 1;
-
-                    if (isset($_POST['submit'])) {
-                        if ($_SESSION['add-client']['stage'] == 1) {
-                            $_SESSION['add-client']['stage'] = 2;
-                        }
-                        elseif ($_SESSION['add-client']['stage'] == 2) {
-                            if (isset($_POST['new-client']))
-                                $_SESSION['add-client']['new-client'] = true;
-                            else {
-                                if (isset($_POST['username'])) {
-                                    $fieldsClient = [
-                                        'username' => $_POST['username'],
-                                        'type' => 2,
-                                        'reg_time' => date("Y-m-d H-i-s")
-                                    ];
-                                    $clientID = Project::insert('account', $fieldsClient, true, null);
-                                    $_POST['client'] = $clientID;
-                                }
-                                if (isset($_POST['client'])) {
-                                    $fields = ["clientid" => $_POST['client']];
-                                    Project::update('project', $project['project_id'], $fields, $_SERVER['REQUEST_URI']);
-                                    unset($_SESSION['add-client']);
-                                }
-                            }
-                        }
-                    }
-                    if (isset($_SESSION['add-client']['stage'])) {
-                        if ($_SESSION['add-client']['stage'] == 1) { ?>
-                            <div class="navbar level-3">
-                                <form class="container-button disabled">
-                                    <a class="button admin-menu disabled"></a>
-                                </form>
-                                <form method="post" class="container-button">
-                                    <input type="submit" name="submit" value="Add Client" class="button admin-menu">
-                                </form>
-                                <form class="container-button disabled">
-                                    <a class="button admin-menu disabled"></a>
-                                </form>
-                            </div>
-                            </div> <?php
-                        }
-                        elseif ($_SESSION['add-client']['stage'] == 2) {
-                            if (!isset($_SESSION['add-client']['new-client'])) { ?>
-                                <div class="navbar level-3">
-                                    <form class="container-button disabled">
-                                        <a class="button admin-menu disabled"></a>
-                                    </form>
-                                    <form method="post" class="container-button">
-                                        <input type="hidden" name="new-client">
-                                        <input type="submit" name="submit" value="+ New Client" class="button admin-menu">
-                                    </form>
-                                    <form class="container-button disabled">
-                                        <a class="button admin-menu disabled"></a>
-                                    </form>
-                                </div>
-                                <div class="info-bar">
-                                </div>
-                                <div class="table-header-container">
-                                    <div class="header-extension admin"></div>
-                                    <div class="header">
-                                        <div class="head admin id" style="width: 7.5%">№</div>
-                                        <div class="head admin" style="width: 60%">Client Name</div>
-                                        <div class="head admin" style="width: 10%">Projects</div>
-                                        <div class="head admin" style="width: 15%">Reg. Date</div>
-                                        <div class="head admin" style="width: 7.5%">Add</div>
-                                    </div>
-                                    <div class="header-extension admin"></div>
-                                </div>
-                                </div>
-                                <div class="table admin"> <?php
-                                    $clients = Project::selectClients();
-                                    foreach ($clients as $client) { ?>
-                                        <form method="post" class="row">
-                                            <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $client['id']); ?>" class="content"></div>
-                                            <div class="cell" style="width: 60%"><input type="submit" name="submit" value="<?php echo $client['username']; ?>" class="content"></div>
-                                            <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $client['project_count']; ?>" class="content"></div>
-                                            <div class="cell" style="width: 15%"><input type="submit" name="submit" value="<?php echo $client['reg_time_date']; ?>" class="content"></div>
-                                            <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
-                                            <input type="hidden" name="client" value="<?php echo $client['id']; ?>">
-                                        </form> <?php
-                                    } ?>
-                                </div> <?php
-                            }
-                            else { ?>
-                                <div class="navbar level-3">
-                                    <form class="container-button disabled">
-                                        <a class="button admin-menu disabled"></a>
-                                    </form>
-                                    <form id="test2" name="test2" method="post" class="container-button">
-                                        <input type="submit" name="submit" value="Save" class="button admin-menu">
-                                    </form>
-                                    <form class="container-button disabled">
-                                        <a class="button admin-menu disabled"></a>
-                                    </form>
-                                </div>
-                                <div class="info-bar">
-                                </div>
-                                <div class="table-header-container">
-                                    <div class="header-extension small admin"></div>
-                                    <div class="header small">
-                                        <div class="head admin">Client Username</div>
-                                    </div>
-                                    <div class="header-extension small admin"></div>
-                                </div>
-                                </div>
-                                <div class="table small">
-                                    <div class="row">
-                                        <input form="test2" name="username" id="username" class="field admin" placeholder="Enter Client Username">
-                                    </div>
-                                </div> <?php
-                            }
-                        }
-                    }
+        elseif (isset($_GET['ioptions'])) {
+            if (isset($_GET['l1']) && $_GET['l1'] == "add") {
+                if (isset($_POST['preset'])) {
+                    $preset = Database::selectInfoPagePreset($_POST['preset']);
+                    $fields = [
+                        'projectid' => $_GET['p'],
+                        'presetid' => $preset['id'],
+                        'title' => $preset['title'],
+                        'description' => $preset['description'],
+                        'link' => null
+                    ];
+                    Database::insert('project_infopage', $fields, false, "projects.php?p=" . $_GET['p'] . "&l1=info");
                 }
-                else { ?>
+
+                $presets = Database::selectInfoPagePresets();
+                $groups = Database::selectInfoPageGroups(); ?>
+                <form class="search-bar with-space admin">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                           type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                           type="text" name="name" class="input-name" placeholder="Enter Info Preset Name" required style="width: calc(20% - 8px);">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                           type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(50% - 8px);">
+                    <div class="custom-select input-group" style="width: calc(15% - 8px);">
+                        <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'}, this)"
+                                name="group" class="input-group" required>
+                            <option value="">All Groups</option>
+                            <option value="None">None</option> <?php
+                            foreach ($groups as $group) { ?>
+                                <option value="<?php echo $group['title']; ?>"><?php echo $group['title']; ?></option> <?php
+                            } ?>
+                        </select>
+                    </div>
+                </form>
+                <div class="table-header-container">
+                    <div class="header-extension admin"></div>
+                    <div class="header">
+                        <div class="head admin" style="width: 7.5%">№</div>
+                        <div class="head admin" style="width: 20%">Info Preset Name</div>
+                        <div class="head admin" style="width: 50%">Description</div>
+                        <div class="head admin" style="width: 15%">Group</div>
+                        <div class="head admin" style="width: 7.5%">Add</div>
+                    </div>
+                    <div class="header-extension admin"></div>
+                </div>
+                </div> <?php
+                $infopages = Database::selectInfoPagePresets();
+                $projectInfopages = Project::selectProjectInfoPages($_GET['p']);
+                if ($infopages && $projectInfopages)
+                    foreach ($projectInfopages as $projectInfo) {
+                        foreach ($infopages as $presetInfo) {
+                            if ($projectInfo['presetid'] == $presetInfo['id'])
+                                unset($infopages[$presetInfo['id']]);
+                        }
+                    }
+
+                if ($infopages) { ?>
+                    <div class="table admin"> <?php
+                        foreach ($infopages as $infopage) { ?>
+                            <form method="post" class="row">
+                                <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $infopage['id']); ?>" class="content"></div>
+                                <div class="cell name" style="width: 20%"><input type="submit" name="submit" value="<?php echo $infopage['title']; ?>" class="content"></div>
+                                <div class="cell description" style="width: 50%"><input type="submit" name="submit" value="<?php echo $infopage['description']; ?>" class="content"></div>
+                                <div class="cell group" style="width: 15%"><input type="submit" name="submit" value="<?php echo $infopage['group']; ?>" class="content"></div>
+                                <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Add" class="content add-button"></div>
+                                <input type="hidden" name="preset" value="<?php echo $infopage['id']; ?>">
+                            </form> <?php
+                        } ?>
                     </div> <?php
                 }
+                else { ?>
+                    <div class="empty-table">NO INFO PAGE PRESETS</div> <?php
+                }
+            }
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "edit") {
+                if (!isset($_GET['i'])) {
+                    $presets = Project::selectProjectInfoPages($_GET['p']);
+                    $groups = Database::selectInfoPageGroups(); ?>
+                    <form class="search-bar with-space admin">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                               type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                               type="text" name="name" class="input-name" placeholder="Enter Info Link Name" required style="width: calc(20% - 8px);">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                               type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(40% - 8px);">
+                        <div class="custom-select input-group" style="width: calc(15% - 8px);">
+                            <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'}, this)"
+                                    name="group" class="input-group" required>
+                                <option value="">All Groups</option>
+                                <option value="None">None</option> <?php
+                                foreach ($groups as $group) { ?>
+                                    <option value="<?php echo $group['title']; ?>"><?php echo $group['title']; ?></option> <?php
+                                } ?>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="table-header-container">
+                        <div class="header-extension admin"></div>
+                        <div class="header">
+                            <div class="head admin" style="width: 7.5%">№</div>
+                            <div class="head admin" style="width: 20%">Info Link Name</div>
+                            <div class="head admin" style="width: 40%">Description</div>
+                            <div class="head admin" style="width: 15%">Group</div>
+                            <div class="head admin" style="width: 10%">Link</div>
+                            <div class="head admin" style="width: 7.5%">Edit</div>
+                        </div>
+                        <div class="header-extension admin"></div>
+                    </div>
+                    </div> <?php
+                    if ($presets) { ?>
+                        <div class="table admin"> <?php
+                            foreach ($presets as $preset) {
+                                $link = "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $preset['id']; ?>
+                                <div class="row">
+                                    <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%03d', $preset['id']); ?></a></div>
+                                    <div class="cell name" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $preset['title']; ?></a></div>
+                                    <div class="cell description" style="width: 40%"><a href="<?php echo $link; ?>" class="content"><?php echo $preset['description']; ?></a></div>
+                                    <div class="cell group" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $preset['group']; ?></a></div>
+                                    <div class="cell" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $preset['hasLink']; ?></a></div>
+                                    <div class="cell" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content edit-button">Edit</a></div>
+                                </div> <?php
+                            } ?>
+                        </div> <?php
+                    }
+                    else { ?>
+                        <div class="empty-table">NO INFO PAGES</div> <?php
+                    }
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "name") {
+                    if (isset($_POST['title']))
+                        Database::update('project_infopage', $_GET['i'], ['title' => $_POST['title']], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" id="title" class="container-button">
+                            <input type="hidden" name="title">
+                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension small admin"></div>
+                        <div class="header small">
+                            <div class="head admin">Info Link Name</div>
+                        </div>
+                        <div class="header-extension small admin"></div>
+                    </div>
+                    </div>
+                    <div class="table small">
+                        <div class="row">
+                            <input form="title" name="title" class="field admin" placeholder="Enter Info Link Name Here" maxlength="50" value="<?php if (isset($infopage['title'])) echo $infopage['title']; ?>">
+                        </div>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "description") {
+                    if (isset($_POST['description']))
+                        Database::update('project_infopage', $_GET['i'], ['description' => $_POST['description']], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" id="description" class="container-button">
+                            <input type="hidden" name="description">
+                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension large admin"></div>
+                        <div class="header large">
+                            <div class="head admin">Info Link Description</div>
+                        </div>
+                        <div class="header-extension large admin"></div>
+                    </div>
+                    </div>
+                    <div class="table large">
+                        <div class="row">
+                            <input form="description" name="description" class="field admin" placeholder="Enter Info Link Description Here" maxlength="200" value="<?php if (isset($infopage['description'])) echo $infopage['description']; ?>">
+                        </div>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "link") {
+                    if (isset($_POST['link']))
+                        Database::update('project_infopage', $_GET['i'], ['link' => $_POST['link']], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" id="link" class="container-button">
+                            <input type="hidden" name="link">
+                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension large admin"></div>
+                        <div class="header large">
+                            <div class="head admin">Info Link URL</div>
+                        </div>
+                        <div class="header-extension large admin"></div>
+                    </div>
+                    </div>
+                    <div class="table large">
+                        <div class="row">
+                            <input form="link" name="link" class="field admin" placeholder="Enter Info Link URL Here" maxlength="255" value="<?php if (isset($infopage['link'])) echo $infopage['link']; ?>">
+                        </div>
+                    </div> <?php
+                }
+            }
+            elseif (isset($_GET['l1']) && $_GET['l1'] == "remove") {
+                if (isset($_POST['del-info']))
+                    Database::remove('project_infopage', $_POST['del-info'], "projects.php?p=" . $_GET['p'] . "&l1=info");
+
+                $presets = Database::selectInfoPagePresets();
+                $groups = Database::selectInfoPageGroups(); ?>
+                <form class="search-bar with-space admin">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                           type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                           type="text" name="name" class="input-name" placeholder="Enter Info Link Name" required style="width: calc(20% - 8px);">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
+                           type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(40% - 8px);">
+                    <div class="custom-select input-group" style="width: calc(15% - 8px);">
+                        <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'}, this)"
+                                name="group" class="input-group" required>
+                            <option value="">All Groups</option>
+                            <option value="None">None</option> <?php
+                            foreach ($groups as $group) { ?>
+                                <option value="<?php echo $group['title']; ?>"><?php echo $group['title']; ?></option> <?php
+                            } ?>
+                        </select>
+                    </div>
+                </form>
+                <div class="table-header-container">
+                    <div class="header-extension admin"></div>
+                    <div class="header">
+                        <div class="head admin" style="width: 7.5%">№</div>
+                        <div class="head admin" style="width: 20%">Info Link Name</div>
+                        <div class="head admin" style="width: 40%">Description</div>
+                        <div class="head admin" style="width: 15%">Group</div>
+                        <div class="head admin" style="width: 10%">Link</div>
+                        <div class="head admin" style="width: 7.5%">Remove</div>
+                    </div>
+                    <div class="header-extension admin"></div>
+                </div>
+                </div> <?php
+                $infopages = Project::selectProjectInfoPages($_GET['p']);
+                if ($infopages) { ?>
+                    <div class="table admin"> <?php
+                        foreach ($infopages as $infopage) { ?>
+                            <form method="post" class="row">
+                                <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $infopage['id']); ?>" class="content"></div>
+                                <div class="cell name" style="width: 20%"><input type="submit" name="submit" value="<?php echo $infopage['title']; ?>" class="content"></div>
+                                <div class="cell description" style="width: 40%"><input type="submit" name="submit" value="<?php echo $infopage['description']; ?>" class="content"></div>
+                                <div class="cell group" style="width: 15%"><input type="submit" name="submit" value="<?php echo $infopage['group']; ?>" class="content"></div>
+                                <div class="cell group" style="width: 10%"><input type="submit" name="submit" value="<?php echo $infopage['hasLink']; ?>" class="content"></div>
+                                <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Remove" class="content del-button"></div>
+                                <input type="hidden" name="del-info" value="<?php echo $infopage['id']; ?>">
+                            </form> <?php
+                        } ?>
+                    </div> <?php
+                }
+                else { ?>
+                    <div class="empty-table">NO INFO PAGES</div> <?php
+                }
+            }
+        }
+        elseif (isset($_GET['l1']) && $_GET['l1'] == "project") {
+            if (isset($_GET['l2']) && $_GET['l2'] == "overview") { ?>
+                </div>
+                <div class="overview-content"> <?php
+                $projectData = Project::selectProjectDetails($project['id']);
+
+                $projectHistory = Project::selectProjectHistory($project['id']);
+                $created = "-";
+                if ($projectHistory && $projectHistory[0]['statusid'] == 6)
+                    $created = $projectHistory[0]['time2'];
+
+                $assignments = Assignment::selectProjectAssignments($project['id']);
+                $members = [];
+                if ($assignments) {
+                    foreach ($assignments as $assignment) {
+                        if ($assignment['assigned_to'] != null)
+                            $members[$assignment['assigned_to']] = $assignment['assigned_to'];
+                    }
+                } ?>
+
+                <div class="info-bar short">
+                    <div class="section">
+                        <div class="stage active">CREATED:</div>
+                        <div class="content"><?php echo $created; ?></div>
+                    </div>
+                    <div class="section">
+                        <div class="stage active">STATUS:</div>
+                        <div class="content"><?php echo $projectData['status']; ?></div>
+                    </div>
+                    <div class="section">
+                        <div class="content"><?php echo $projectData['time2']; ?></div>
+                    </div>
+                </div> <?php
+                if ($projectData['productid'] != null) {
+                    if ($projectData['presetid'] != null) { ?>
+                        <div class="info-bar tiny">
+                            <div class="section line-right active">
+                                <div class="content"><?php echo $projectData['product']; ?></div>
+                            </div>
+                            <div class="section">
+                                <div class="content"><?php echo $projectData['preset']; ?></div>
+                            </div>
+                        </div> <?php
+                    }
+                    else { ?>
+                        <div class="info-bar tiny">
+                            <div class="section">
+                                <div class="content"><?php echo $projectData['product']; ?></div>
+                            </div>
+                        </div> <?php
+                    }
+                } ?>
+                <div class="overview">
+                    <div class="top">
+                        <div class="box">
+                            <div class="title"><?php echo "#" . sprintf('%04d', $projectData['id']) . ": " . $projectData['title']; ?></div>
+                            <div class="data"><?php echo $projectData['description']; ?></div>
+                        </div>
+                    </div>
+                    <div class="mid">
+                        <div class="box-container">
+                            <div class="box">
+                                <div class="title"><?php echo $projectData['asgTotal']; ?> ASSIGNMENTS</div>
+                                <div class="data">
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['asgPending']; ?></span>
+                                        <span class="num-data">PENDING</span>
+                                    </div>
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['asgAvailable']; ?></span>
+                                        <span class="num-data">AVAILABLE</span>
+                                    </div>
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['asgActive']; ?></span>
+                                        <span class="num-data">IN PROGRESS</span>
+                                    </div>
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['asgCompleted']; ?></span>
+                                        <span class="num-data">COMPLETED</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-container">
+                            <div class="box">
+                                <span class="title"><?php echo $projectData['tasksTotal']; ?> TASKS</span>
+                                <div class="data">
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['tasksPending']; ?></span>
+                                        <span class="num-data">PENDING</span>
+                                    </div>
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['tasksActive']; ?></span>
+                                        <span class="num-data">IN PROGRESS</span>
+                                    </div>
+                                    <div class="total-container">
+                                        <span class="number"><?php echo $projectData['tasksCompleted']; ?></span>
+                                        <span class="num-data">COMPLETED</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-container">
+                            <div class="box">
+                                <span class="title"><?php echo $projectData['links']; ?> INFO LINKS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-bar" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
+                    <div class="section line-right active">
+                        <div class="stage active"><?php echo $projectData['task_time']; ?></div>
+                        <div class="content">REMAINING</div>
+                    </div>
+                    <div class="section">
+                        <div class="stage active"><?php echo count($members); ?></div>
+                        <div class="content">MEMBERS</div>
+                    </div>
+                    <div class="section line-left active">
+                        <div class="stage active"><?php echo $projectData['task_time']; ?></div>
+                        <div class="content">SPENT</div>
+                    </div>
+                </div>
+                </div> <?php
             }
             else { ?>
                 </div> <?php
             }
         }
         elseif (isset($_GET['l1']) && $_GET['l1'] == "assignments") {
-            if (isset($_GET['l2']) && $_GET['l2'] == "pending") {
-                $assignments = Assignment::selectProjectAssignmentsByStatus($_GET['p'], $_GET['l2']); ?>
-                <form class="search-bar">
-                    <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
+            $divisions = Assignment::selectDivisions(); // For search bar
+            if (isset($_GET['l2']) && $_GET['l2'] == "pending") { ?>
+                <form class="search-bar with-space">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                    <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(35% - 8px);">
-                    <div class="custom-select input-division" style="width: calc(15% - 8px);">
-                        <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
+                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(45% - 8px);">
+                    <div class="custom-select input-division" style="width: calc(20% - 8px);">
+                        <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
                                 name="preset" class="input-division" required>
                             <option value="">All Divisions</option>
+                            <option value="None">None</option>
+                            <option value="Custom">Custom</option> <?php                            foreach ($divisions as $division) { ?>
+                                <option value="<?php echo $division['title']; ?>"><?php echo $division['title']; ?></option> <?php
+                            } ?>
                         </select>
                     </div>
                 </form>
@@ -559,9 +1007,8 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head" style="width: 7.5%">№</div>
-                        <div class="head" style="width: 35%">Assignment Name</div>
+                        <div class="head" style="width: 45%">Assignment Objective</div>
                         <div class="head" style="width: 20%">Division</div>
-                        <div class="head" style="width: 10%">Tasks</div>
                         <div class="head" style="width: 20%">Pending Reason</div>
                         <div class="head" style="width: 7.5%">Open</div>
                     </div>
@@ -569,14 +1016,13 @@ if (isset($_SESSION['account'])) {
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($assignments) {
-                        foreach ($assignments as $row) { ?>
+                    if (isset($pending)) {
+                        foreach ($pending as $row) { ?>
                             <div class="row">
                                 <?php $link = "assignments.php?a=" . $row['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $row['assignment_id']); ?></a></div>
-                                <div class="cell name" style="width: 35%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['assignment_title']; ?></a></div>
+                                <div class="cell name" style="width: 45%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['objective']; ?></a></div>
                                 <div class="cell division" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['division']; ?></a></div>
-                                <div class="cell" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['tasks']; ?></a></div>
                                 <div class="cell" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['note']; ?></a></div>
                                 <div class="cell" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content open-button">Open</a></div>
                             </div> <?php
@@ -587,17 +1033,20 @@ if (isset($_SESSION['account'])) {
                     } ?>
                 </div> <?php
             }
-            elseif (isset($_GET['l2']) && $_GET['l2'] == "active") {
-                $assignments = Assignment::selectProjectAssignmentsByStatus($_GET['p'], $_GET['l2']); ?>
-                <form class="search-bar">
-                    <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
+            elseif (isset($_GET['l2']) && $_GET['l2'] == "active") { ?>
+                <form class="search-bar with-space">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                    <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(35% - 8px);">
-                    <div class="custom-select input-division" style="width: calc(15% - 8px);">
-                        <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
+                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(45% - 8px);">
+                    <div class="custom-select input-division" style="width: calc(20% - 8px);">
+                        <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
                                 name="preset" class="input-division" required>
                             <option value="">All Divisions</option>
+                            <option value="None">None</option>
+                            <option value="Custom">Custom</option> <?php                            foreach ($divisions as $division) { ?>
+                                <option value="<?php echo $division['title']; ?>"><?php echo $division['title']; ?></option> <?php
+                            } ?>
                         </select>
                     </div>
                 </form>
@@ -605,27 +1054,25 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head" style="width: 7.5%">№</div>
-                        <div class="head" style="width: 35%">Assignment Name</div>
+                        <div class="head" style="width: 45%">Assignment Objective</div>
                         <div class="head" style="width: 20%">Division</div>
-                        <div class="head" style="width: 10%">Tasks</div>
-                        <div class="head" style="width: 10%">Time</div>
-                        <div class="head" style="width: 10%">Earn</div>
+                        <div class="head tasks" style="width: 10%" onclick="sortTable('.head.tasks', '.cell.tasks .content')">Tasks</div>
+                        <div class="head time" style="width: 10%" onclick="sortTime('.head.time', '.cell.time .content')">Time</div>
                         <div class="head" style="width: 7.5%">Open</div>
                     </div>
                     <div class="header-extension"></div>
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($assignments) {
-                        foreach ($assignments as $row) { ?>
+                    if (isset($active)) {
+                        foreach ($active as $row) { ?>
                             <div class="row">
                                 <?php $link = "assignments.php?a=" . $row['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $row['assignment_id']); ?></a></div>
-                                <div class="cell name" style="width: 35%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['assignment_title']; ?></a></div>
+                                <div class="cell name" style="width: 45%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['objective']; ?></a></div>
                                 <div class="cell division" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['division']; ?></a></div>
-                                <div class="cell" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['tasks']; ?></a></div>
-                                <div class="cell" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['time']; ?></a></div>
-                                <div class="cell" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['earn']; ?></span></a></div>
+                                <div class="cell tasks" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['tasks']; ?></a></div>
+                                <div class="cell time" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['time']; ?></a></div>
                                 <div class="cell" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content open-button">Open</a></div>
                             </div> <?php
                         }
@@ -635,17 +1082,21 @@ if (isset($_SESSION['account'])) {
                     } ?>
                 </div> <?php
             }
-            elseif (isset($_GET['l2']) && $_GET['l2'] == "completed") {
-                $assignments = Assignment::selectProjectAssignmentsByStatus($_GET['p'], $_GET['l2']); ?>
-                <form class="search-bar">
-                    <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
+            elseif (isset($_GET['l2']) && $_GET['l2'] == "completed") { ?>
+                <form class="search-bar with-space">
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
-                    <input onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(35% - 8px);">
-                    <div class="custom-select input-division" style="width: calc(15% - 8px);">
-                        <select onchange="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
+                    <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
+                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(45% - 8px);">
+                    <div class="custom-select input-division" style="width: calc(20% - 8px);">
+                        <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
                                 name="preset" class="input-division" required>
                             <option value="">All Divisions</option>
+                            <option value="None">None</option>
+                            <option value="Custom">Custom</option> <?php
+                            foreach ($divisions as $division) { ?>
+                                <option value="<?php echo $division['title']; ?>"><?php echo $division['title']; ?></option> <?php
+                            } ?>
                         </select>
                     </div>
                 </form>
@@ -653,26 +1104,25 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head" style="width: 7.5%">№</div>
-                        <div class="head" style="width: 35%">Assignment Name</div>
+                        <div class="head" style="width: 45%">Assignment Objective</div>
                         <div class="head" style="width: 20%">Division</div>
-                        <div class="head" style="width: 10%">Tasks</div>
-                        <div class="head" style="width: 20%">Finished</div>
+                        <div class="head date" style="width: 20%" onclick="sortDates('.head.date', '.cell.date .content', '.finished')">Completed</div>
                         <div class="head" style="width: 7.5%">Open</div>
                     </div>
                     <div class="header-extension"></div>
                 </div>
                 </div>
                 <div class="table"> <?php
-                    if ($assignments) {
-                        foreach ($assignments as $row) { ?>
+                    if (isset($completed)) {
+                        foreach ($completed as $row) { ?>
                             <div class="row">
                                 <?php $link = "assignments.php?a=" . $row['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $row['assignment_id']); ?></a></div>
-                                <div class="cell name" style="width: 35%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['assignment_title']; ?></a></div>
+                                <div class="cell name" style="width: 45%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['objective']; ?></a></div>
                                 <div class="cell division" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['division']; ?></a></div>
-                                <div class="cell" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['tasks']; ?></a></div>
-                                <div class="cell" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['finished']; ?></span></a></div>
+                                <div class="cell date" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $row['status_time2']; ?></span></a></div>
                                 <div class="cell" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content open-button">Open</a></div>
+                                <input class="finished" type="hidden" value="<?php echo $row[4]; ?>">
                             </div> <?php
                         }
                     }
@@ -685,16 +1135,8 @@ if (isset($_SESSION['account'])) {
                 </div> <?php
             }
         }
-        elseif (isset($_GET['l1']) && $_GET['l1'] == "info") {
-            if (isset($_GET['l2']) && $_GET['l2'] == "product") { ?>
-                </div> <?php
-            }
-            elseif (isset($_GET['l2']) && $_GET['l2'] == "style") { ?>
-                </div> <?php
-            }
-            else { ?>
-                </div> <?php
-            }
+        elseif (isset($_GET['l1']) && $_GET['l1'] == "info") { ?>
+            </div> <?php
         }
         else { ?>
             </div> <?php

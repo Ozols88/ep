@@ -8,10 +8,11 @@ class Account extends Database
     public $username;
     private $password;
     public $manager;
-    public $client;
+    public $divisions;
+    public $status;
+    public $lastRefresh;
 
-    public function __construct($fields)
-    {
+    public function __construct($fields) {
         if (empty($fields['user']) || empty($fields['pass'])) {
             $this->loginStatus = 3;
         }
@@ -22,13 +23,16 @@ class Account extends Database
             if ($stmt->rowCount() == 1) {
                 $userData = $stmt->fetch();
                 if (password_verify($fields['pass'], $userData['password'])) {
-                    header("Location: /ep/epsystem/account");
                     $this->id = $userData['id'];
                     $this->username = $userData['username'];
                     $this->password = $userData['password'];
                     $this->manager = $userData['manager'];
-                    $this->client = $userData['client'];
+                    $this->status = $userData['status'];
+                    $this->divisions = self::selectStatic(array($userData['id']), "SELECT * FROM `account_division` WHERE `accountid` = ?");
                     $this->loginStatus = 1;
+                    $this->lastRefresh = time();
+                    Database::update('account', $userData['id'], ['online' => 1, 'last_activity' => date("Y-m-d H-i-s")], false);
+                    header("Location: " . $_SERVER['REQUEST_URI']);
                 }
                 else $this->loginStatus = 2;
             }
@@ -37,28 +41,12 @@ class Account extends Database
     }
 
     public $loginStatuses = [
-        1 => "Logged in!",
-        2 => "Wrong data!",
-        3 => "Fill in both fields!"
+        1 => "LOGGED IN",
+        2 => "WRONG NAME OR PASSWORD",
+        3 => "FILL IN BOTH FIELDS",
     ];
     public function getLoginStatusName()
     {
         return $this->loginStatuses[$this->loginStatus];
-    }
-
-    public function selectAdminAccountList()
-    {
-        $rows = $this->select(null, "SELECT `id`, `username` FROM `account`");
-        return $rows;
-    }
-
-    public function selectAdminAccount()
-    {
-        $rows = $this->select(array($_GET['a']), "SELECT * FROM `account` WHERE account.id = ?");
-        if ($rows) {
-            $rows[0]['reg_date'] = $this->datetimeToDateWithoutSeconds($rows[0]['reg_time']);
-            return $rows;
-        }
-        else return null;
     }
 }

@@ -2,10 +2,10 @@
 
 // task page
 
-.objective-container {
+.task-container {
   width: 75vw;
-  margin: 0 auto;
-  &:hover .objective {
+  margin: 0 auto 4vh auto;
+  &:hover .name {
     background-color: $c2;
   }
   &:hover .description {
@@ -13,7 +13,7 @@
     border: solid 1px $c2;
     color: $c1;
   }
-  .objective {
+  .name {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -37,13 +37,13 @@
 }
 
 .link-section {
-  margin: 4vh 12.5vw 4vh 12.5vw;
+  margin: 0 12.5vw 4vh 12.5vw;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   .link-type {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    width: 17.25vw;
     margin: 0 1vw;
     &:first-child {
       margin-left: 0;
@@ -64,6 +64,7 @@
       user-select: none;
       justify-content: center;
       align-items: center;
+      border-radius: 5px;
       &:hover ~ .link {
         background-color: $c37;
         border: solid 1px $c2;
@@ -91,6 +92,9 @@
           color: $c1;
         }
       }
+      &.disabled {
+        cursor: not-allowed;
+      }
       span {
         align-self: center;
         color: $c9;
@@ -99,7 +103,7 @@
         }
         &.title {
           font-size: 1.05vw;
-          margin: 0.75vh 0;
+          margin: 0 0 0.75vh 0;
           font-weight: bold;
           text-transform: uppercase;
         }
@@ -112,40 +116,34 @@
 }
 
 .comment-container {
-  width: 75vw;
-  margin: 0 auto 3.5vh auto;
-  &:hover .comment-header {
-    background-color: $c2;
-    span {
-      color: $c1;
-    }
-  }
-  &:hover .comment-body {
-    background-color: $c37;
-    border: solid 1px $c2;
-    color: $c1;
-  }
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: 0 0 3vh 0;
   .comment-header {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 3.2vh;
-    background-color: $c35;
+    background: $c34;
     color: $c1;
-    font-size: 0.75vw;
     user-select: none;
+    font-size: 0.6vw;
     .align-helper {
       margin-right: auto;
       margin-left: 0.65vw;
       visibility: hidden;
     }
-    .title {
+    .username {
+      color: $c1;
       font-weight: bold;
+      font-size: 0.75vw;
     }
     .added {
       margin-left: auto;
       margin-right: 0.65vw;
-      color: $c9;
+      color: $c1;
+      font-weight: bold;
     }
   }
   .comment-body {
@@ -154,8 +152,17 @@
     flex-direction: column;
     text-align: center;
     justify-content: center;
-    border: solid 1px $c36;
-    color: $c9;
+    border: solid 1px $c34;
+    color: $c8;
     cursor: default;
+    font-size: 0.7vw;
   }
 }
+//.comment-container.manager {
+//  .comment-header {
+//    background: $c60;
+//  }
+//  .comment-body {
+//    border: solid 1px $c60;
+//  }
+//}

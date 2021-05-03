@@ -1,7 +1,6 @@
 <?php
 $page = "";
 include "includes/autoloader.php";
-session_start();
 if (isset($_SESSION['account'])) {
     $account = $_SESSION['account'];
     require_once "includes/header.php";

@@ -8,15 +8,24 @@
 
 .info-bar {
   display: flex;
-  margin: 0 12.5vw;
-  justify-content: space-between;
+  margin: 0;
+  justify-content: space-around;
   text-align: center;
-  background: #FFFFFF;
   user-select: none;
-  padding: 3.5vh 0 3.5vh 0;
-  &.extended {
-    margin: 0;
-    justify-content: space-around;
+  padding: 3vh 0 5vh 0;
+  &.short {
+    margin: 0 10vw;
+  }
+  &.tiny {
+    margin: 0 30vw;
+    padding: 0 0 2.5vh 0;
+    .section .content {
+      color: $c10;
+      text-transform: uppercase;
+      &.lower {
+        text-transform: none;
+      }
+    }
   }
   .section {
     display: flex;
@@ -24,11 +33,19 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
     &.line-left {
-      border-left: 1px solid $c61;
+      border-left: 1px solid $c2;
+      &.active {
+        border-left: 1px solid $c2;
+      }
     }
     &.line-right {
-      border-right: 1px solid $c61;
+      border-right: 1px solid $c2;
+      &.active {
+        border-right: 1px solid $c2;
+      }
     }
     .stage {
       border: none;
@@ -37,15 +54,15 @@
       align-items: center;
       justify-content: center;
       height: 3vh;
-      color: $c9;
+      color: $c10;
       font-weight: bold;
       font-size: 0.8vw;
       &.active {
         color: $c2;
       }
-      &.admin {
-        color: $c61;
-      }
+      //&.admin {
+      //  color: $c61;
+      //}
     }
     input.stage {
       cursor: pointer;
@@ -54,7 +71,7 @@
     .divider {
       width: 10px;
       margin: 0;
-      background: $c9;
+      background: $c10;
     }
     .space {
       margin: 0 2vw;
@@ -69,6 +86,9 @@
       font-weight: bold;
       font-size: 0.8vw;
       padding: 0 0.5vw;
+      &.other {
+        color: $c10;
+      }
       &.active {
         color: $c2;
       }
@@ -76,30 +96,25 @@
   }
 }
 
-
-.info-bar .hours-button {
-  font-size: 0.8vw;
-  font-weight: bold;
-  width: 4vw;
-  height: 3vh;
-  border: none;
-  border-radius: 5px;
-  background: $c11;
-  color: $c9;
-  cursor: pointer;
-  margin: 0 0.1vw;
-}
-.info-bar .hours-button:first-of-type {
-  margin-left: 0.5vw;
-}
-.info-bar .hours-button:hover {
-  color: $c1;
-  border: none;
-}
-.info-bar .hours-button.active {
-  background: $c2;
-  color: $c1;
-  border: none;
+.info-bar.edit {
+  .section {
+    .stage {
+      //color: $c61;
+      color: $c10;
+    }
+    .content {
+      //color: $c62;
+      color: $c1;
+    }
+    &.active {
+      .stage {
+        color: $c2;
+      }
+      .content {
+        color: $c1;
+      }
+    }
+  }
 }
 
 
@@ -112,6 +127,9 @@ hr {
   height: 1px;
   border: none
 }
+.spacer {
+  height: 4.6vh;
+}
 
 
 /* SEARCH BAR */
@@ -119,10 +137,13 @@ hr {
 
 .search-bar {
   display: flex;
-  padding: 4.8vh 0 1.6vh 0;
+  padding: 0 0 1.6vh 0;
   margin: 0 12.5vw;
   background: #FFFFFF;
   user-select: none;
+  &.with-space {
+    padding-top: 4.6vh;
+  }
 
   input {
     box-shadow: none;
@@ -136,13 +157,13 @@ hr {
     font-size: 0.8vw;
     margin: 0 4px;
     &:focus {
-      border: 1px solid $c2;
+      border: 1px solid $c34;
       &::placeholder {
         color: transparent;
       }
     }
     &:valid {
-      border: 1px solid $c2;
+      border: 1px solid $c34;
     }
   }
   ::placeholder {
@@ -176,11 +197,11 @@ hr {
     -webkit-border-radius: 5px;
     background: transparent;
     &:focus {
-      border: 1px solid $c2;
+      border: 1px solid $c34;
     }
   }
   select:valid {
-    border: 1px solid $c2;
+    border: 1px solid $c34;
   }
   select:invalid {
     color: $c11;
@@ -203,5 +224,26 @@ hr {
   }
   .custom-select:hover, .custom-select:focus-within, .custom-select.active {
     background-image: url("../epsystem/account/img/dropdown-menu-button-hl.svg");
+  }
+
+  &.admin {
+    input:focus {
+      border: 1px solid $c34;
+      &::placeholder {
+        color: transparent;
+      }
+    }
+    input:valid {
+      border: 1px solid $c34;
+    }
+    select:focus {
+      border: 1px solid $c34;
+    }
+    select:valid {
+      border: 1px solid $c34;
+    }
+    .custom-select:hover, .custom-select:focus-within, .custom-select.active {
+      background-image: url("../epsystem/account/img/dropdown-menu-button-hl.svg");
+    }
   }
 }

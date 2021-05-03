@@ -6,8 +6,8 @@ class Database
     {
         static $conn;
 
-        $dsn = 'mysql:host=localhost;dbname=epa;charset=utf8';
-        $username = 'root';
+        $dsn = 'mysql:host=localhost;dbname=epsystem;charset=utf8';
+        $username = 'epsystemdbuser';
         $password = 'php159A';
 
         if (!$conn) {
@@ -20,8 +20,8 @@ class Database
     {
         static $conn;
 
-        $dsn = 'mysql:host=localhost;dbname=epa;charset=utf8';
-        $username = 'root';
+        $dsn = 'mysql:host=localhost;dbname=epsystem;charset=utf8';
+        $username = 'epsystemdbuser';
         $password = 'php159A';
 
         if (!$conn) {
@@ -53,9 +53,8 @@ class Database
         else
             return null;
     }
-    public static function selectNextNewID($table)
-    {
-        $rows = self::selectStatic(array($table), "SELECT T.AUTO_INCREMENT AS `id` FROM information_schema.TABLES T WHERE T.TABLE_SCHEMA = 'epa' AND T.TABLE_NAME = '$table'");
+    public static function selectNextNewID($table) {
+        $rows = self::selectStatic(array($table), "SELECT T.AUTO_INCREMENT AS `id` FROM information_schema.TABLES T WHERE T.TABLE_SCHEMA = 'epsystem' AND T.TABLE_NAME = ?");
         return $rows[0][0];
     }
 
@@ -83,7 +82,11 @@ class Database
     public static function update($table, $id, $fields, $redirect)
     {
         foreach ($fields as $key => $value) {
-            $valueSets[] = $key . " = '" . $value . "'";
+            $value = addslashes($value); // For quotes inside strings
+            if ($value != null)
+                $valueSets[] = $key . " = '" . $value . "'";
+            else
+                $valueSets[] = $key . " = null";
         }
         $sql = "UPDATE `$table` SET " . join(", ", $valueSets) . " WHERE `id` = :id";
         $stmt = self::connectStatic()->prepare($sql);
@@ -107,13 +110,6 @@ class Database
         }
     }
 
-    public static function datetimeToDays($date)
-    {
-        $date = strtotime($date);
-        $diff = $date - time();
-        $days = floor($diff / (60 * 60 * 24));
-        return $days;
-    }
     public static function datetimeToDateWithoutSeconds($value)
     {
         if ($value)
@@ -125,13 +121,6 @@ class Database
     {
         if ($value)
             return date('d M Y', strtotime($value));
-        else
-            return "-";
-    }
-    public static function datetimeToMinutes($value)
-    {
-        if ($value)
-            return date('i', strtotime($value));
         else
             return "-";
     }
@@ -155,9 +144,56 @@ class Database
             return $numberOfUnits . ' ' . $text. (($numberOfUnits>1)?'s':'') . ' ago';
         }
     }
+    public static function timeToSeconds($value) {
+        sscanf($value, "%d:%d:%d", $hours, $minutes, $seconds);
+        $time = isset($hours) ? $hours * 3600 + $minutes * 60 + $seconds : $minutes * 60 + $seconds;
+        return $time;
+    }
 
     public static function selectMembers() {
-        $rows = self::selectStatic(null, "SELECT * FROM `account`");
+        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`description`, `account`.`online`, `account`.`last_activity`, `account`.`reg_time`, `account`.`status`, COUNT(`payment`.`id`) AS `payment_count`, ( SELECT COUNT(*) FROM `account_division` WHERE `account_division`.`accountid` = `account`.`id` ) AS `division_count`, ( SELECT COUNT(*) FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`assigned_to` = `account`.`id` AND `assignment_status`.`statusid` = '4' ) AS `asg_active`, ( SELECT COUNT(*) FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`assigned_to` = `account`.`id` AND (`assignment_status`.`statusid` = '3' OR `assignment_status`.`statusid` = '5' OR `assignment_status`.`statusid` = '6') ) AS `asg_pending`, ( SELECT COUNT(*) FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`assigned_to` = `account`.`id` AND (`assignment_status`.`statusid` = '7' OR `assignment_status`.`statusid` = '9') ) AS `asg_completed`, ( SELECT COUNT(*) FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`assigned_to` = `account`.`id` AND `assignment_status`.`statusid` = '7' ) AS `asg_unpaid`, ( SELECT COUNT(*) FROM `assignment` INNER JOIN `assignment_status` ON `assignment_status`.`id` = `assignment`.`statusid` WHERE `assignment_status`.`assigned_to` = `account`.`id` AND `assignment_status`.`statusid` = '9' ) AS `asg_paid` FROM `account` LEFT JOIN `payment` ON `account`.`id` = `payment`.`accountid` GROUP BY `account`.`id`");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);
+
+                if ($rows[$key]['status'] == 0)
+                    $rows[$key]['status_txt'] = "Paused";
+                elseif ($rows[$key]['status'] == 1)
+                    $rows[$key]['status_txt'] = "Active";
+                else
+                    $rows[$key]['status_txt'] = "?";
+
+                if (isset($value['last_activity'])) {
+                    $activity = strtotime($value['last_activity']);
+                    $rows[$key]['last_activity_timestamp'] = $activity;
+                    if ($value['online'] == 1) {
+                        $rows[$key]['last_online'] = "Currently";
+                    }
+                    else {
+                        if ($activity < strtotime('-7 days'))
+                            $rows[$key]['last_online'] = date('d M Y', strtotime($rows[$key]['last_activity']));
+                        else
+                            $rows[$key]['last_online'] = Database::datetimeToTimeAgo($rows[$key]['last_activity']);
+                    }
+                }
+                else {
+                    $rows[$key]['last_activity'] = "Never";
+                    $rows[$key]['last_online'] = "Never";
+                    $rows[$key]['last_activity_timestamp'] = 0;
+                }
+
+            }
+            return $rows;
+        }
+        else return null;
+    }
+    public static function selectAccountByID($id) {
+        $rows = self::selectStatic(array($id), "SELECT `account`.`id`, `account`.`username`, `account`.`password`, `account`.`manager`, `account`.`description`, `account`.`online`, `account`.`last_activity`, `account`.`reg_time`, `account`.`status`, ( SELECT COUNT(*) FROM `account_division` WHERE `account_division`.`accountid` = `account`.`id` ) AS `divisions` FROM `account` WHERE `account`.`id` = ?");
+        if ($rows[0]) return $rows[0];
+        else return null;
+    }
+    public static function selectAccountsByDivision($id) {
+        $rows = self::selectStatic(array($id), "SELECT `account`.`id`, `account`.`username`, `account`.`description`, `account`.`reg_time`, `account`.`status` FROM `account` INNER JOIN `account_division` ON `account`.`id` = `account_division`.`accountid` WHERE `account_division`.`divisionid` = ?");
         if ($rows) {
             foreach ($rows as $key => $value) {
                 $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);
@@ -166,30 +202,42 @@ class Database
         }
         else return null;
     }
-    public static function selectManagers() {
-        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time` FROM `account` WHERE `account`.`manager` = '1'");
-        if ($rows) {
-            foreach ($rows as $key => $value) {
-                $rows[$key]['reg_time_date'] = self::datetimeToDate($rows[$key]['reg_time']);
-            }
-            return $rows;
-        }
-        else return null;
-    }
-    public static function selectClients() {
-        $rows = self::selectStatic(null, "SELECT `account`.`id`, `account`.`username`, `account`.`reg_time`, COUNT(`project`.`id`) AS `project_count` FROM `account` LEFT JOIN `project` ON `account`.`id` = `project`.`clientid` WHERE `account`.`client` = '1' GROUP BY `account`.`id`");
-        if ($rows) {
-            foreach ($rows as $key => $value) {
-                $rows[$key]['reg_time_date'] = self::datetimeToDateWithoutSeconds($rows[$key]['reg_time']);
-            }
-            return $rows;
-        }
+    public static function selectAccountDivisions($id) {
+        $rows = self::selectStatic(array($id), "SELECT `account_division`.`id`, `account_division`.`divisionid`, `division`.`departid`, `division`.`title`, `division`.`description`, `department`.`title` AS `department` FROM `account_division` INNER JOIN `division` ON `division`.`id` = `account_division`.`divisionid` INNER JOIN `department` ON `department`.`id` = `division`.`departid` WHERE `accountid` = ?");
+        if ($rows) return $rows;
         else return null;
     }
 
-    public static function selectAccountByID($id) {
-        $rows = self::selectStatic(array($id), "SELECT * FROM `account` WHERE `id` = ?");
+    public static function selectInfoPageGroups() {
+        $rows = self::selectStatic(null, "SELECT * FROM `infopage_group`");
+        if ($rows) return $rows;
+        else return null;
+    }
+    public static function selectInfoPageGroup($groupID) {
+        $rows = self::selectStatic(array($groupID), "SELECT * FROM `infopage_group` WHERE `infopage_group`.`id` = ?");
         if ($rows[0]) return $rows[0];
+        else return null;
+    }
+    public static function selectInfoPagePresets() {
+        $rows = self::selectStatic(null, "SELECT `preset-infopage`.`id`, `preset-infopage`.`title`, `preset-infopage`.`description`, `infopage_group`.`title` AS `group` FROM `preset-infopage` LEFT JOIN `infopage_group` ON `infopage_group`.`id` = `preset-infopage`.`groupid`");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                $rowsIDs[$value['id']] = $value;
+
+                if (!$rowsIDs[$value['id']]['group'])
+                    $rowsIDs[$value['id']]['group'] = "None";
+            }
+            return $rowsIDs;
+        }
+        else return null;
+    }
+    public static function selectInfoPagePreset($id) {
+        $rows = self::selectStatic(array($id), "SELECT `preset-infopage`.`id`, `preset-infopage`.`title`, `preset-infopage`.`description`, `infopage_group`.`title` AS `group` FROM `preset-infopage` LEFT JOIN `infopage_group` ON `infopage_group`.`id` = `preset-infopage`.`groupid` WHERE `preset-infopage`.`id` = ?");
+        if (isset($rows[0])) {
+            if (!$rows[0]['group'])
+                $rows[0]['group'] = "None";
+            return $rows[0];
+        }
         else return null;
     }
 }

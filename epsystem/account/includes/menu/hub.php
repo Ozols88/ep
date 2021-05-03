@@ -43,7 +43,7 @@ $menu = [
         ],
         "My Numbers" => [
             "admin" => false,
-            "page" => "numbers.php",
+            "page" => "numbers.php?l1=progress",
             "hud" => "My Numbers",
             "home" => [
                 "title" => "",

@@ -1,0 +1,180 @@
+@import "colors";
+
+// Overview pages
+
+.overview-content {
+  background-color: #F8F7F5;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  .overview {
+    display: flex;
+    flex-direction: column;
+    margin: 0 20vw;
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: $c34;
+      font-weight: bold;
+      color: $c1;
+    }
+    .data {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      height: 6vh;
+      background: $c37;
+      color: $c8;
+      word-break: break-word;
+    }
+
+    .top {
+      display: flex;
+      flex-direction: column;
+      margin: 2.5vh 0 3.5vh 0;
+      .box {
+        border: 1px solid $c34;
+        .title {
+          height: 3vh;
+          font-size: 0.9vw;
+        }
+        .data {
+          font-size: 0.85vw;
+        }
+      }
+    }
+
+    .mid {
+      display: flex;
+      margin: 0 0 3vh 0;
+      &.mid.tbl {
+        flex-direction: column;
+      }
+      .box-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        margin: 0 1vw 5vh 1vw;
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
+        .box {
+          height: 100%;
+          background: $c34;
+          border: 1px solid $c34;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          .title {
+            height: 6vh;
+            font-size: 1vw;
+          }
+          .data {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+            .total-container {
+              display: flex;
+              flex-direction: column;
+              .number {
+                align-self: center;
+                font-size: 0.8vw;
+                font-weight: bold;
+                color: $c9;
+              }
+              .num-data {
+                font-size: 0.4vw;
+                font-weight: bold;
+                color: $c9;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .table-container {
+      display: flex;
+      justify-content: center;
+      border-radius: 5px;
+      border: solid 1px $c34;
+      background: white;
+      padding: 1vh 1vw;
+      flex-wrap: wrap;
+      .link-box {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        flex: 0 0 calc(33.333333% - 1.67vw);
+        border-radius: 5px;
+        padding: 1vh 1vw;
+        margin: 1vh 1vw;
+        align-items: center;
+        background-color: $c37;
+        text-decoration: none;
+        background-image: url("../epsystem/account/img/new-tab.svg");
+        background-repeat: no-repeat;
+        background-position: right 10px bottom 10px;
+        background-size: 2.5vh;
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
+
+        .type {
+          text-transform: uppercase;
+          font-size: 0.7vw;
+          font-weight: bold;
+          color: $c10;
+        }
+        .name {
+          font-size: 1.05vw;
+          font-weight: bold;
+          color: $c10;
+          margin: 1vh 0;
+        }
+        .description {
+          font-size: 0.5vw;
+          font-weight: bold;
+          color: $c10;
+        }
+        .new-tab-button {
+          height: 3vh;
+          width: 3vw;
+          background-image: url("../epsystem/account/img/new-tab.svg");
+          background-color: $c63;
+        }
+        &:hover .new-tab-button {
+          background-image: url("../epsystem/account/img/new-tab-hl.svg");
+          background-color: $c34;
+        }
+
+        &:hover {
+          background-color: $c34;
+          background-image: url("../epsystem/account/img/new-tab-hl.svg");
+          .type {
+            color: $c8;
+          }
+          .name {
+            color: $c1;
+          }
+          .description {
+            color: $c8;
+          }
+        }
+      }
+    }
+  }
+}

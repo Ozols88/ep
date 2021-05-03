@@ -1,9 +1,22 @@
 <?php
 
+// Project list
+if (isset($account)) {
+    $pending = Project::selectProjectsByStatus(6, $account);
+    $active = Project::selectProjectsByStatus(4, $account);
+    $completed = Project::selectProjectsByStatus(7, $account);
+    $canceled = Project::selectProjectsByStatus(8, $account);
+}
+// Project count
+if (is_countable($pending)) $countPending = count($pending);
+else $countPending = 0;
+if (is_countable($active)) $countActive = count($active);
+else $countActive = 0;
+
 $menu = [
     "hud" => "Projects",
     "level-1" => [
-        "+ New Project" => [
+        "+ Project" => [
             "admin" => false,
             "manager" => true,
             "link" => "new",
@@ -13,7 +26,7 @@ $menu = [
         ],
         "PENDING" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(6),
+            "count" => $countPending,
             "link" => "pending",
             "default-link" => "pending",
             "hud" => "Pending Projects",
@@ -39,7 +52,7 @@ $menu = [
         ],
         "ACTIVE" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(4),
+            "count" => $countActive,
             "link" => "active",
             "default-link" => "active",
             "hud" => "Active Projects",
@@ -69,7 +82,6 @@ $menu = [
         ],
         "COMPLETED" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(7),
             "link" => "completed",
             "default-link" => "completed",
             "hud" => "Completed Projects",
@@ -95,7 +107,6 @@ $menu = [
         ],
         "CANCELED" => [
             "admin" => false,
-            "count" => Project::getProjectCountByStatus(8),
             "link" => "canceled",
             "default-link" => "canceled",
             "hud" => "Canceled Projects",

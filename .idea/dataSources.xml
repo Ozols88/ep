@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="MySQL - epa@192.168.1.101" uuid="aa9f3d46-864a-4ecd-b77e-c4b0796c129b">
+    <data-source source="LOCAL" name="epsystem@192.168.1.101" uuid="61ef80b5-d508-4962-974b-befc48e5d268">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://192.168.1.101:3306/epa</jdbc-url>
+      <jdbc-url>jdbc:mysql://192.168.1.101:3306/epsystem</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <driver-properties>
+        <property name="serverTimezone" value="UTC" />
+      </driver-properties>
     </data-source>
   </component>
 </project>

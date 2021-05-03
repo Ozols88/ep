@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 108 30" style="enable-background:new 0 0 108 30;" xml:space="preserve">
+	 viewBox="-1709 1236 80 30" style="enable-background:new -1709 1236 80 30;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#F5B82E;}
-	.st1{fill:#705D34;}
+	.st0{fill:#F9D482;}
+	.st1{fill:none;stroke:#705D34;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
 </style>
-<path id="XMLID_615_" class="st0" d="M103,30H0V0h103c2.8,0,5,2.3,5,5v20C108,27.8,105.7,30,103,30z"/>
-<path id="XMLID_103_" class="st1" d="M64.8,9.6C64.8,9.6,64.8,9.6,64.8,9.6c0.6-0.6,0.6-1.5,0-2.1c-0.6-0.6-1.5-0.6-2.1,0l0,0
-	L51.4,18.7l-6-6l0,0c-0.6-0.6-1.5-0.6-2.1,0s-0.6,1.5,0,2.1c0,0,0,0,0,0l8.2,8.2L64.8,9.6z"/>
+<path id="XMLID_139_" class="st0" d="M-1634,1266h-75v-30h75c2.8,0,5,2.3,5,5v20C-1629,1263.8-1631.3,1266-1634,1266z"/>
+<path id="XMLID_137_" class="st1" d="M-1660.3,1251v3.7c0,2.8-2.3,5-5,5h-7.3c-2.8,0-5-2.3-5-5v-7.3c0-2.8,2.3-5,5-5h3.7"/>
+<line id="XMLID_134_" class="st1" x1="-1669" y1="1251" x2="-1672.5" y2="1247.5"/>
+<line id="XMLID_132_" class="st1" x1="-1660.3" y1="1242.3" x2="-1668.9" y2="1251"/>
 </svg>

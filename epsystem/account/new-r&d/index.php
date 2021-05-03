@@ -1,7 +1,6 @@
 <?php
 $page = "r&d";
 include "../includes/autoloader.php";
-session_start();
 if (isset($_SESSION['account'])) {
     $account = $_SESSION['account'];
     if ($account->manager == 1) {

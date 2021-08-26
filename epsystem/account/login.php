@@ -1,20 +1,21 @@
-<?php if (isset($_POST['exit']))
-    header("Location: ../../"); ?>
+<?php
+if (isset($_POST['exit']))
+    header("Location: " . RootPath); ?>
 <html lang="en">
 <head>
     <title>ep system login</title>
     <!--realfavicongenerator.net-->
-    <link rel="apple-touch-icon" sizes="180x180" href="../../icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="../../icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../../icons/favicon-16x16.png">
-    <link rel="manifest" href="../../icons/site.webmanifest">
-    <link rel="mask-icon" href="../../icons/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" href="../../icons/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo RootPath; ?>icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo RootPath; ?>icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo RootPath; ?>icons/favicon-16x16.png">
+    <link rel="manifest" href="<?php echo RootPath; ?>icons/site.webmanifest">
+    <link rel="mask-icon" href="<?php echo RootPath; ?>icons/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="<?php echo RootPath; ?>icons/favicon.ico">
     <meta name="msapplication-TileColor" content="#705d34">
-    <meta name="msapplication-config" content="icons/browserconfig.xml">
+    <meta name="msapplication-config" content="<?php echo RootPath; ?>icons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     <!--CSS, FONT, JS-->
-    <link rel="stylesheet" href="../../css/styles.css" type="text/css">
+    <link rel="stylesheet" href="<?php echo RootPath; ?>css/styles.css" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
     <!--GOOGLE-->
@@ -33,7 +34,7 @@
 <div id="container-login">
     <div id="login-box">
         <form method="post">
-            <img id="login-logo" src="img/logo-login.svg" alt="ep">
+            <img id="login-logo" src="<?php echo RootPath; ?>epsystem/account/img/logo-login.svg" alt="ep">
             <input class="login-field" id="login-username-field" name="user" type="text" aria-label="Name" placeholder="Name">
             <input class="login-field" id="login-password-field" name="pass" type="password" aria-label="Password" placeholder="Password">
             <button id="login-button" name="login" type="submit">Enter</button>
@@ -47,6 +48,7 @@
         $account = new Account($fields); ?>
         <div class="login-message"><?php echo $account->getLoginStatusName(); ?></div> <?php
         if ($account->loginStatus == 1) {
+            session_id($account->id);
             session_start();
             $_SESSION['account'] = $account;
         }

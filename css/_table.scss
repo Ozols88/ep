@@ -63,6 +63,13 @@
   font-weight: bold;
   color: $c63;
   line-height: 12vh;
+  &.comments {
+    font-size: 1.4vw;
+    line-height: 6vh;
+    color: $c10;
+    //border: 1px solid $c10;
+    margin: 0 0 3vh 0;
+  }
 }
 .table {
   display: table;

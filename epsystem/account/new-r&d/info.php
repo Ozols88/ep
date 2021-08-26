@@ -45,6 +45,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-infopage']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-infopage']['info']['description'] = substr($_SESSION['new-infopage']['info']['description'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-infopage']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $presetID = Database::insert('preset-infopage', $_SESSION['new-infopage']['fields'], true, false);
                 // From new task preset
                 if (isset($_SESSION['new-taskpr']['new-infopage'])) {
@@ -87,7 +88,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-infopage']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Info Preset: Choose Group</span>
+                <span>New Project Link Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -95,7 +96,7 @@ if (isset($_SESSION['account'])) {
                 </form>
                 <form method="post" class="container-button">
                     <input type="hidden" name="none">
-                    <input type="submit" name="submit" value="None" class="button admin-menu">
+                    <input type="submit" name="submit" value="NONE" class="button admin-menu">
                 </form>
                 <form class="container-button disabled">
                     <a class="button admin-menu disabled"></a>
@@ -115,7 +116,7 @@ if (isset($_SESSION['account'])) {
                 <div class="header-extension admin"></div>
                 <div class="header">
                     <div class="head admin" style="width: 7.5%">№</div>
-                    <div class="head admin" style="width: 20%">Info Group Name</div>
+                    <div class="head admin" style="width: 20%">Project Link Group Name</div>
                     <div class="head admin" style="width: 65%">Description</div>
                     <div class="head admin" style="width: 7.5%">Select</div>
                 </div>
@@ -141,7 +142,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-infopage']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Info Preset: Enter Name</span>
+                <span>New Project Link Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -158,20 +159,20 @@ if (isset($_SESSION['account'])) {
             <div class="table-header-container">
                 <div class="header-extension small admin"></div>
                 <div class="header small">
-                    <div class="head admin">Info Preset Name</div>
+                    <div class="head admin">Project Link Preset Name</div>
                 </div>
                 <div class="header-extension small admin"></div>
             </div>
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Info Preset Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-infopage']['fields']['title'])) echo $_SESSION['new-infopage']['fields']['title']; ?>">
+                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Project Link Preset Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-infopage']['fields']['title'])) echo htmlspecialchars($_SESSION['new-infopage']['fields']['title']); ?>">
                 </div>
             </div> <?php
         }
         elseif ($_SESSION['new-infopage']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Info Preset: Enter Description</span>
+                <span>New Project Link Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -188,14 +189,14 @@ if (isset($_SESSION['account'])) {
             <div class="table-header-container">
                 <div class="header-extension large admin"></div>
                 <div class="header large">
-                    <div class="head admin">Info Preset Description</div>
+                    <div class="head admin">Project Link Preset Description</div>
                 </div>
                 <div class="header-extension large admin"></div>
             </div>
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Info Preset Description Here" value="<?php if (isset($_SESSION['new-infopage']['fields']['description'])) echo $_SESSION['new-infopage']['fields']['description']; ?>">
+                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Project Link Preset Description Here" value="<?php if (isset($_SESSION['new-infopage']['fields']['description'])) echo htmlspecialchars($_SESSION['new-infopage']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

@@ -81,7 +81,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-project']['info']['title']) > InfobarCharLimit)
                     $_SESSION['new-project']['info']['title'] = substr($_SESSION['new-project']['info']['title'], 0, InfobarCharLimit) . "...";
 
-                $_SESSION['new-project']['stage'] = '5';
+                $_SESSION['new-project']['stage'] = '4';
                 if (!isset($_SESSION['new-project']['info']['description']))
                     $_SESSION['new-project']['info']['description'] = ""; // Info bar fix
             }
@@ -96,14 +96,14 @@ if (isset($_SESSION['account'])) {
 
                 $fieldsStatus = [
                     'projectid' => $_SESSION['new-project']['fields']['projectid'],
-                    'statusid' => 6,
+                    'status1' => 1,
+                    'status2' => 1,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "New Project"
+                    'assigned_by' => $account->id
                 ];
 
-                // Insert to `project_status` table and save ID of the new record
-                $statusID = Project::insert('project_status', $fieldsStatus, true, false);
+                // Insert to `status_project` table and save ID of the new record
+                $statusID = Project::insert('status_project', $fieldsStatus, true, false);
                 // Update `project` table record with saved ID status
                 Project::update('project', $_SESSION['new-project']['fields']['projectid'], ["statusid" => $statusID], false);
 
@@ -117,13 +117,13 @@ if (isset($_SESSION['account'])) {
 
                         $fieldsStatus = [
                             'assignmentid' => $asgID,
-                            'statusid' => 1,
+                            'status1' => 1,
+                            'status2' => 1,
                             'time' => date("Y-m-d H-i-s"),
-                            'assigned_by' => $account->id,
-                            'note' => "New Assignment"
+                            'assigned_by' => $account->id
                         ];
-                        // Insert to `assignment_status` table and save ID of the new record
-                        $statusID = Assignment::insert('assignment_status', $fieldsStatus, true, false);
+                        // Insert to `status_assignment` table and save ID of the new record
+                        $statusID = Assignment::insert('status_assignment', $fieldsStatus, true, false);
                         // Update `assignment` table record with saved ID status
                         Assignment::update('assignment', $asgID, ["statusid" => $statusID], false);
                     }
@@ -150,7 +150,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-project']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>Select a product for the new project</span>
+                <span>New Project</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -203,7 +203,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-project']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>Select a project preset for the new project</span>
+                <span>New Project</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -258,7 +258,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-project']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>Enter the name of the new project</span>
+                <span>New Project</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -282,7 +282,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="test" name="title" id="title" class="field admin" placeholder="Enter Project Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-project']['fields']['title'])) echo $_SESSION['new-project']['fields']['title']; ?>">
+                    <input form="test" name="title" id="title" class="field admin" placeholder="Enter Project Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-project']['fields']['title'])) echo htmlspecialchars($_SESSION['new-project']['fields']['title']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))
@@ -290,7 +290,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-project']['stage'] == '4') { ?>
             <div class="head-up-display-bar">
-                <span>Enter a description of the new project</span>
+                <span>New Project</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -314,7 +314,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="test" name="description" id="description" class="field admin" placeholder="Enter Project Description Here" value="<?php if (isset($_SESSION['new-project']['fields']['description'])) echo $_SESSION['new-project']['fields']['description']; ?>">
+                    <input form="test" name="description" id="description" class="field admin" placeholder="Enter Project Description Here" value="<?php if (isset($_SESSION['new-project']['fields']['description'])) echo htmlspecialchars($_SESSION['new-project']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

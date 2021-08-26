@@ -10,7 +10,50 @@ if (isset($_SESSION['account'])) {
     <div class="menu"> <?php
     require "includes/menu.php";
     if (!isset($member)) {
-        if (isset($_GET['l1']) && $_GET['l1'] == "membership") { ?>
+        if (isset($_GET['l1']) && $_GET['l1'] == "membership") {
+            $acc = Database::selectAccountByID($account->id); ?>
+            </div>
+            <div class="overview-content">
+            <div class="info-bar short">
+                <div class="section">
+                    <div class="stage active">STATUS:</div>
+                    <div class="content"><?php echo $acc['status_txt']; ?></div>
+                </div>
+            </div>
+            <div class="info-bar tiny">
+                <div class="section active">
+                    <div class="content"><?php echo $acc['manager_txt']; ?></div>
+                </div>
+            </div>
+            <div class="overview">
+                <div class="top">
+                    <div class="box">
+                        <div class="title"><?php echo $acc['username']; ?></div>
+                        <div class="data"><?php echo $acc['description']; ?></div>
+                    </div>
+                </div>
+                <div class="info-bar">
+                    <div class="section active">
+                        <div class="stage active"><?php echo $acc['reg_time3']; ?></div>
+                        <div class="content">EP SYSTEM MEMBER</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-bar" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
+                <div class="section line-right active">
+                    <div class="stage active"><?php echo $acc['departments']; ?></div>
+                    <div class="content">DEPARTMENTS</div>
+                </div>
+                <div class="section line-left active">
+                    <div class="stage active"><?php echo $acc['divisions']; ?></div>
+                    <div class="content">DIVISIONS</div>
+                </div>
+            </div>
+            <div class="info-bar short" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
+                <div class="section">
+                    <div class="content light"><?php echo $acc['reg_time2']; ?></div>
+                </div>
+            </div>
             </div> <?php
         }
         elseif (isset($_GET['l1']) && $_GET['l1'] == "divisions") {
@@ -188,6 +231,18 @@ if (isset($_SESSION['account'])) {
                     elseif (isset($_GET['l3']) && $_GET['l3'] == "add") {
                         if (isset($_POST['div'])) {
                             Database::insert('account_division', ['accountid' => $_GET['m'], 'divisionid' => $_POST['div']], false, false);
+
+                            $currentSessionID = session_id();
+                            session_write_close();
+
+                            session_id($_GET['m']);
+                            session_start();
+                            $account->divisions = Database::selectStatic(array($_GET['m']), "SELECT * FROM `account_division` WHERE `accountid` = ?");
+                            session_write_close();
+
+                            session_id($currentSessionID);
+                            session_start();
+
                             $query_string = http_build_query($_GET);
                             header('Location: member.php?' . $query_string);
                             unset($_SESSION['edit-member']);
@@ -277,7 +332,7 @@ if (isset($_SESSION['account'])) {
                     </div>
                     <div class="table small">
                         <div class="row">
-                            <input form="username" name="username" class="field admin" placeholder="Enter Member Name Here" maxlength="50" value="<?php if (isset($member['username'])) echo $member['username']; ?>">
+                            <input form="username" name="username" class="field admin" placeholder="Enter Member Name Here" maxlength="50" value="<?php if (isset($member['username'])) echo htmlspecialchars($member['username']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -302,7 +357,7 @@ if (isset($_SESSION['account'])) {
                     </div>
                     <div class="table large">
                         <div class="row">
-                            <input form="description" name="description" class="field admin" placeholder="Enter Member Description Here" maxlength="255" value="<?php if (isset($member['description'])) echo $member['description']; ?>">
+                            <input form="description" name="description" class="field admin" placeholder="Enter Member Description Here" maxlength="255" value="<?php if (isset($member['description'])) echo htmlspecialchars($member['description']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -380,6 +435,56 @@ if (isset($_SESSION['account'])) {
         }
 
         if (isset($_GET['l1']) && $_GET['l1'] == "overview") { ?>
+            </div>
+            <div class="overview-content">
+                <div class="info-bar short">
+                    <div class="section">
+                        <div class="stage active">MANAGER:</div>
+                        <div class="content"><?php if ($member['manager']) echo "Yes"; else echo "No"; ?></div>
+                    </div>
+                    <div class="section">
+                        <div class="stage active">STATUS:</div>
+                        <div class="content"><?php if ($member['status']) echo "Active"; else echo "Paused"; ?></div>
+                    </div>
+                    <div class="section">
+                        <div class="stage active">PAYMENTS:</div>
+                        <div class="content"><?php echo $member['payment_count']; ?></div>
+                    </div>
+                </div>
+                <div class="overview">
+                    <div class="top">
+                        <div class="box">
+                            <div class="title"><?php echo $member['username']; ?></div>
+                            <div class="data"><?php echo $member['description']; ?></div>
+                        </div>
+                    </div>
+                    <div class="mid tbl">
+                        <div class="table-container">
+                            <div class="table ow"> <?php
+                                $divisions = Database::selectAccountDivisions($_GET['m']);
+                                if ($divisions) {
+                                    foreach ($divisions as $div) { ?>
+                                        <div class="row">
+                                            <div class="cell id" style="width: 7.5%"><a class="content"><?php echo "#" . sprintf('%03d', $div['id']); ?></a></div>
+                                            <div class="cell name" style="width: 20%"><a class="content"><?php echo $div['title']; ?></a></div>
+                                            <div class="cell description" style="width: 50%"><a class="content"><?php echo $div['description'] . " Comments"; ?></a></div>
+                                            <div class="cell depart" style="width: 15%"><a class="content"><?php echo $div['department'] . " Links"; ?></a></div>
+                                            <div class="cell" style="width: 7.5%"><a class="content empty-button"></a></div>
+                                        </div> <?php
+                                    }
+                                }
+                                else { ?>
+                                    <div class="empty-table">NO DIVISIONS</div> <?php
+                                } ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-bar short" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
+                    <div class="section">
+                        <div class="content light"><?php echo $member['reg_time2']; ?></div>
+                    </div>
+                </div>
             </div> <?php
         }
         elseif (isset($_GET['l1']) && $_GET['l1'] == "divisions") {

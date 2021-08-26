@@ -35,10 +35,7 @@ if (isset($_SESSION['account'])) {
 
                     $_SESSION['new-payment']['info']['total'] = 0;
                     foreach ($_SESSION['new-payment']['assignments'] as $asg) {
-                        if ($asg['presetid'] == null)
-                            $_SESSION['new-payment']['info']['total'] += $asg['value'];
-                        else
-                            $_SESSION['new-payment']['info']['total'] += $asg['task_sum'];
+                        $_SESSION['new-payment']['info']['total'] += $asg['task_sum'];
                     }
 
                     unset($_SESSION['new-payment']['add-asg-page']);
@@ -48,10 +45,7 @@ if (isset($_SESSION['account'])) {
 
                     $_SESSION['new-payment']['info']['total'] = 0;
                     foreach ($_SESSION['new-payment']['assignments'] as $asg) {
-                        if ($asg['presetid'] == null)
-                            $_SESSION['new-payment']['info']['total'] += $asg['value'];
-                        else
-                            $_SESSION['new-payment']['info']['total'] += $asg['task_sum'];
+                        $_SESSION['new-payment']['info']['total'] += $asg['task_sum'];
                     }
                 }
 
@@ -78,13 +72,13 @@ if (isset($_SESSION['account'])) {
 
                     $fieldsStatus = [
                         'assignmentid' => $asg['id'],
-                        'statusid' => 9,
+                        'status1' => 3,
+                        'status2' => 2,
                         'time' => date("Y-m-d H-i-s"),
                         'assigned_by' => $account->id,
-                        'assigned_to' => $_SESSION['new-payment']['fields']['accountid'],
-                        'note' => "Paid"
+                        'assigned_to' => $_SESSION['new-payment']['fields']['accountid']
                     ];
-                    $statusID = Database::insert('assignment_status', $fieldsStatus, true, false);
+                    $statusID = Database::insert('status_assignment', $fieldsStatus, true, false);
                     Database::update('assignment', $asg['id'], ['statusid' => $statusID], false);
                 }
 
@@ -106,7 +100,7 @@ if (isset($_SESSION['account'])) {
 
         if ($_SESSION['new-payment']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>Select a member for the new payment</span>
+                <span>New Payment</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -158,7 +152,7 @@ if (isset($_SESSION['account'])) {
         elseif ($_SESSION['new-payment']['stage'] == '2') {
             if (!isset($_SESSION['new-payment']['add-asg-page'])) { ?>
                 <div class="head-up-display-bar">
-                    <span><?php echo $_SESSION['new-payment']['info']['member']; ?> assignments getting paid</span>
+                    <span>New Payment</span>
                 </div>
                 <div class="navbar level-1 unselected">
                     <form method="post" class="container-button">
@@ -191,7 +185,7 @@ if (isset($_SESSION['account'])) {
                                 <div class="cell" style="width: 30%"><input type="submit" name="submit" value="<?php echo $asg['title']; ?>" class="content"></div>
                                 <div class="cell" style="width: 30%"><input type="submit" name="submit" value="<?php echo $asg['project']; ?>" class="content"></div>
                                 <div class="cell date" style="width: 15%"><input type="submit" name="submit" value="<?php echo $asg['time']; ?>" class="content"></div>
-                                <div class="cell total" style="width: 10%"><input type="submit" name="submit" value="<?php if (isset($asg['task_sum'])) echo $asg['task_sum'] . "€"; else echo $asg['value'] . "€"; ?>" class="content"></div>
+                                <div class="cell total" style="width: 10%"><input type="submit" name="submit" value="<?php echo $asg['task_sum'] . "€"; ?>" class="content"></div>
                                 <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Remove" class="content del-button"></div>
                                 <input type="hidden" name="del-asg" value="<?php echo $asg['id']; ?>">
                                 <input class="completed" type="hidden" value="<?php echo $asg[5]; ?>">
@@ -211,7 +205,7 @@ if (isset($_SESSION['account'])) {
                 $divisions = Assignment::selectDivisions();
                 $products = Project::selectProducts(); ?>
                 <div class="head-up-display-bar">
-                    <span>Select an assignment to add to the payment</span>
+                    <span>New Payment</span>
                 </div>
                 <div class="navbar level-1 unselected">
                     <form class="container-button disabled">
@@ -246,7 +240,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension admin"></div>
                 </div>
                 </div> <?php
-                $assignments = Assignment::SelectUnpaidCompletedAssignmentsByAccount($_SESSION['new-payment']['fields']['accountid']);
+                $assignments = Assignment::selectUnpaidCompletedAssignmentsByAccount($_SESSION['new-payment']['fields']['accountid']);
                 if ($_SESSION['new-payment']['assignments']) {
                     foreach ($_SESSION['new-payment']['assignments'] as $selectedAsg) {
                         foreach ($assignments as $allAsg) {
@@ -279,7 +273,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-payment']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>Enter a description of the new payment</span>
+                <span>New Payment</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -303,7 +297,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Payment Description Here" maxlength="255" value="<?php if (isset($_SESSION['new-payment']['fields']['description'])) echo $_SESSION['new-payment']['fields']['description']; ?>">
+                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Payment Description Here" maxlength="255" value="<?php if (isset($_SESSION['new-payment']['fields']['description'])) echo htmlspecialchars($_SESSION['new-payment']['fields']['description']); ?>">
                 </div>
             </div> <?php
         }

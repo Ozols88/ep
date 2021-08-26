@@ -1,4 +1,5 @@
-<?php include "epsystem/account/includes/autoloader.php"; ?>
+<?php
+include "epsystem/account/includes/autoloader.php"; ?>
 <html lang="en">
 <head>
     <title>ep home</title>
@@ -26,8 +27,7 @@
 </head>
 <body>
 <div class="container-header">
-    <div class="logo-container"><img class="logo-header" src="<?php echo RootPath; ?>img/logo.svg" alt="ep"></div>
-    <div class="logo-container"><img class="logo-header" src="<?php echo RootPath; ?>img/logo.svg" alt="ep" style="visibility: hidden"></div>
+    <div class="logo-container"><a class="logo-link"><img class="logo-header" src="<?php echo RootPath; ?>img/logo.svg" alt="ep"></a></div>
 </div>
 <div class="menu"> <?php
     require "epsystem/account/includes/menu.php"; ?>

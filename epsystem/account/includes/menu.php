@@ -1,6 +1,6 @@
 <?php
 
-if (!isset($_SESSION['account']) && basename($_SERVER['SCRIPT_FILENAME']) == "index.php")
+if (basename($_SERVER['REQUEST_URI']) == "ep" || basename($_SERVER['REQUEST_URI']) == "")
     require "menu/public.php";
 
 elseif (basename($_SERVER['REQUEST_URI']) == "account")

@@ -30,6 +30,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-product']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-product']['info']['description'] = substr($_SESSION['new-product']['info']['description'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-product']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $productID = Database::insert('product', $_SESSION['new-product']['fields'], true, false);
                 header('Location: ../r&d.php?f=' . $productID . '&l1=overview');
                 unset($_SESSION['new-product']);
@@ -48,7 +49,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-product']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Product: Enter Name</span>
+                <span>New Product</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -72,13 +73,13 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Product Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-product']['fields']['title'])) echo $_SESSION['new-product']['fields']['title']; ?>">
+                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Product Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-product']['fields']['title'])) echo htmlspecialchars($_SESSION['new-product']['fields']['title']); ?>">
                 </div>
             </div> <?php
         }
         elseif ($_SESSION['new-product']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Product: Enter Description</span>
+                <span>New Product</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -102,7 +103,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Product Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-product']['fields']['description'])) echo $_SESSION['new-product']['fields']['description']; ?>">
+                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Product Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-product']['fields']['description'])) echo htmlspecialchars($_SESSION['new-product']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

@@ -30,6 +30,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-department']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-department']['info']['description'] = substr($_SESSION['new-department']['info']['description'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-department']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $departID = Database::insert('department', $_SESSION['new-department']['fields'], true, false);
                 header('Location: ../r&d.php?dp=' . $departID . '&l1=overview');
                 unset($_SESSION['new-department']);
@@ -48,7 +49,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-department']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Department: Enter Name</span>
+                <span>New Department</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -72,13 +73,13 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Department Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-department']['fields']['title'])) echo $_SESSION['new-department']['fields']['title']; ?>">
+                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Department Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-department']['fields']['title'])) echo htmlspecialchars($_SESSION['new-department']['fields']['title']); ?>">
                 </div>
             </div> <?php
         }
         elseif ($_SESSION['new-department']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Department: Enter Description</span>
+                <span>New Department</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -102,7 +103,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Department Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-department']['fields']['description'])) echo $_SESSION['new-department']['fields']['description']; ?>">
+                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Department Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-department']['fields']['description'])) echo htmlspecialchars($_SESSION['new-department']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

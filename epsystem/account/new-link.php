@@ -72,7 +72,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-link']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>Select type of new link</span>
+                <span>New Task Link</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -118,7 +118,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-link']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>Enter URL of new link</span>
+                <span>New Task Link</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -142,13 +142,13 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="link" name="link" id="link" class="field admin" placeholder="Paste Link URL Here" maxlength="255">
+                    <input form="link" name="link" id="link" class="field admin" placeholder="Paste Link URL Here" maxlength="255" value="<?php if (isset($_SESSION['new-link']['fields']['link'])) echo htmlspecialchars($_SESSION['new-link']['fields']['link']); ?>">
                 </div>
             </div> <?php
         }
         elseif ($_SESSION['new-link']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>Enter name of new link</span>
+                <span>New Task Link</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -172,7 +172,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Link Name Here" maxlength="50">
+                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Link Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-member']['fields']['title'])) echo htmlspecialchars($_SESSION['new-member']['fields']['title']); ?>">
                 </div>
             </div> <?php
         }

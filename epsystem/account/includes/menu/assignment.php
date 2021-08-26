@@ -15,21 +15,22 @@ elseif ($assignment && isset($account) && $account->manager == 0) {
     if ($assignment['assigned_to'] == $account->id)
         $allow = true;
     // If assignment is available
-    elseif ($assignment['status_id'] == 3) {
-        foreach ($account->divisions as $division) {
-            if ($division['divisionid'] == $assignment['divisionid']) {
-                $allow = true;
-                break;
+    elseif ($assignment['status1'] == 1 && $assignment['status2'] == 8) {
+        if ($assignment['divisionid'] == null || $assignment['divisionid'] == 0)
+            $allow = true;
+        if ($account->divisions)
+            foreach ($account->divisions as $division) {
+                if ($division['divisionid'] == $assignment['divisionid']) {
+                    $allow = true;
+                    break;
+                }
             }
-            elseif ($assignment['divisionid'] == null || $assignment['divisionid'] == 0)
-                $allow = true;
-        }
     }
 }
 else $allow = false;
 
 if ($allow == true)
-    $hudInitial = "\"" . $assignment['title'] . "\"";
+    $hud = "Assignment #" . sprintf('%05d', $assignment['id']) . " Page";
 else {
     header("Location: assignments.php?l1=my&l2=active");
     exit();
@@ -40,57 +41,57 @@ $tasks = Task::selectAssignmentTasks($assignment['id']);
 $enable = true;
 if ($tasks)
     foreach ($tasks as $task)
-        if ($task['statusid'] == 7) $enable = false;
-if ($enable && $account->manager == 1 && ($assignment['status_id'] == 4 || $assignment['status_id'] == 5 || $assignment['status_id'] == 6))
+        if ($task['status1'] == 3 || ($task['status1'] == 1 && ($task['status2'] == 4 || $task['status2'] == 5))) $enable = false;
+if ($enable && $account->manager == 1 && ($assignment['status1'] == 2 || ($assignment['status1'] == 1 && ($assignment['status2'] == 10 || $assignment['status2'] == 11))))
     $cancel = true;
 
-if ($tasks && $account->manager == 1 && $assignment['status_id'] == 1)
+if ($tasks && $account->manager == 1 && $assignment['status1'] == 1 && $assignment['status2'] >= 1 && $assignment['status2'] <= 6)
     $assign = true;
 
-if ($account->manager == 1 && $assignment['status_id'] == 1)
+if ($account->manager == 1 && $assignment['status1'] == 1 && $assignment['status2'] >= 1 && $assignment['status2'] <= 6)
     $hide = true;
-elseif ($account->manager == 1 && $assignment['status_id'] == 2)
+elseif ($account->manager == 1 && $assignment['status1'] == 1 && $assignment['status2'] == 7)
     $show = true;
 
-if ($account->manager == 1 && $assignment['status_id'] == 1 && $tasks)
+if ($account->manager == 1 && $assignment['status1'] == 1 && $assignment['status2'] >= 1 && $assignment['status2'] <= 6 && $tasks)
     $publish = true;
-elseif ($account->manager == 1 && $assignment['status_id'] == 3)
+elseif ($account->manager == 1 && $assignment['status1'] == 1 && ($assignment['status2'] == 8 || $assignment['status2'] == 9))
     $unpublish = true;
 
 $enable = true;
 if ($tasks)
     foreach ($tasks as $task)
-        if ($task['statusid'] != 7) $enable = false;
-if ($enable && $account->manager == 1 && $assignment['status_id'] == 6)
+        if ($task['status1'] != 3) $enable = false;
+if ($enable && $account->manager == 1 && $assignment['status1'] == 1 && $assignment['status2'] == 11)
     $complete = true;
 
-if ($account->manager == 1 && $assignment['status_id'] == 1 || $assignment['status_id'] == 2)
+if ($account->manager == 1 && $assignment['status1'] == 1 && $assignment['status2'] >= 1 && $assignment['status2'] <= 7)
     if ($assignment['presetid'] != null)
         $remove = true;
     else
         $delete = true;
 
-if ($assignment['status_id'] == 3 && (!$assignment['assigned_to'] || $assignment['assigned_to'] == $account->id))
+if ($assignment['status1'] == 1 && ($assignment['status2'] == 8 && Assignment::assignmentDivisionCheck($assignment['divisionid'], $account->divisions) || ($assignment['status2'] == 9 && $assignment['assigned_to'] == $account->id)))
     $accept = true;
 
 $enable = true;
 if ($tasks)
     foreach ($tasks as $task)
-        if ($task['statusid'] == 6 || $task['statusid'] == 7) $enable = false;
-if ($enable && $assignment['status_id'] == 4 && $assignment['assigned_to'] == $account->id)
+        if ($task['status1'] == 3 || ($task['status1'] == 1 && ($task['status2'] == 4 || $task['status2'] == 5))) $enable = false;
+if ($enable && $assignment['status1'] == 2 && $assignment['assigned_to'] == $account->id)
     $undoAccept = true;
 
 // Assignment page
 if (isset($_GET['a']) && !isset($_GET['options'])) {
     if (!isset($_GET['comment'])) {
         $menu = [
-            "hud" => $hudInitial,
+            "hud" => $hud,
             "level-1" => [
                 "ASSIGNMENT OVERVIEW" => [
                     "admin" => false,
                     "link" => "assignment",
                     "default-link" => "assignment",
-                    "hud" => $hudInitial,
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -114,25 +115,25 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
         $tasks = Task::selectAssignmentTasks($_GET['a']);
         if ($tasks)
             $menu['level-1']["ASSIGNMENT TASKS"] = [
-            "admin" => false,
-            "link" => "tasks",
-            "default-link" => "tasks",
-            "hud" => $hudInitial . ": Tasks",
-            "home" => [
-                "title" => "",
-                "description" => "",
-                "total" => [
-                    "name" => "",
-                    "count" => ""
-                ],
-                "last-hours" => [
+                "admin" => false,
+                "link" => "tasks",
+                "default-link" => "tasks",
+                "hud" => $hud,
+                "home" => [
                     "title" => "",
-                    "details" => []
-                ],
-                "link" => "",
-                "note" => ""
-            ]
-        ];
+                    "description" => "",
+                    "total" => [
+                        "name" => "",
+                        "count" => ""
+                    ],
+                    "last-hours" => [
+                        "title" => "",
+                        "details" => []
+                    ],
+                    "link" => "",
+                    "note" => ""
+                ]
+            ];
 
         // Check if undo accept button is needed
         if (isset($undoAccept))
@@ -143,21 +144,21 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
             ];
 
         // Check if add task button is needed
-        if ($account->manager == 1 && ($assignment['status_id'] == '1' || $assignment['status_id'] == '2' || $assignment['status_id'] == '5' || $assignment['status_id'] == '6'))
+        if ($account->manager == 1 && ($assignment['status1'] == 1 && $assignment['status2'] != 8 && $assignment['status2'] != 9))
             $menu['level-1']['ASSIGNMENT OVERVIEW']['level-2']['+ Task'] = [
                 "admin" => false,
                 "page" => "assignments.php?a=" . $_GET['a'] . "&options&l1=add",
                 "hud" => ""
             ];
         // Check if accept button is needed
-        if ($assignment['status_id'] == '3' && Assignment::assignmentDivisionCheck($assignment['divisionid'], $account->divisions) && (!$assignment['assigned_to'] || $assignment['assigned_to'] == $account->id))
+        if (isset($accept))
             $menu['level-1']['ASSIGNMENT OVERVIEW']['level-2']['Accept Assignment'] = [
                 "admin" => false,
                 "page" => "assignments.php?a=" . $_GET['a'] . "&options&l1=accept",
                 "hud" => ""
             ];
         // Edit shortcut
-        if ($account->manager == 1 && $assignment['status_id'] != '7') {
+        if ($account->manager == 1 && $assignment['status1'] != 3) {
             $menu['level-1']['ASSIGNMENT OVERVIEW']['level-2']['Edit Assignment'] = [
                 "admin" => false,
                 "page" => "assignments.php?a=" . $_GET['a'] . "&options&l1=edit",
@@ -212,7 +213,7 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
         if (isset($remove))
             $menu['level-1']['ASSIGNMENT OVERVIEW']['level-2']['Remove Assignment'] = [
                 "admin" => false,
-                "page" => "assignments.php?a=" . $_GET['a'] . "&options&l1=actions&l2=delete",
+                "page" => "assignments.php?a=" . $_GET['a'] . "&options&l1=actions&l2=remove",
                 "hud" => ""
             ];
         if (isset($delete))
@@ -230,7 +231,7 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
                         "admin" => false,
                         "link" => $task['id'],
                         "default-link" => $task['id'],
-                        "hud" => $hudInitial . ": Task #" . $task['number'],
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -248,13 +249,13 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
                         "level-3" => []
                     ];
                     // Task buttons
-                    if ($task['statusid'] != 7 && ($account->manager == 1 || $assignment['assigned_to'] == $account->id)) {
+                    if ($task['status1'] != 3 && ($account->manager == 1 || $assignment['assigned_to'] == $account->id)) {
                         $menu['level-1']['ASSIGNMENT TASKS']['level-2']["TASK #" . $task['number']]['level-3']['Comment On Task'] = [
                             "admin" => false,
                             "page" => "assignments.php?t=" . $task['id'] . "&options&l1=comment",
                             "hud" => ""
                         ];
-                        if ($task['statusid'] == 4 && $assignment['assigned_to'] == $account->id) {
+                        if ($task['status1'] == 2 && $assignment['assigned_to'] == $account->id) {
                             $menu['level-1']['ASSIGNMENT TASKS']['level-2']["TASK #" . $task['number']]['level-3']['Submit Task'] = [
                                 "admin" => false,
                                 "page" => "assignments.php?t=" . $task['id'] . "&options&l1=submit",
@@ -272,20 +273,26 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
                                 "page" => "assignments.php?t=" . $task['id'] . "&options&l1=edit",
                                 "hud" => ""
                             ];
-                            if ($account->manager == 1 && $task['statusid'] == 4 || $task['statusid'] == 5 || $task['statusid'] == 6)
+                            if ($task['status1'] == 2 || ($task['status1'] == 1 && ($task['status2'] == 4 || $task['status2'] == 5)))
                                 $menu['level-1']['ASSIGNMENT TASKS']['level-2']["TASK #" . $task['number']]['level-3']['Complete Task'] = [
                                     "admin" => false,
                                     "page" => "assignments.php?t=" . $task['id'] . "&options&l1=actions&l2=complete",
                                     "hud" => ""
                                 ];
-                            if ($account->manager == 1 && $task['statusid'] == 5 || $task['statusid'] == 6 || ($task['statusid'] == 1 && $assignment['status_id'] == 5))
+                            if (($task['status1'] == 1 && ($task['status2'] == 4 || $task['status2'] == 5)) || ($task['status1'] == 1 && $assignment['status1'] == 1 && $assignment['status2'] == 10))
                                 $menu['level-1']['ASSIGNMENT TASKS']['level-2']["TASK #" . $task['number']]['level-3']['Activate Task'] = [
                                     "admin" => false,
                                     "page" => "assignments.php?t=" . $task['id'] . "&options&l1=actions&l2=activate",
                                     "hud" => ""
                                 ];
-                            if ($account->manager == 1 && $task['statusid'] != 7)
+                            if ($task['status1'] != 3 && $task['presetid'] != null)
                                 $menu['level-1']['ASSIGNMENT TASKS']['level-2']["TASK #" . $task['number']]['level-3']['Remove Task'] = [
+                                    "admin" => false,
+                                    "page" => "assignments.php?t=" . $task['id'] . "&options&l1=actions&l2=remove",
+                                    "hud" => ""
+                                ];
+                            if ($task['status1'] != 3 && $task['presetid'] == null)
+                                $menu['level-1']['ASSIGNMENT TASKS']['level-2']["TASK #" . $task['number']]['level-3']['Delete Task'] = [
                                     "admin" => false,
                                     "page" => "assignments.php?t=" . $task['id'] . "&options&l1=actions&l2=delete",
                                     "hud" => ""
@@ -309,9 +316,9 @@ if (isset($_GET['a']) && !isset($_GET['options'])) {
 
 // Assignment options
 elseif (isset($_GET['a']) && isset($_GET['options'])) {
-    $hudInitial = $assignment['title'];
+    $hud = "Assignment #" . sprintf('%05d', $assignment['id']) . " Options";
     $menu = [
-        "hud" => $hudInitial . ": Options",
+        "hud" => $hud,
         "level-1" => [
             // + TASK
             "EDIT ASSIGNMENT" => [
@@ -319,7 +326,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "edit",
                 "default-link" => "edit",
-                "hud" => "Edit assignment preset & objective",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -340,7 +347,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "preset",
                         "default-link" => "preset",
-                        "hud" => "Select a preset for the assignment",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -361,7 +368,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "objective",
                         "default-link" => "objective",
-                        "hud" => "Edit the objective of the assignment",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -384,7 +391,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "actions",
                 "default-link" => "actions",
-                "hud" => "Assignment actions",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -404,13 +411,13 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
         ]
     ];
     // + TASK
-    if ($assignment['status_id'] == '1' || $assignment['status_id'] == '2' || $assignment['status_id'] == '5' || $assignment['status_id'] == '6' && $account->manager == 1)
+    if ($assignment['status1'] == 1 && $assignment['status2'] != 8 && $assignment['status2'] != 9 && $account->manager == 1)
         $menu['level-1'] = array_merge(array_slice($menu['level-1'], 0, 0), array("+ TASK" => [
             "admin" => true,
             "manager" => true,
             "link" => "add",
             "default-link" => "add",
-            "hud" => "Select a task preset to add to the assignment",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -439,7 +446,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "cancel",
             "default-link" => "cancel",
-            "hud" => "Cancel assignment?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -462,7 +469,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "assign",
             "default-link" => "assign",
-            "hud" => "Select a member to assign the assignment",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -485,7 +492,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "hide",
             "default-link" => "hide",
-            "hud" => "Hide the assignment?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -507,7 +514,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "show",
             "default-link" => "show",
-            "hud" => "Show the assignment?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -530,7 +537,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "publish",
             "default-link" => "publish",
-            "hud" => "Make the assignment available?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -552,7 +559,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "unpublish",
             "default-link" => "unpublish",
-            "hud" => "Undo available?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -575,7 +582,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "complete",
             "default-link" => "complete",
-            "hud" => "Complete assignment?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -596,9 +603,9 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
         $menu['level-1']['ASSIGNMENT ACTIONS']['level-2'] = array_merge(array_slice($menu['level-1']['ASSIGNMENT ACTIONS']['level-2'], 0, 5), array("REMOVE ASSIGNMENT" => [
             "admin" => true,
             "manager" => true,
-            "link" => "delete",
-            "default-link" => "delete",
-            "hud" => "Remove the assignment?",
+            "link" => "remove",
+            "default-link" => "remove",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -620,7 +627,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "manager" => true,
             "link" => "delete",
             "default-link" => "delete",
-            "hud" => "Delete the assignment?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -638,14 +645,14 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
         ]), array_slice($menu['level-1']['ASSIGNMENT ACTIONS']['level-2'], 5));
 
     // Check if accept/undo-accept button is needed
-    if ($assignment['status_id'] == 3 && (!$assignment['assigned_to'] || $assignment['assigned_to'] == $account->id)) {
+    if ($assignment['status1'] == 1 && $assignment['status2'] == 8 || ($assignment['status2'] == 9 && $assignment['assigned_to'] == $account->id)) {
         if ($account->manager == 0) {
             unset($menu['level-1']);
             $menu['level-1']['ACCEPT ASSIGNMENT'] = [
                 "admin" => false,
                 "link" => "accept",
                 "default-link" => "accept",
-                "hud" => "Accept the assignment?",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -667,7 +674,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
                 "admin" => true,
                 "link" => "accept",
                 "default-link" => "accept",
-                "hud" => "Accept assignment?",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -689,7 +696,7 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
             "admin" => false,
             "link" => "undo-accept",
             "default-link" => "undo-accept",
-            "hud" => "Undo accept?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -713,16 +720,16 @@ elseif (isset($_GET['a']) && isset($_GET['options'])) {
 // Task options
 elseif (isset($_GET['t']) && isset($_GET['options'])) {
     $task = Task::selectTask($_GET['t']);
-    $hudInitial = "#" . $task['number'];
+    $hud = "Task #" . $task['id'] . " Options";
     $menu = [
-        "hud" => $hudInitial,
+        "hud" => $hud,
         "level-1" => [
             "EDIT TASK" => [
                 "admin" => true,
                 "manager" => true,
                 "link" => "edit",
                 "default-link" => "edit",
-                "hud" => "Edit task " . $hudInitial,
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -743,7 +750,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "preset",
                         "default-link" => "preset",
-                        "hud" => "Edit task " . $hudInitial . " preset",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -764,7 +771,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "description",
                         "default-link" => "description",
-                        "hud" => "Edit task " . $hudInitial . " description",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -785,7 +792,28 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "time",
                         "default-link" => "time",
-                        "hud" => "Edit task " . $hudInitial . " time",
+                        "hud" => $hud,
+                        "home" => [
+                            "title" => "",
+                            "description" => "",
+                            "total" => [
+                                "name" => "",
+                                "count" => ""
+                            ],
+                            "last-hours" => [
+                                "title" => "",
+                                "details" => []
+                            ],
+                            "link" => "",
+                            "note" => ""
+                        ]
+                    ],
+                    "PROJECT LINK" => [
+                        "admin" => true,
+                        "manager" => true,
+                        "link" => "prjlink",
+                        "default-link" => "prjlink",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -806,7 +834,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "links",
                         "default-link" => "links",
-                        "hud" => "Edit task " . $hudInitial . " links",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -827,7 +855,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                         "manager" => true,
                         "link" => "comments",
                         "default-link" => "comments",
-                        "hud" => "Edit task " . $hudInitial . " comments",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -850,7 +878,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "actions",
                 "default-link" => "actions",
-                "hud" => "Task " . $hudInitial . " actions",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -869,8 +897,8 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
             ]
         ]
     ];
-    // Can't change preset if assignment is custom/no preset or task is custom
-    if ($task['asg-presetid'] == null || $task['asg-presetid'] == 0 || $task['presetid'] == null)
+    // Can't change preset if assignment is custom
+    if ($task['asg-presetid'] == null)
         unset($menu['level-1']['EDIT TASK']['level-2']['TASK PRESET']);
     // Can't change time for preset tasks
     if ($task['presetid'] != null)
@@ -881,7 +909,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
         "admin" => false,
         "link" => "comment",
         "default-link" => "comment",
-        "hud" => "Write a comment for task " . $hudInitial,
+        "hud" => $hud,
         "home" => [
             "title" => "",
             "description" => "",
@@ -898,12 +926,12 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
         ],
     ]), array_slice($menu['level-1'], 0));
     $menu['level-1']['COMMENT ON TASK']['admin'] = true;
-    if ($task['statusid'] == 4 && $assignment['assigned_to'] == $account->id) {
+    if ($task['status1'] == 2 && $assignment['assigned_to'] == $account->id) {
         $menu['level-1'] = array_merge(array_slice($menu['level-1'], 0, 1), array("SUBMIT" => [
             "admin" => false,
             "link" => "submit",
             "default-link" => "submit",
-            "hud" => "Submit task " . $hudInitial . "?",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -923,7 +951,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
             "admin" => false,
             "link" => "problem",
             "default-link" => "problem",
-            "hud" => "Task " . $hudInitial . " problem",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -943,7 +971,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                     "admin" => false,
                     "link" => "file",
                     "default-link" => "file",
-                    "hud" => "Task " . $hudInitial . " file problem",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -963,7 +991,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                     "admin" => false,
                     "link" => "link",
                     "default-link" => "link",
-                    "hud" => "Task " . $hudInitial . " link problem",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -983,7 +1011,7 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
                     "admin" => false,
                     "link" => "completion",
                     "default-link" => "completion",
-                    "hud" => "Task " . $hudInitial . " completion problem",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1006,13 +1034,13 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
     }
 
     // Check if complete button is needed
-    if ($account->manager == 1 && $task['statusid'] == 4 || $task['statusid'] == 5 || $task['statusid'] == 6)
+    if ($account->manager == 1 && $task['status1'] == 2 || ($task['status1'] == 1 && ($task['status2'] == 4 || $task['status2'] == 5)))
         $menu['level-1']['TASK ACTIONS']['level-2'] = array_merge(array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 0, 2), array("COMPLETE TASK" => [
             "admin" => true,
             "manager" => true,
             "link" => "complete",
             "default-link" => "complete",
-            "hud" => "Complete task " . $hudInitial,
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -1030,13 +1058,13 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
         ]), array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 2));
 
     // Check if activate button is needed
-    if ($account->manager == 1 && $task['statusid'] == 5 || $task['statusid'] == 6 || ($task['statusid'] == 1 && $assignment['status_id'] == 5))
+    if ($account->manager == 1 && ($task['status1'] == 1 && ($task['status2'] == 4 || $task['status2'] == 5)) || ($task['status1'] == 1 && $assignment['status1'] == 1 && $assignment['status2'] == 10))
         $menu['level-1']['TASK ACTIONS']['level-2'] = array_merge(array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 0, 4), array("ACTIVATE TASK" => [
             "admin" => true,
             "manager" => true,
             "link" => "activate",
             "default-link" => "activate",
-            "hud" => "Activate task " . $hudInitial,
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -1054,13 +1082,35 @@ elseif (isset($_GET['t']) && isset($_GET['options'])) {
         ]), array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 4));
 
     // Check if remove button is needed
-    if ($account->manager == 1 && $task['statusid'] != 7)
+    if ($account->manager == 1 && $task['status1'] != 3 && $task['presetid'] != null)
         $menu['level-1']['TASK ACTIONS']['level-2'] = array_merge(array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 0, 5), array("REMOVE TASK" => [
+            "admin" => true,
+            "manager" => true,
+            "link" => "remove",
+            "default-link" => "remove",
+            "hud" => $hud,
+            "home" => [
+                "title" => "",
+                "description" => "",
+                "total" => [
+                    "name" => "",
+                    "count" => ""
+                ],
+                "last-hours" => [
+                    "title" => "",
+                    "details" => []
+                ],
+                "link" => "",
+                "note" => ""
+            ],
+        ]), array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 5));
+    if ($account->manager == 1 && $task['status1'] != 3 && $task['presetid'] == null)
+        $menu['level-1']['TASK ACTIONS']['level-2'] = array_merge(array_slice($menu['level-1']['TASK ACTIONS']['level-2'], 0, 5), array("DELETE TASK" => [
             "admin" => true,
             "manager" => true,
             "link" => "delete",
             "default-link" => "delete",
-            "hud" => "Remove task " . $hudInitial,
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",

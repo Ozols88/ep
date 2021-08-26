@@ -2,10 +2,10 @@
 
 // Project list
 if (isset($account)) {
-    $pending = Project::selectProjectsByStatus(6, $account);
-    $active = Project::selectProjectsByStatus(4, $account);
-    $completed = Project::selectProjectsByStatus(7, $account);
-    $canceled = Project::selectProjectsByStatus(8, $account);
+    $pending = Project::selectProjectsByStatus(1, $account);
+    $active = Project::selectProjectsByStatus(2, $account);
+    $completed = Project::selectProjectsByStatus(3, $account);
+    $canceled = Project::selectProjectsByStatus(4, $account);
 }
 // Project count
 if (is_countable($pending)) $countPending = count($pending);

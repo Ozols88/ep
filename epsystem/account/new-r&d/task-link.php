@@ -27,11 +27,16 @@ if (isset($_SESSION['account'])) {
                     $_SESSION['new-task-link']['info']['link'] = ""; // Info bar fix
             }
             elseif ($_SESSION['new-task-link']['stage'] == '2') {
-                $_SESSION['new-task-link']['fields']['link'] = $_POST['link'];
-                $_SESSION['new-task-link']['info']['link'] = $_POST['link'];
-                if (strlen($_SESSION['new-task-link']['info']['link']) > InfobarCharLimit)
-                    $_SESSION['new-task-link']['info']['link'] = substr($_SESSION['new-task-link']['info']['link'], 0, InfobarCharLimit) . "...";
-
+                if (isset($_POST['link'])) {
+                    $_SESSION['new-task-link']['fields']['link'] = $_POST['link'];
+                    $_SESSION['new-task-link']['info']['link'] = $_POST['link'];
+                    if (strlen($_SESSION['new-task-link']['info']['link']) > InfobarCharLimit)
+                        $_SESSION['new-task-link']['info']['link'] = substr($_SESSION['new-task-link']['info']['link'], 0, InfobarCharLimit) . "...";
+                }
+                else {
+                    $_SESSION['new-task-link']['fields']['link'] = null;
+                    $_SESSION['new-task-link']['info']['link'] = "None";
+                }
                 $_SESSION['new-task-link']['stage'] = '3';
                 if (!isset($_SESSION['new-task-link']['info']['title']))
                     $_SESSION['new-task-link']['info']['title'] = ""; // Info bar fix
@@ -44,6 +49,8 @@ if (isset($_SESSION['account'])) {
                 // From existing task preset
                 if (isset($_SESSION['new-task-link']['fields']['taskid'])) {
                     Database::insert('preset-task_links', $_SESSION['new-task-link']['fields'], false, false);
+                    $preset = Task::selectTaskPreset($_SESSION['new-task-link']['fields']['taskid']);
+                    Database::update('preset-task', $_SESSION['new-task-link']['fields']['taskid'], ['date_updated' => date("Y-m-d H-i-s"), 'times_updated' => ++$preset['times_updated']], false);
                     if ($_SESSION['new-task-link']['redirect'] == 1)
                         header('Location: ../r&d.php?t=' . $_SESSION['new-task-link']['fields']['taskid'] . "&l1=links");
                     else
@@ -76,7 +83,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-task-link']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task Link: Select Link Type</span>
+                <span>New Task Link Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -123,17 +130,14 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-task-link']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task: Enter Link</span>
+                <span>New Task Link Preset</span>
             </div>
             <div class="navbar level-1 unselected">
-                <form class="container-button disabled">
-                    <a class="button admin-menu disabled"></a>
+                <form id="none" name="none" method="post" class="container-button">
+                    <input type="submit" name="submit" value="NONE" class="button admin-menu">
                 </form>
                 <form id="submit" name="submit" method="post" class="container-button">
                     <input type="submit" name="submit" value="NEXT" class="button admin-menu">
-                </form>
-                <form class="container-button disabled">
-                    <a class="button admin-menu disabled"></a>
                 </form>
             </div> <?php
             include_once "../includes/info-bar.php"; ?>
@@ -147,7 +151,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="submit" name="link" id="link" class="field admin" placeholder="Paste Link URL Here" value="<?php if (isset($_SESSION['new-task-link']['fields']['link'])) echo $_SESSION['new-task-link']['fields']['link']; ?>">
+                    <input form="submit" name="link" id="link" class="field admin" placeholder="Paste Link URL Here" value="<?php if (isset($_SESSION['new-task-link']['fields']['link'])) echo htmlspecialchars($_SESSION['new-task-link']['fields']['link']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))
@@ -155,7 +159,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-task-link']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task: Enter Name</span>
+                <span>New Task Link Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -179,7 +183,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="submit" name="title" id="title" class="field admin" placeholder="Enter Link Name Here" value="<?php if (isset($_SESSION['new-task-link']['fields']['title'])) echo $_SESSION['new-task-link']['fields']['title']; ?>">
+                    <input form="submit" name="title" id="title" class="field admin" placeholder="Enter Link Name Here" value="<?php if (isset($_SESSION['new-task-link']['fields']['title'])) echo htmlspecialchars($_SESSION['new-task-link']['fields']['title']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

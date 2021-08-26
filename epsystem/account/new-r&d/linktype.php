@@ -30,6 +30,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-linktype']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-linktype']['info']['description'] = substr($_SESSION['new-linktype']['info']['description'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-linktype']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $typeID = Database::insert('link_type', $_SESSION['new-linktype']['fields'], true, false);
 
                 // From new task link
@@ -61,7 +62,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-linktype']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Link Type: Enter Name</span>
+                <span>New Task Link Type</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -85,13 +86,13 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Link Type Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-linktype']['fields']['title'])) echo $_SESSION['new-linktype']['fields']['title']; ?>">
+                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Link Type Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-linktype']['fields']['title'])) echo htmlspecialchars($_SESSION['new-linktype']['fields']['title']); ?>">
                 </div>
             </div> <?php
         }
         elseif ($_SESSION['new-linktype']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Link Type: Enter Description</span>
+                <span>New Task Link Type</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -115,7 +116,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Link Type Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-linktype']['fields']['description'])) echo $_SESSION['new-linktype']['fields']['description']; ?>">
+                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Link Type Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-linktype']['fields']['description'])) echo htmlspecialchars($_SESSION['new-linktype']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

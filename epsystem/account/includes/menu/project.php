@@ -13,7 +13,7 @@ if (isset($account) && $account->manager == 0) {
     }
 }
 if ($project && isset($account) && ($account->manager == 1 || $participate == true))
-    $hudInitial = $project['title'];
+    $projectID = "#" . sprintf('%04d', $project['id']);
 else {
     header("Location: projects.php?l1=active");
     exit();
@@ -37,13 +37,13 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
     if (is_countable($completed)) $countCompleted = count($completed);
     else $countCompleted = 0;
     $menu = [
-        "hud" => "\"" . $hudInitial . "\" project page",
+        "hud" => "Project " . $projectID . " Page",
         "level-1" => [
             "PROJECT OVERVIEW" => [
                 "admin" => false,
                 "link" => "project",
                 "default-link" => "project&l2=overview",
-                "hud" => "\"" . $hudInitial . "\" project info and stats",
+                "hud" => "Project " . $projectID . " Page",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -72,7 +72,7 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                 "admin" => false,
                 "link" => "assignments",
                 "default-link" => "assignments&l2=active",
-                "hud" => "\"" . $hudInitial . "\" project assignments",
+                "hud" => "Project " . $projectID . " Page",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -88,7 +88,7 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                     "note" => ""
                 ],
                 "level-2" => [
-                    "+ Assignment" => [
+                    "+ Assignment Preset" => [
                         "admin" => false,
                         "manager" => true,
                         "link" => "new",
@@ -115,7 +115,7 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                         "count" => $countPending,
                         "link" => "pending",
                         "default-link" => "pending",
-                        "hud" => "Pending \"" . $hudInitial . "\" project assignments",
+                        "hud" => "Project " . $projectID . " Page",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -136,7 +136,7 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                         "count" => $countActive,
                         "link" => "active",
                         "default-link" => "active",
-                        "hud" => "Active \"" . $hudInitial . "\" project assignments",
+                        "hud" => "Project " . $projectID . " Page",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -157,7 +157,7 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                         "count" => $countCompleted,
                         "link" => "completed",
                         "default-link" => "completed",
-                        "hud" => "Completed \"" . $hudInitial . "\" project assignments",
+                        "hud" => "Project " . $projectID . " Page",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -175,11 +175,11 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                     ]
                 ]
             ],
-            "PROJECT INFO" => [
+            "PROJECT LINKS" => [
                 "admin" => false,
                 "link" => "info",
                 "default-link" => "info",
-                "hud" => "\"" . $hudInitial . "\" project info groups",
+                "hud" => "Project " . $projectID . " Page",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -216,8 +216,8 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
             "hud" => ""
         ];
 
-    if ($project['statusid'] != '4' && $project['statusid'] != '6')
-        unset($menu['level-1']['PROJECT ASSIGNMENTS']['level-2']['+ Assignment']);
+    if ($project['status1'] != 1 && $project['status1'] != 2)
+        unset($menu['level-1']['PROJECT ASSIGNMENTS']['level-2']['+ Assignment Preset']);
 
     // Info pages
     $infoPages = Project::selectProjectInfoPages($project['id']);
@@ -225,15 +225,15 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
         $prevGroup = null;
         if (count($infoPages) > 5) {
             if (isset($_GET['l2']) && $_GET['l2'] == "") // Fix for group "none"
-                $menu['level-1']['PROJECT INFO']['hud'] = "\"" . $hudInitial . "\" project info links";
+                $menu['level-1']['PROJECT LINKS']['hud'] = "Project " . $projectID . " Page";
             foreach ($infoPages as $page) {
                 // Lvl2 (info page group)
                 if ($prevGroup != $page['group']) {
-                    $menu['level-1']['PROJECT INFO']['level-2'][$page['group']] = [
+                    $menu['level-1']['PROJECT LINKS']['level-2'][$page['group']] = [
                         "admin" => false,
                         "link" => $page['groupid'],
                         "default-link" => $page['groupid'],
-                        "hud" => "\"" . $hudInitial . "\" project info links",
+                        "hud" => "Project " . $projectID . " Page",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -256,7 +256,7 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
                 else $hasLink = "No link to darkness!";
 
                 // Lvl3 (info page)
-                $menu['level-1']['PROJECT INFO']['level-2'][$page['group']]['level-3'][$page['title']] = [
+                $menu['level-1']['PROJECT LINKS']['level-2'][$page['group']]['level-3'][$page['title']] = [
                     "admin" => false,
                     "page" => $page['link'],
                     "new-tab" => true,
@@ -279,13 +279,13 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
             }
         }
         else {
-            $menu['level-1']['PROJECT INFO']['hud'] = "\"" . $hudInitial . "\" project info links"; // Different hud when no info groups in menu
+            $menu['level-1']['PROJECT LINKS']['hud'] = "Project " . $projectID . " Page"; // Different hud when no info groups in menu
             foreach ($infoPages as $page) {
                 if (isset($page['link'])) $hasLink = "Link to the darkness!";
                 else $hasLink = "No link to darkness!";
 
                 // Lvl2 (info page)
-                $menu['level-1']['PROJECT INFO']['level-2'][$page['title']] = [
+                $menu['level-1']['PROJECT LINKS']['level-2'][$page['title']] = [
                     "admin" => false,
                     "page" => $page['link'],
                     "new-tab" => true,
@@ -309,11 +309,11 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
         }
 
     }
-    $menu['level-1']['PROJECT INFO']['level-2']['Edit Info Links'] = [
+    $menu['level-1']['PROJECT LINKS']['level-2']['Project Link Options'] = [
         "admin" => false,
         "manager" => true,
         "page" => "?p=" . $_GET['p'] . "&ioptions&l1=edit",
-        "hud" => $hudInitial . ": Options",
+        "hud" => $projectID . ": Options",
         "home" => [
             "title" => "",
             "description" => "",
@@ -338,13 +338,13 @@ if (!isset($_GET['options']) && !isset($_GET['ioptions'])) {
 // Project options
 elseif (isset($_GET['options'])) {
     $menu = [
-        "hud" => "\"" . $hudInitial . "\" options",
+        "hud" => "Project " . $projectID . " Options",
         "level-1" => [
-            "+ ASSIGNMENT" => [
+            "+ ASSIGNMENT PRESET" => [
                 "admin" => true,
                 "link" => "add",
                 "default-link" => "add",
-                "hud" => "Select an assignment preset to add to the project",
+                "hud" => "Project " . $projectID . " Options",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -365,7 +365,7 @@ elseif (isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "edit",
                 "default-link" => "edit",
-                "hud" => "Edit project preset, name or description",
+                "hud" => "Project " . $projectID . " Options",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -385,7 +385,7 @@ elseif (isset($_GET['options'])) {
                         "admin" => true,
                         "link" => "preset",
                         "default-link" => "preset",
-                        "hud" => "Select a project preset for the project",
+                        "hud" => "Project " . $projectID . " Options",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -405,7 +405,7 @@ elseif (isset($_GET['options'])) {
                         "admin" => true,
                         "link" => "name",
                         "default-link" => "name",
-                        "hud" => "Edit the name of the project",
+                        "hud" => "Project " . $projectID . " Options",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -425,7 +425,7 @@ elseif (isset($_GET['options'])) {
                         "admin" => true,
                         "link" => "description",
                         "default-link" => "description",
-                        "hud" => "Edit the description of the project",
+                        "hud" => "Project " . $projectID . " Options",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -448,7 +448,7 @@ elseif (isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "actions",
                 "default-link" => "actions",
-                "hud" => "Complete, cancel or delete project",
+                "hud" => "Project " . $projectID . " Options",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -468,7 +468,7 @@ elseif (isset($_GET['options'])) {
                         "admin" => true,
                         "link" => "complete",
                         "default-link" => "complete",
-                        "hud" => "Complete project?",
+                        "hud" => "Project " . $projectID . " Options",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -488,7 +488,7 @@ elseif (isset($_GET['options'])) {
                         "admin" => true,
                         "link" => "cancel",
                         "default-link" => "cancel",
-                        "hud" => "Select a reason for project cancellation",
+                        "hud" => "Project " . $projectID . " Options",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -508,7 +508,7 @@ elseif (isset($_GET['options'])) {
                         "admin" => true,
                         "link" => "delete",
                         "default-link" => "delete",
-                        "hud" => "Delete project?",
+                        "hud" => "Project " . $projectID . " Options",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -528,8 +528,8 @@ elseif (isset($_GET['options'])) {
             ]
         ]
     ];
-    if ($project['statusid'] != '4' && $project['statusid'] != '6')
-        unset($menu['level-1']['+ ASSIGNMENT']);
+    if ($project['status1'] != 1 && $project['status1'] != 2)
+        unset($menu['level-1']['+ ASSIGNMENT PRESET']);
 
     // Check if project is completable
     if (!$canComplete)
@@ -547,14 +547,15 @@ elseif (isset($_GET['options'])) {
 
 // Info page options
 elseif (isset($_GET['ioptions'])) {
+    $hud = "Project Link Options";
     $menu = [
         "hud" => "Info link options",
         "level-1" => [
-            "+ INFO LINK" => [
+            "+ Project Link" => [
                 "admin" => true,
                 "link" => "add",
                 "default-link" => "add",
-                "hud" => "Select an info preset to add to the project",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -570,11 +571,11 @@ elseif (isset($_GET['ioptions'])) {
                     "note" => ""
                 ]
             ],
-            "EDIT INFO LINK" => [
+            "EDIT PROJECT LINK" => [
                 "admin" => true,
                 "link" => "edit",
                 "default-link" => "edit",
-                "hud" => "Select an info link to edit",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -590,11 +591,11 @@ elseif (isset($_GET['ioptions'])) {
                     "note" => ""
                 ]
             ],
-            "- INFO LINK" => [
+            "- PROJECT LINK" => [
                 "admin" => true,
                 "link" => "remove",
                 "default-link" => "remove",
-                "hud" => /** @lang Text */ "Select an info link to remove from the project",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -614,13 +615,33 @@ elseif (isset($_GET['ioptions'])) {
     ];
     if (isset($_GET['l1']) && $_GET['l1'] == "edit" && isset($_GET['i'])) {
         $infopage = Project::selectProjectInfoPage($_GET['i']);
-        $menu['level-1']['EDIT INFO LINK']['hud'] = "Edit the name, link and description of the info link";
-        $menu['level-1']['EDIT INFO LINK']['level-2'] = [
-            "INFO LINK NAME" => [
+        $menu['level-1']['EDIT PROJECT LINK']['hud'] = $hud;
+        $menu['level-1']['EDIT PROJECT LINK']['level-2'] = [
+            "PROJECT LINK GROUP" => [
+                "admin" => true,
+                "link" => "group",
+                "default-link" => "group",
+                "hud" => $hud,
+                "home" => [
+                    "title" => "",
+                    "description" => "",
+                    "total" => [
+                        "name" => "",
+                        "count" => ""
+                    ],
+                    "last-hours" => [
+                        "title" => "",
+                        "details" => []
+                    ],
+                    "link" => "",
+                    "note" => ""
+                ]
+            ],
+            "PROJECT LINK NAME" => [
                 "admin" => true,
                 "link" => "name",
                 "default-link" => "name",
-                "hud" => "Edit the name of the info link",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -636,11 +657,11 @@ elseif (isset($_GET['ioptions'])) {
                     "note" => ""
                 ]
             ],
-            "INFO LINK URL" => [
+            "PROJECT LINK URL" => [
                 "admin" => true,
                 "link" => "link",
                 "default-link" => "link",
-                "hud" => "Edit the URL of the info link",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -656,11 +677,11 @@ elseif (isset($_GET['ioptions'])) {
                     "note" => ""
                 ]
             ],
-            "INFO LINK DESCRIPTION" => [
+            "PROJECT LINK DESCRIPTION" => [
                 "admin" => true,
                 "link" => "description",
                 "default-link" => "description",
-                "hud" => "Edit the description of the info link",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",

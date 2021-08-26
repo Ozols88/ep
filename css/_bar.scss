@@ -13,20 +13,6 @@
   text-align: center;
   user-select: none;
   padding: 3vh 0 5vh 0;
-  &.short {
-    margin: 0 10vw;
-  }
-  &.tiny {
-    margin: 0 30vw;
-    padding: 0 0 2.5vh 0;
-    .section .content {
-      color: $c10;
-      text-transform: uppercase;
-      &.lower {
-        text-transform: none;
-      }
-    }
-  }
   .section {
     display: flex;
     flex: 1;
@@ -57,6 +43,7 @@
       color: $c10;
       font-weight: bold;
       font-size: 0.8vw;
+      text-decoration: none;
       &.active {
         color: $c2;
       }
@@ -91,6 +78,23 @@
       }
       &.active {
         color: $c2;
+      }
+    }
+  }
+  &.short {
+    margin: 0 10vw;
+    .section .content.light {
+      color: $c10;
+    }
+  }
+  &.tiny {
+    margin: 0 30vw;
+    padding: 0 0 2.5vh 0;
+    .section .content {
+      color: $c9;
+      text-transform: uppercase;
+      &.lower {
+        text-transform: none;
       }
     }
   }

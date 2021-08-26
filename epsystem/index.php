@@ -1,6 +1,7 @@
-<?php if (isset($_POST['exit']))
+<?php
+if (isset($_POST['exit']))
     header("Location: ../");
-include "includes/autoloader.php"; ?>
+include "account/includes/autoloader.php"; ?>
 <html lang="en">
 <head>
     <title>ep system</title>
@@ -27,11 +28,8 @@ include "includes/autoloader.php"; ?>
     </script>
 </head>
 <body>
-<div class="container-header system">
-    <img class="logo-header" src="account/img/logo-system.svg" alt="ep">
-    <form method="post" class="exit-form">
-        <input type="submit" name="exit" value="Go to ep home" class="exit-button">
-    </form>
+<div class="container-header">
+    <div class="logo-container"><a class="logo-link"><img class="logo-header" src="<?php echo RootPath; ?>epsystem/account/img/logo-system.svg" alt="ep"></a></div>
 </div>
 <div class="menu">
     <div class="head-up-display-bar">

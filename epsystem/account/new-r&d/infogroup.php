@@ -30,6 +30,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-infogroup']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-infogroup']['info']['description'] = substr($_SESSION['new-infogroup']['info']['description'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-infogroup']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $groupID = Database::insert('infopage_group', $_SESSION['new-infogroup']['fields'], true, false);
 
                 // From new info page
@@ -61,7 +62,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-infogroup']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Info Group: Enter Name</span>
+                <span>New Project Link Group</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -78,20 +79,20 @@ if (isset($_SESSION['account'])) {
             <div class="table-header-container">
                 <div class="header-extension small admin"></div>
                 <div class="header small">
-                    <div class="head admin">Info Group Name</div>
+                    <div class="head admin">Project Link Group Name</div>
                 </div>
                 <div class="header-extension small admin"></div>
             </div>
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Info Group Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-infogroup']['fields']['title'])) echo $_SESSION['new-infogroup']['fields']['title']; ?>">
+                    <input form="title" name="title" id="title" class="field admin" placeholder="Enter Project Link Group Name Here" maxlength="50" value="<?php if (isset($_SESSION['new-infogroup']['fields']['title'])) echo htmlspecialchars($_SESSION['new-infogroup']['fields']['title']); ?>">
                 </div>
             </div> <?php
         }
         elseif ($_SESSION['new-infogroup']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Info Group: Enter Description</span>
+                <span>New Project Link Group</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -108,14 +109,14 @@ if (isset($_SESSION['account'])) {
             <div class="table-header-container">
                 <div class="header-extension large admin"></div>
                 <div class="header large">
-                    <div class="head admin">Info Group Description</div>
+                    <div class="head admin">Project Link Group Description</div>
                 </div>
                 <div class="header-extension large admin"></div>
             </div>
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Info Group Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-infogroup']['fields']['description'])) echo $_SESSION['new-infogroup']['fields']['description']; ?>">
+                    <input form="description" name="description" id="description" class="field admin" placeholder="Enter Project Link Group Description Here" maxlength="200" value="<?php if (isset($_SESSION['new-infogroup']['fields']['description'])) echo htmlspecialchars($_SESSION['new-infogroup']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

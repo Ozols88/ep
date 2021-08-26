@@ -4,15 +4,16 @@ if (isset($_GET['m']))
     $member = Account::selectAccountByID($_GET['m']);
 
 if (!isset($_GET['options'])) {
+    $hud = "Member Page";
     $menu = [
-        "hud" => "Member",
+        "hud" => $hud,
         "level-1" => [
             "MEMBER OVERVIEW" => [
                 "admin" => true,
                 "manager" => true,
                 "link" => "overview",
                 "default-link" => "overview",
-                "hud" => "\"" . $member['username'] . "\" account info and stats",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -50,7 +51,7 @@ if (!isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "divisions",
                 "default-link" => "divisions",
-                "hud" => "\"" . $member['username'] . "\" divisions",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -71,7 +72,7 @@ if (!isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "payments",
                 "default-link" => "payments",
-                "hud" => "Payments to \"" . $member['username'] . "\"",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -92,7 +93,7 @@ if (!isset($_GET['options'])) {
                 "manager" => true,
                 "link" => "assignments",
                 "default-link" => "assignments",
-                "hud" => "\"" . $member['username'] . "\" assignments",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -131,15 +132,16 @@ if (!isset($_GET['options'])) {
 }
 
 else {
+    $hud = "Member Options";
     $menu = [
-        "hud" => "Member",
+        "hud" => $hud,
         "level-1" => [
             "EDIT MEMBER" => [
                 "admin" => true,
                 "manager" => true,
                 "link" => "edit",
                 "default-link" => "edit",
-                "hud" => "Edit the member divisions, name, description and password",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -160,7 +162,7 @@ else {
                         "manager" => true,
                         "link" => "name",
                         "default-link" => "name",
-                        "hud" => "Edit the name of the member",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -181,7 +183,7 @@ else {
                         "manager" => true,
                         "link" => "description",
                         "default-link" => "description",
-                        "hud" => "Edit the description of the member",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -202,7 +204,7 @@ else {
                         "manager" => true,
                         "link" => "password",
                         "default-link" => "password",
-                        "hud" => "Edit the password of the member's account",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -223,7 +225,7 @@ else {
                         "manager" => true,
                         "link" => "divisions",
                         "default-link" => "divisions&l3=delete",
-                        "hud" => "Edit \"" . $member['username'] . "\" account divisions",
+                        "hud" => $hud,
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -244,14 +246,14 @@ else {
                                 "manager" => true,
                                 "link" => "delete",
                                 "default-link" => "delete",
-                                "hud" => /** @lang Text */ "Select a division to remove from the member",
+                                "hud" => $hud,
                             ],
                             "+ DIVISION" => [
                                 "admin" => true,
                                 "manager" => true,
                                 "link" => "add",
                                 "default-link" => "add",
-                                "hud" => "Select a division to add to the member"
+                                "hud" => $hud,
                             ],
                         ]
                     ]
@@ -262,7 +264,7 @@ else {
                 "manager" => true,
                 "link" => "delete",
                 "default-link" => "delete",
-                "hud" => "Delete \"" . $member['username'] . "\" account",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -288,7 +290,7 @@ else {
             "manager" => true,
             "link" => "activate",
             "default-link" => "activate",
-            "hud" => "Activate \"" . $member['username'] . "\" account",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",
@@ -310,7 +312,7 @@ else {
             "manager" => true,
             "link" => "pause",
             "default-link" => "pause",
-            "hud" => "Pause \"" . $member['username'] . "\" account",
+            "hud" => $hud,
             "home" => [
                 "title" => "",
                 "description" => "",

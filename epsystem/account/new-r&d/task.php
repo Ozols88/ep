@@ -22,11 +22,16 @@ if (isset($_SESSION['account'])) {
 
         if (isset($_POST['submit'])) {
             if ($_SESSION['new-taskpr']['stage'] == '1') {
-                $_SESSION['new-taskpr']['fields']['assignmentid'] = $_POST['asg'];
-                $_SESSION['new-taskpr']['info']['assignment'] = $_POST['asg-title'];
-                if (strlen($_SESSION['new-taskpr']['info']['assignment']) > InfobarCharLimit)
-                    $_SESSION['new-taskpr']['info']['assignment'] = substr($_SESSION['new-taskpr']['info']['assignment'], 0, InfobarCharLimit) . "...";
-
+                if (isset($_POST['none'])) {
+                    $_SESSION['new-taskpr']['fields']['assignmentid'] = null;
+                    $_SESSION['new-taskpr']['info']['assignment'] = "None";
+                }
+                elseif (isset($_POST['asg'])) {
+                    $_SESSION['new-taskpr']['fields']['assignmentid'] = $_POST['asg'];
+                    $_SESSION['new-taskpr']['info']['assignment'] = $_POST['asg-title'];
+                    if (strlen($_SESSION['new-taskpr']['info']['assignment']) > InfobarCharLimit)
+                        $_SESSION['new-taskpr']['info']['assignment'] = substr($_SESSION['new-taskpr']['info']['assignment'], 0, InfobarCharLimit) . "...";
+                }
                 $_SESSION['new-taskpr']['stage'] = '2';
                 if (!isset($_SESSION['new-taskpr']['info']['name']))
                     $_SESSION['new-taskpr']['info']['name'] = ""; // Info bar fix
@@ -79,7 +84,10 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-taskpr']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-taskpr']['info']['description'] = substr($_SESSION['new-taskpr']['info']['description'], 0, InfobarCharLimit) . "...";
 
-                $presetID = Task::insert('preset-task', $_SESSION['new-taskpr']['fields'], true, false);
+                $_SESSION['new-taskpr']['fields']['date_created'] = date("Y-m-d H-i-s");
+                $presetID = Database::insert('preset-task', $_SESSION['new-taskpr']['fields'], true, false);
+                $preset = Assignment::selectPresetByID($_SESSION['new-taskpr']['fields']['assignmentid']);
+                Database::update('preset-assignment', $_SESSION['new-taskpr']['fields']['assignmentid'], ['date_updated' => date("Y-m-d H-i-s"), 'times_updated' => ++$preset['times_updated']], false);
                 if (isset($_SESSION['edit-assignmentpr']['redirect'])) {
                     if ($_SESSION['edit-assignmentpr']['redirect'] == 1)
                         header('Location: ../r&d.php?a=' . $_SESSION['new-taskpr']['fields']['assignmentid'] . "&l1=tasks");
@@ -87,7 +95,7 @@ if (isset($_SESSION['account'])) {
                         header('Location: ../r&d.php?a=' . $_SESSION['new-taskpr']['fields']['assignmentid'] . "&options&l1=edit&l2=tasks");
                 }
                 else
-                    header('Location: ../r&d.php?l1=task&l2=tasks');
+                    header('Location: ../r&d.php?t=' . $presetID . '&l1=overview');
                 unset($_SESSION['new-taskpr']);
                 unset($_SESSION['edit-assignmentpr']);
                 exit();
@@ -102,7 +110,7 @@ if (isset($_SESSION['account'])) {
         if (isset($_POST['stage2'])) $_SESSION['new-taskpr']['stage'] = '2';
         if (isset($_POST['stage3'])) $_SESSION['new-taskpr']['stage'] = '3';
         if (isset($_POST['stage4'])) $_SESSION['new-taskpr']['stage'] = '4';
-        if (isset($_POST['stage4'])) $_SESSION['new-taskpr']['stage'] = '5';
+        if (isset($_POST['stage5'])) $_SESSION['new-taskpr']['stage'] = '5';
 
         if (isset($_POST['cancel']))
             unset($_SESSION['new-taskpr']); ?>
@@ -110,9 +118,16 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-taskpr']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task Preset: Select Assignment Preset</span>
+                <span>New Task Preset</span>
             </div>
             <div class="navbar level-1 unselected">
+                <form class="container-button disabled">
+                    <input class="button admin-menu disabled">
+                </form>
+                <form method="post" class="container-button">
+                    <input type="hidden" name="none">
+                    <input type="submit" name="submit" value="NONE" class="button admin-menu">
+                </form>
                 <form class="container-button disabled">
                     <input class="button admin-menu disabled">
                 </form>
@@ -182,7 +197,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-taskpr']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task Preset: Enter Name</span>
+                <span>New Task Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -206,7 +221,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="name" name="name" id="name" class="field admin" placeholder="Enter Task Name Here" value="<?php if (isset($_SESSION['new-taskpr']['fields']['name'])) echo $_SESSION['new-taskpr']['fields']['name']; ?>">
+                    <input form="name" name="name" id="name" class="field admin" placeholder="Enter Task Name Here" value="<?php if (isset($_SESSION['new-taskpr']['fields']['name'])) echo htmlspecialchars($_SESSION['new-taskpr']['fields']['name']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))
@@ -214,7 +229,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-taskpr']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task Preset: Select Info Preset</span>
+                <span>New Task Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -253,7 +268,7 @@ if (isset($_SESSION['account'])) {
                 <div class="header-extension admin"></div>
                 <div class="header">
                     <div class="head admin" style="width: 7.5%">№</div>
-                    <div class="head admin" style="width: 20%">Info Preset Name</div>
+                    <div class="head admin" style="width: 20%">Project Link Preset Name</div>
                     <div class="head admin" style="width: 50%">Description</div>
                     <div class="head admin" style="width: 15%">Group</div>
                     <div class="head admin" style="width: 7.5%">Select</div>
@@ -277,12 +292,12 @@ if (isset($_SESSION['account'])) {
                 </div> <?php
             }
             else { ?>
-                <div class="empty-table">NO INFO PAGE PRESETS</div> <?php
+                <div class="empty-table">NO PROJECT LINK PRESETS</div> <?php
             }
         }
         elseif ($_SESSION['new-taskpr']['stage'] == '4') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task Preset: Enter Time</span>
+                <span>New Task Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -312,7 +327,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-taskpr']['stage'] == '5') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Task Preset: Enter Description</span>
+                <span>New Task Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -336,7 +351,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="test" name="description" id="description" class="field admin" placeholder="Enter Task Description Here" value="<?php if (isset($_SESSION['new-taskpr']['fields']['description'])) echo $_SESSION['new-taskpr']['fields']['description']; ?>">
+                    <input form="test" name="description" id="description" class="field admin" placeholder="Enter Task Description Here" value="<?php if (isset($_SESSION['new-taskpr']['fields']['description'])) echo htmlspecialchars($_SESSION['new-taskpr']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

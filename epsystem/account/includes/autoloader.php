@@ -2,9 +2,11 @@
 spl_autoload_register('myAutoLoader');
 
 function myAutoLoader($className) {
-    if ($_SERVER['DOCUMENT_ROOT'] == "C:/wamp64/www/sites/")
+    if ($_SERVER['DOCUMENT_ROOT'] == "C:/wamp64/www/sites/") // http
         $path = $_SERVER['DOCUMENT_ROOT'] . "ep/epsystem/account/classes/";
-    else
+    elseif ($_SERVER['DOCUMENT_ROOT'] == "C:/wamp64/www/sites") // https
+        $path = $_SERVER['DOCUMENT_ROOT'] . "/ep/epsystem/account/classes/";
+    else // godaddy
         $path = $_SERVER['DOCUMENT_ROOT'] . "/epsystem/account/classes/";
     $extension = ".php";
     $fullPath = $path . strtolower($className) . $extension;
@@ -17,7 +19,7 @@ function myAutoLoader($className) {
 
 if (!defined('InfobarCharLimit'))
     define('InfobarCharLimit', 19);
-if (!defined('RootPath') && $_SERVER['DOCUMENT_ROOT'] == "C:/wamp64/www/sites/")
+if (!defined('RootPath') && ($_SERVER['DOCUMENT_ROOT'] == "C:/wamp64/www/sites" || $_SERVER['DOCUMENT_ROOT'] == "C:/wamp64/www/sites/"))
     define('RootPath', '/ep/');
 else
     define('RootPath', '/');

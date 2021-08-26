@@ -231,7 +231,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
-                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Preset Name" required style="width: calc(25% - 8px);">
+                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Name" required style="width: calc(25% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
                            type="text" name="project" class="input-project" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
                     <div class="custom-select input-division" style="width: calc(15% - 8px);">
@@ -249,8 +249,10 @@ if (isset($_SESSION['account'])) {
                         <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'}, this)"
                                 name="reason" class="input-reason" required>
                             <option value="">All Reasons</option>
-                            <option value="Submitted">Submitted</option>
+                            <option value="New">New</option>
+                            <option value="Hidden">Hidden</option>
                             <option value="Problem">Problem</option>
+                            <option value="Submitted">Submitted</option>
                             <option value="Canceled">Canceled</option>
                         </select>
                     </div>
@@ -259,7 +261,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head id" style="width: 7.5%">№</div>
-                        <div class="head preset" style="width: 25%">Assignment Preset Name</div>
+                        <div class="head preset" style="width: 25%">Assignment Name</div>
                         <div class="head project" style="width: 20%">Project</div>
                         <div class="head division" style="width: 15%">Division</div>
                         <div class="head" style="width: 15%">Reason</div>
@@ -275,10 +277,10 @@ if (isset($_SESSION['account'])) {
                             <div class="row">
                                 <?php $link = "?a=" . $assignment['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $assignment['assignment_id']); ?></a></div>
-                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['asg_preset']; ?></a></div>
+                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['assignment_name']; ?></a></div>
                                 <div class="cell project" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['project']; ?></a></div>
                                 <div class="cell division" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['division']; ?></a></div>
-                                <div class="cell reason" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['status_note']; ?></a></div>
+                                <div class="cell reason" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['note']; ?></a></div>
                                 <div class="cell tasks" style="width: 10%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['tasks']; ?></a></div>
                                 <div class="cell" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content open-button">Open</a></div>
                             </div> <?php
@@ -294,7 +296,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
-                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Preset Name" required style="width: calc(25% - 8px);">
+                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Name" required style="width: calc(25% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
                            type="text" name="project" class="input-project" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
                     <div class="custom-select input-division" style="width: calc(15% - 8px);">
@@ -313,7 +315,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head id" style="width: 7.5%">№</div>
-                        <div class="head preset" style="width: 25%">Assignment Preset Name</div>
+                        <div class="head preset" style="width: 25%">Assignment Name</div>
                         <div class="head project" style="width: 20%">Project</div>
                         <div class="head division" style="width: 15%">Division</div>
                         <div class="head time" style="width: 15%" onclick="sortDates('.head.time', '.cell.time .content', '.made-avb')">Made Available</div>
@@ -329,7 +331,7 @@ if (isset($_SESSION['account'])) {
                             <div class="row">
                                 <?php $link = "?a=" . $assignment['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $assignment['assignment_id']); ?></a></div>
-                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['asg_preset']; ?></a></div>
+                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['assignment_name']; ?></a></div>
                                 <div class="cell project" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['project']; ?></a></div>
                                 <div class="cell division" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['division']; ?></a></div>
                                 <div class="cell time" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['status_time_ago']; ?></a></div>
@@ -349,7 +351,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-member':'.cell.member'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .custom-select.input-product .input-product':'.cell.product', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
-                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Preset Name" required style="width: calc(25% - 8px);">
+                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Name" required style="width: calc(25% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .custom-select.input-reason .input-reason':'.cell.reason'})"
                            type="text" name="project" class="input-project" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
                     <div class="custom-select input-division" style="width: calc(15% - 8px);">
@@ -370,7 +372,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head id" style="width: 7.5%">№</div>
-                        <div class="head preset" style="width: 25%">Assignment Preset Name</div>
+                        <div class="head preset" style="width: 25%">Assignment Name</div>
                         <div class="head project" style="width: 20%">Project</div>
                         <div class="head division" style="width: 15%">Division</div>
                         <div class="head member" style="width: 15%">Member</div>
@@ -386,7 +388,7 @@ if (isset($_SESSION['account'])) {
                             <div class="row">
                                 <?php $link = "?a=" . $assignment['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $assignment['assignment_id']); ?></a></div>
-                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['asg_preset']; ?></a></div>
+                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['assignment_name']; ?></a></div>
                                 <div class="cell project" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['project']; ?></a></div>
                                 <div class="cell division" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['division']; ?></a></div>
                                 <div class="cell member" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['member']; ?></a></div>
@@ -405,7 +407,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-member':'.cell.member'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-member':'.cell.member'})"
-                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Preset Name" required style="width: calc(25% - 8px);">
+                           type="text" name="preset" class="input-preset" placeholder="Enter Assignment Name" required style="width: calc(25% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-preset':'.cell.preset', '.search-bar .input-project':'.cell.project', '.search-bar .custom-select.input-division .input-division':'.cell.division', '.search-bar .input-member':'.cell.member'})"
                            type="text" name="project" class="input-project" placeholder="Enter Project Name" required style="width: calc(20% - 8px);">
                     <div class="custom-select input-division" style="width: calc(15% - 8px);">
@@ -426,7 +428,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension"></div>
                     <div class="header">
                         <div class="head id" style="width: 7.5%">№</div>
-                        <div class="head preset" style="width: 25%">Assignment Preset Name</div>
+                        <div class="head preset" style="width: 25%">Assignment Name</div>
                         <div class="head project" style="width: 20%">Project</div>
                         <div class="head division" style="width: 15%">Division</div>
                         <div class="head member" style="width: 15%">Member</div>
@@ -442,7 +444,7 @@ if (isset($_SESSION['account'])) {
                             <div class="row">
                                 <?php $link = "?a=" . $assignment['assignment_id'] . "&l1=assignment"; ?>
                                 <div class="cell id" style="width: 7.5%"><a href="<?php echo $link; ?>" class="content"><?php echo "#" . sprintf('%05d', $assignment['assignment_id']); ?></a></div>
-                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['asg_preset']; ?></a></div>
+                                <div class="cell preset" style="width: 25%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['assignment_name']; ?></a></div>
                                 <div class="cell project" style="width: 20%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['project']; ?></a></div>
                                 <div class="cell division" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['division']; ?></a></div>
                                 <div class="cell member" style="width: 15%"><a href="<?php echo $link; ?>" class="content"><?php echo $assignment['member']; ?></a></div>
@@ -482,32 +484,32 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['cancel'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 1,
+                    'status1' => 1,
+                    'status2' => 3,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
-                    'assigned_to' => null,
-                    'note' => "Canceled by manager"
+                    'assigned_to' => $assignment['assigned_to']
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
-                Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
+                Assignment::update('assignment', $_GET['a'], ["assigned" => 0, "statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
 
                 // Update all task status
                 $tasks = Task::selectAssignmentTasks($assignment['id']);
                 if ($tasks) {
                     foreach ($tasks as $task) {
-                        if ($task['statusid'] != 1 && 7) {
+                        if ($task['status1'] == 2) {
                             $fields = [
                                 'taskid' => $task['id'],
-                                'statusid' => 1,
+                                'status1' => 1,
+                                'status2' => 2,
                                 'time' => date("Y-m-d H-i-s"),
-                                'assigned_by' => $account->id,
-                                'note' => "Assignment canceled by manager"
+                                'assigned_by' => $account->id
                             ];
 
-                            $statusID = Task::insert('task_status', $fields, true, false);
+                            $statusID = Task::insert('status_task', $fields, true, false);
                             Task::update('task', $task['id'], ["statusid" => $statusID], false);
                         }
                     }
@@ -516,14 +518,14 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['assign'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 3,
+                    'status1' => 1,
+                    'status2' => 9,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
-                    'assigned_to' => $_POST['assign'],
-                    'note' => "Manager assigned to member"
+                    'assigned_to' => $_POST['assign']
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
                 Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -531,13 +533,13 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['hide'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 2,
+                    'status1' => 1,
+                    'status2' => 7,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "Hidden"
+                    'assigned_by' => $account->id
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
                 Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -545,13 +547,13 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['show'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 1,
+                    'status1' => 1,
+                    'status2' => 6,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "New Assignment"
+                    'assigned_by' => $account->id
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
                 Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -559,13 +561,13 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['publish'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 3,
+                    'status1' => 1,
+                    'status2' => 8,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "Assignment made available"
+                    'assigned_by' => $account->id
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
                 Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -573,13 +575,13 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['unpublish'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 1,
+                    'status1' => 1,
+                    'status2' => 4,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "Made unavailable"
+                    'assigned_by' => $account->id
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
                 Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -587,14 +589,14 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['complete'])) {
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 7,
+                    'status1' => 3,
+                    'status2' => 1,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
-                    'assigned_to' => $assignment['assigned_to'],
-                    'note' => "Completed"
+                    'assigned_to' => $assignment['assigned_to']
                 ];
 
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
                 $redirect = "assignments.php?a=" . $_GET['a'] . "&l1=assignment";
                 Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], $redirect);
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -605,16 +607,32 @@ if (isset($_SESSION['account'])) {
             }
             elseif (isset($_POST['accept'])) {
                 // Update assignment status
-                $fields = [
-                    'assignmentid' => $_GET['a'],
-                    'statusid' => 4,
-                    'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'assigned_to' => $account->id,
-                    'note' => "User accepted assignment"
-                ];
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
-                Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], false);
+                // If assigned to member
+                if ($assignment['status1'] == 1 && $assignment['status2'] == 9) {
+                    $fields = [
+                        'assignmentid' => $_GET['a'],
+                        'status1' => 2,
+                        'status2' => 2,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $account->id
+                    ];
+                    $statusID = Assignment::insert('status_assignment', $fields, true, false);
+                    Assignment::update('assignment', $_GET['a'], ["assigned" => 1, "statusid" => $statusID], false);
+                }
+                // If made available to all
+                else {
+                    $fields = [
+                        'assignmentid' => $_GET['a'],
+                        'status1' => 2,
+                        'status2' => 1,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $account->id
+                    ];
+                    $statusID = Assignment::insert('status_assignment', $fields, true, false);
+                    Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], false);
+                }
 
                 // Update project status (if needed)
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -623,16 +641,17 @@ if (isset($_SESSION['account'])) {
                 $tasks = Task::selectAssignmentTasks($assignment['id']);
                 if ($tasks) {
                     foreach ($tasks as $task) {
-                        if ($task['statusid'] == 1) {
+                        if ($task['status1'] == 1) {
                             $fields = [
                                 'taskid' => $task['id'],
-                                'statusid' => 4,
+                                'status1' => 2,
+                                'status2' => 1,
                                 'time' => date("Y-m-d H-i-s"),
                                 'assigned_by' => $account->id,
-                                'note' => "User accepted assignment"
+                                'assigned_to' => $account->id
                             ];
 
-                            $statusID = Task::insert('task_status', $fields, true, false);
+                            $statusID = Task::insert('status_task', $fields, true, false);
                             Task::update('task', $task['id'], ["statusid" => $statusID], false);
                         }
                     }
@@ -645,13 +664,13 @@ if (isset($_SESSION['account'])) {
                 // Update assignment status
                 $fields = [
                     'assignmentid' => $_GET['a'],
-                    'statusid' => 1,
+                    'status1' => 1,
+                    'status2' => 5,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "Undone accept"
+                    'assigned_by' => $account->id
                 ];
-                $statusID = Assignment::insert('assignment_status', $fields, true, false);
-                Assignment::update('assignment', $_GET['a'], ["statusid" => $statusID], false);
+                $statusID = Assignment::insert('status_assignment', $fields, true, false);
+                Assignment::update('assignment', $_GET['a'], ["assigned" => 0, "statusid" => $statusID], false);
 
                 // Update project status (if needed)
                 Project::projectStatusChanger($assignment['projectid'], $account->id);
@@ -660,16 +679,16 @@ if (isset($_SESSION['account'])) {
                 $tasks = Task::selectAssignmentTasks($assignment['id']);
                 if ($tasks) {
                     foreach ($tasks as $task) {
-                        if ($task['statusid'] != 6 && $task['statusid'] != 7) {
+                        if ($task['status1'] == 2) {
                             $fields = [
                                 'taskid' => $task['id'],
-                                'statusid' => 1,
+                                'status1' => 1,
+                                'status2' => 3,
                                 'time' => date("Y-m-d H-i-s"),
-                                'assigned_by' => $account->id,
-                                'note' => "Assignment canceled by member"
+                                'assigned_by' => $account->id
                             ];
 
-                            $statusID = Task::insert('task_status', $fields, true, false);
+                            $statusID = Task::insert('status_task', $fields, true, false);
                             Task::update('task', $task['id'], ["statusid" => $statusID], false);
                         }
                     }
@@ -710,23 +729,23 @@ if (isset($_SESSION['account'])) {
                     $_SESSION['new-task']['fields']['number'] = $number;
                     $taskID = Task::insert('task', $_SESSION['new-task']['fields'], true, false);
 
-                    if ($assignment['status_id'] == 5 || $assignment['status_id'] == 6)
+                    if ($assignment['status1'] == 1 && ($assignment['status2'] == 10 || $assignment['status2'] == 11))
                         $fieldsStatus = [
                             'taskid' => $taskID,
-                            'statusid' => 4,
+                            'status1' => 2,
+                            'status2' => 4,
                             'time' => date("Y-m-d H-i-s"),
-                            'assigned_by' => $account->id,
-                            'note' => "New Task"
+                            'assigned_by' => $account->id
                         ];
                     else
                         $fieldsStatus = [
                             'taskid' => $taskID,
-                            'statusid' => 1,
+                            'status1' => 1,
+                            'status2' => 1,
                             'time' => date("Y-m-d H-i-s"),
-                            'assigned_by' => $account->id,
-                            'note' => "New Task"
+                            'assigned_by' => $account->id
                         ];
-                    $statusID = Task::insert('task_status', $fieldsStatus, true, false);
+                    $statusID = Task::insert('status_task', $fieldsStatus, true, false);
                     Task::update('task', $taskID, ["statusid" => $statusID], false);
                     Assignment::assignmentStatusChanger($assignment, $account->id);
 
@@ -915,7 +934,7 @@ if (isset($_SESSION['account'])) {
                     </div>
                     <div class="table medium">
                         <div class="row">
-                            <input form="objective" name="objective" class="field admin" placeholder="Enter Assignment Objective Here" maxlength="100" value="<?php if (isset($assignment['objective'])) echo $assignment['objective']; ?>">
+                            <input form="objective" name="objective" class="field admin" placeholder="Enter Assignment Objective Here" maxlength="100" value="<?php if (isset($assignment['objective'])) echo htmlspecialchars($assignment['objective']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -925,21 +944,21 @@ if (isset($_SESSION['account'])) {
                     <div class="navbar level-3 current unselected">
                         <form method="post" class="container-button">
                             <input type="hidden" name="cancel">
-                            <input type="submit" name="submit" value="CONFIRM" class="button admin-menu">
+                            <input type="submit" name="submit" value="Confirm Cancel" class="button admin-menu">
                             <input type="submit" name="submit" value="" class="home-menu admin">
                         </form>
                         <form method="post" class="container-button">
                             <input type="hidden" name="back">
-                            <input type="submit" name="submit" value="NOT NOW" class="button admin-menu">
+                            <input type="submit" name="submit" value="Don't Cancel" class="button admin-menu">
                             <input type="submit" name="submit" value="" class="home-menu admin">
                         </form>
                     </div>
                     </div> <?php
                 }
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "assign") {
-                    if ($assignment['presetid'] != null)
+                    /*if ($assignment['presetid'] != null)
                         $members = Account::selectAccountsByDivision($assignment['divisionid']);
-                    else
+                    else*/
                         $members = Account::selectMembers(); ?>
                     <form class="search-bar with-space">
                         <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id'})"
@@ -1049,6 +1068,21 @@ if (isset($_SESSION['account'])) {
                     </div>
                     </div> <?php
                 }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "remove") { ?>
+                    <div class="navbar level-3 current unselected">
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="delete">
+                            <input type="submit" name="submit" value="Confirm Remove" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="back">
+                            <input type="submit" name="submit" value="Don't Remove" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                    </div>
+                    </div> <?php
+                }
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "delete") { ?>
                     <div class="navbar level-3 current unselected">
                         <form method="post" class="container-button">
@@ -1114,7 +1148,6 @@ if (isset($_SESSION['account'])) {
                     'accountid' => $account->id,
                     'time' => date("Y-m-d H-i-s"),
                     'comment' => $_POST['comment']
-
                 ];
                 $redirect = "?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
                 Task::insert('task_comment', $fields, false, $redirect);
@@ -1122,24 +1155,28 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['submit-complete'])) {
                 $fields = [
                     'taskid' => $_GET['t'],
-                    'statusid' => 6,
+                    'status1' => 1,
+                    'status2' => 5,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
-                    'note' => "Member submitted task"
+                    'assigned_to' => $account->id
                 ];
 
-                $statusID = Task::insert('task_status', $fields, true, false);
+                $statusID = Task::insert('status_task', $fields, true, false);
                 $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
                 Task::update('task', $_GET['t'], ["statusid" => $statusID], false);
                 Assignment::assignmentStatusChanger($assignment, $account->id);
+                Project::projectStatusChanger($assignment['projectid'], $account->id);
                 header('Location: ' . $redirect);
             }
             elseif (isset($_POST['problem'])) {
                 $taskFields = [
                     'taskid' => $_GET['t'],
-                    'statusid' => 5,
+                    'status1' => 1,
+                    'status2' => 4,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id
+                    'assigned_by' => $account->id,
+                    'assigned_to' => $account->id
                 ];
                 if (isset($_GET['l2']) && $_GET['l2'] == "file" && $_POST['submit'] == "No File") $taskFields['note'] = "No file";
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "file" && $_POST['submit'] == "Not Prepared") $taskFields['note'] = "File not prepared";
@@ -1152,47 +1189,110 @@ if (isset($_SESSION['account'])) {
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "completion" && $_POST['submit'] == "Need Help") $taskFields['note'] = "Need help";
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "completion" && $_POST['submit'] == "Other") $taskFields['note'] = "Completion (other)";
 
-                $statusID = Task::insert('task_status', $taskFields, true, false);
+                $statusID = Task::insert('status_task', $taskFields, true, false);
                 $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
                 Task::update('task', $_GET['t'], ["statusid" => $statusID], false);
                 Assignment::assignmentStatusChanger($assignment, $account->id);
+                Project::projectStatusChanger($assignment['projectid'], $account->id);
                 header('Location: ' . $redirect);
             }
             elseif (isset($_POST['complete'])) {
-                $fields = [
-                    'taskid' => $_GET['t'],
-                    'statusid' => 7,
-                    'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "Completed"
-                ];
+                $check = false;
+                // Submitted task
+                if ($task['status1'] == 1 && $task['status2'] == 5) {
+                    $fields = [
+                        'taskid' => $_GET['t'],
+                        'status1' => 3,
+                        'status2' => 1,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $assignment['assigned_to']
+                    ];
+                    $check = true;
+                }
+                // In progress task
+                elseif ($task['status1'] == 2) {
+                    $fields = [
+                        'taskid' => $_GET['t'],
+                        'status1' => 3,
+                        'status2' => 2,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $assignment['assigned_to']
+                    ];
+                    $check = true;
+                }
+                // Task with problem
+                elseif ($task['status1'] == 1 && $task['status2'] == 4) {
+                    $fields = [
+                        'taskid' => $_GET['t'],
+                        'status1' => 3,
+                        'status2' => 3,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $assignment['assigned_to']
+                    ];
+                    $check = true;
+                }
 
-                $statusID = Task::insert('task_status', $fields, true, false);
-                $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
-                Task::update('task', $_GET['t'], ["statusid" => $statusID], false);
-                Assignment::assignmentStatusChanger($assignment, $account->id);
-                header('Location: ' . $redirect);
+                if ($check) {
+                    $statusID = Task::insert('status_task', $fields, true, false);
+                    $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
+                    Task::update('task', $_GET['t'], ["statusid" => $statusID], false);
+                    Assignment::assignmentStatusChanger($assignment, $account->id);
+                    Project::projectStatusChanger($assignment['projectid'], $account->id);
+                    header('Location: ' . $redirect);
+                }
             }
             elseif (isset($_POST['activate'])) {
-                $fields = [
-                    'taskid' => $_GET['t'],
-                    'statusid' => 4,
-                    'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "Task activated"
-                ];
+                $check = false;
+                // Problem
+                if ($task['status1'] == 1 && $task['status2'] == 4) {
+                    $fields = [
+                        'taskid' => $_GET['t'],
+                        'status1' => 2,
+                        'status2' => 2,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $assignment['assigned_to']
+                    ];
+                    $check = true;
+                }
+                // Submitted
+                elseif ($task['status1'] == 1 && $task['status2'] == 5) {
+                    $fields = [
+                        'taskid' => $_GET['t'],
+                        'status1' => 2,
+                        'status2' => 3,
+                        'time' => date("Y-m-d H-i-s"),
+                        'assigned_by' => $account->id,
+                        'assigned_to' => $assignment['assigned_to']
+                    ];
+                    $check = true;
+                }
 
-                $statusID = Task::insert('task_status', $fields, true, false);
-                $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
-                Task::update('task', $_GET['t'], ["statusid" => $statusID], false);
-                Assignment::assignmentStatusChanger($assignment, $account->id);
-                header('Location: ' . $redirect);
+                if ($check) {
+                    $statusID = Task::insert('status_task', $fields, true, false);
+                    $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks&l2=" . $_GET['t'];
+                    Task::update('task', $_GET['t'], ["statusid" => $statusID], false);
+                    Assignment::assignmentStatusChanger($assignment, $account->id);
+                    Project::projectStatusChanger($assignment['projectid'], $account->id);
+                    header('Location: ' . $redirect);
+                }
             }
             elseif (isset($_POST['delete'])) {
-                Task::remove('task', $_GET['t'], "assignments.php?a=" . $assignment['id'] . "&l1=tasks");
-                Task::RenumberTasksInAssignment($assignment['id']);
+                $tasks = Task::selectAssignmentTasks($assignment['id']);
+                if ($tasks && count($tasks) > 1) {
+                    Task::remove('task', $_GET['t'], false);
+                    Task::RenumberTasksInAssignment($assignment['id']);
+                    $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks";
+                }
+                else {
+                    Task::remove('task', $_GET['t'], false);
+                    $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=assignment";
+                }
                 Assignment::assignmentStatusChanger($assignment, $account->id);
-                $redirect = "assignments.php?a=" . $assignment['id'] . "&l1=tasks";
+                Project::projectStatusChanger($assignment['projectid'], $account->id);
                 header('Location: ' . $redirect);
             }
 
@@ -1207,8 +1307,15 @@ if (isset($_SESSION['account'])) {
                         ];
                         Database::update('task', $_GET['t'], $fields, "assignments.php?t=" . $_GET['t'] . "&options&l1=edit");
                     }
-                    elseif (isset($_POST['none']))
-                        Database::update('task', $_GET['t'], ["presetid" => null], "assignments.php?t=" . $_GET['t'] . "&options&l1=edit"); ?>
+                    elseif (isset($_POST['none'])) {
+                        if ($task['presetid'] == null)
+                            Database::update('task', $_GET['t'], ["presetid" => null], "assignments.php?t=" . $_GET['t'] . "&options&l1=edit");
+                        else {
+                            $tskPreset = Task::selectTaskPreset($task['presetid']);
+                            $estimated = $tskPreset['estimated'];
+                            Database::update('task', $_GET['t'], ["presetid" => null, "estimated" => $estimated], "assignments.php?t=" . $_GET['t'] . "&options&l1=edit");
+                        }
+                    } ?>
 
                     <div class="navbar level-3 unselected">
                         <form method="post" class="container-button">
@@ -1271,7 +1378,7 @@ if (isset($_SESSION['account'])) {
                     </div>
                     <div class="table large">
                         <div class="row">
-                            <input form="description" name="description" class="field admin" placeholder="Enter Task Description Here" maxlength="200" value="<?php if (isset($task['description'])) echo $task['description']; ?>">
+                            <input form="description" name="description" class="field admin" placeholder="Enter Task Description Here" maxlength="200" value="<?php if (isset($task['description'])) echo htmlspecialchars($task['description']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -1301,6 +1408,52 @@ if (isset($_SESSION['account'])) {
                             <input form="time" name="time" type="number" min="10" max="7200" class="field admin" placeholder="Enter Task Time Here" value="<?php if (isset($task['estimated'])) echo strtotime($task['estimated']) - strtotime('TODAY'); ?>">
                         </div>
                     </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "prjlink") {
+                    if (isset($_POST['link']))
+                        Database::update('task', $_GET['t'], ['infoid' => $_POST['link']], "assignments.php?t=" . $_GET['t'] . "&options&l1=edit");
+                    elseif (isset($_POST['none']))
+                        Database::update('task', $_GET['t'], ["infoid" => null], "assignments.php?t=" . $_GET['t'] . "&options&l1=edit"); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="none">
+                            <input type="submit" name="submit" value="NONE" class="button admin-menu">
+                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension admin"></div>
+                        <div class="header">
+                            <div class="head admin" style="width: 7.5%">№</div>
+                            <div class="head admin" style="width: 20%">Project Link Name</div>
+                            <div class="head admin" style="width: 40%">Description</div>
+                            <div class="head admin" style="width: 15%">Group</div>
+                            <div class="head admin" style="width: 10%">Link</div>
+                            <div class="head admin" style="width: 7.5%">Select</div>
+                        </div>
+                        <div class="header-extension admin"></div>
+                    </div>
+                    </div> <?php
+                    $infopages = Project::selectProjectInfoPages($assignment['projectid']);
+                    if ($infopages) { ?>
+                        <div class="table admin"> <?php
+                            foreach ($infopages as $info) { ?>
+                                <form method="post" class="row">
+                                    <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $info['id']); ?>" class="content"></div>
+                                    <div class="cell name" style="width: 20%"><input type="submit" name="submit" value="<?php echo $info['title']; ?>" class="content"></div>
+                                    <div class="cell description" style="width: 40%"><input type="submit" name="submit" value="<?php echo $info['description']; ?>" class="content"></div>
+                                    <div class="cell group" style="width: 15%"><input type="submit" name="submit" value="<?php echo $info['group']; ?>" class="content"></div>
+                                    <div class="cell" style="width: 10%"><input type="submit" name="submit" value="<?php echo $info['hasLink']; ?>" class="content"></div>
+                                    <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
+                                    <input type="hidden" name="link" value="<?php echo $info['id']; ?>">
+                                </form> <?php
+                            } ?>
+                        </div> <?php
+                    }
+                    else { ?>
+                        <div class="empty-table">NO PROJECT LINKS</div> <?php
+                    }
                 }
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "links") {
                     if (isset($_POST['new-link'])) {
@@ -1414,6 +1567,21 @@ if (isset($_SESSION['account'])) {
                         <form method="post" class="container-button">
                             <input type="hidden" name="back">
                             <input type="submit" name="submit" value="Don't Activate" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                    </div>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "remove") { ?>
+                    <div class="navbar level-3 current unselected">
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="delete">
+                            <input type="submit" name="submit" value="Confirm Remove" class="button admin-menu">
+                            <input type="submit" name="submit" value="" class="home-menu admin">
+                        </form>
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="back">
+                            <input type="submit" name="submit" value="Don't Remove" class="button admin-menu">
                             <input type="submit" name="submit" value="" class="home-menu admin">
                         </form>
                     </div>
@@ -1554,48 +1722,39 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="overview-content"><?php
             $asgData = Assignment::selectAssignmentByID($assignment['id']);
+            $asgHistory = Assignment::selectAssignmentHistory($assignment['id']);
+            $created = "-";
+            if ($asgHistory && $asgHistory[0]['status1'] == 1 && $asgHistory[0]['status2'] == 1)
+                $created = $asgHistory[0]['time2'];
             $tasks = Task::selectAssignmentTasks($assignment['id']); ?>
 
             <div class="info-bar short">
                 <div class="section">
+                    <div class="content light"><?php echo "#" . sprintf('%05d', $asgData['id']); ?></div>
                 </div>
                 <div class="section">
                     <div class="stage active">STATUS:</div>
                     <div class="content"><?php echo $asgData['status']; ?></div>
                 </div>
                 <div class="section">
-                    <div class="content"><?php echo $asgData['time2']; ?></div>
+                    <div class="content light"><?php echo $asgData['time2']; ?></div>
                 </div>
-            </div> <?php
-            if ($asgData['divisionid'] != null) { ?>
-                <div class="info-bar tiny">
-                    <div class="section line-right active">
-                        <div class="content"><?php echo $asgData['division']; ?></div>
-                    </div>
-                    <div class="section">
-                        <div class="content lower"><?php echo "PROJECT \"" . $asgData['project'] . "\""; ?></div>
-                    </div> <?php
-                    if ($asgData['department']) { ?>
-                        <div class="section line-left active">
-                            <div class="content"><?php echo $asgData['department']; ?></div>
-                        </div> <?php
-                    } ?>
-                </div> <?php
-            }
-            else { ?>
-                <div class="info-bar tiny">
-                    <div class="section line-right active">
-                        <div class="content"><?php echo $asgData['division']; ?></div>
-                    </div>
-                    <div class="section active">
-                        <div class="content"><?php echo "\"" . $asgData['project'] . "\""; ?></div>
-                    </div>
-                </div> <?php
-            } ?>
+            </div>
+            <div class="info-bar tiny">
+                <div class="section line-right active">
+                    <div class="content"><?php echo $asgData['division']; ?></div>
+                </div>
+                <div class="section">
+                    <div class="content lower"><?php echo "\"" . $asgData['project'] . "\""; ?></div>
+                </div>
+                <div class="section line-left active">
+                    <div class="content"><?php echo $asgData['department']; ?></div>
+                </div>
+            </div>
             <div class="overview">
                 <div class="top">
                     <div class="box">
-                        <div class="title"><?php echo "#" . sprintf('%05d', $asgData['id']) . ": " . $asgData['title']; ?></div>
+                        <div class="title"><?php echo $asgData['title']; ?></div>
                         <div class="data"><?php echo $asgData['objective']; ?></div>
                     </div>
                 </div>
@@ -1628,7 +1787,7 @@ if (isset($_SESSION['account'])) {
                     <div class="stage active"><?php echo $asgData['tasks']; ?></div>
                     <div class="content">TASKS</div>
                 </div> <?php
-                if ($asgData['username'] && $asgData['status_id'] == 3) { ?>
+                if ($asgData['username'] && $asgData['status1'] == 1 && $asgData['status2'] == 9) { ?>
                     <div class="section">
                         <div class="stage active"><?php echo "Assigned to " . $asgData['username']; ?></div>
                     </div> <?php
@@ -1648,6 +1807,11 @@ if (isset($_SESSION['account'])) {
                     <div class="content">TASK TIME</div>
                 </div>
             </div>
+            <div class="info-bar short" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
+                <div class="section">
+                    <div class="content light"><?php echo $created; ?></div>
+                </div>
+            </div>
             </div> <?php
         }
         elseif (isset($_GET['l1']) && $_GET['l1'] == "tasks") {
@@ -1661,13 +1825,14 @@ if (isset($_SESSION['account'])) {
                     <div class="overview-content">
                     <div class="info-bar short">
                         <div class="section">
+                            <div class="content light"><?php echo "#" . $task['number']; ?></div>
                         </div>
                         <div class="section">
                             <div class="stage active">STATUS:</div>
-                            <div class="content"><?php echo $task['status2']; if ($task['statusid'] == 5) echo " - " . $task['note']; ?></div>
+                            <div class="content"><?php echo $task['status']; if ($task['status1'] == 1 && $task['status2'] == 4) echo " - " . $task['note']; ?></div>
                         </div>
                         <div class="section">
-                            <div class="content"><?php echo $task['time2']; ?></div>
+                            <div class="content light"><?php echo $task['time2']; ?></div>
                         </div>
                     </div> <?php
                     if ($task['estimated'] != "00:00:00") { ?>
@@ -1686,17 +1851,31 @@ if (isset($_SESSION['account'])) {
                         </div> <?php
                         if ($links || $task['infoid']) { ?>
                             <div class="mid tbl">
-                                <div class="table-container"> <?php
-                                    if ($links) {
-                                        foreach ($links as $link) { ?>
-                                            <a class="link-box" href="<?php echo $link['link']; ?>" target="_blank">
-                                                <span class="type"><?php echo $link['type']; ?></span>
-                                                <span class="name"><?php echo $link['title']; ?></span>
-                                                <span class="description"><?php echo $link['type_desc']; ?></span>
-                                            </a> <?php
-                                        }
-                                    } ?>
-                                </div>
+                            <div class="table-container"> <?php
+                                if ($task['infoid']) { ?>
+                                    <a class="link-box"<?php if ($task['link']) { ?> href="<?php echo $task['link']; ?>" target="_blank"<?php } ?>>
+                                        <span class="type">PROJECT LINK</span>
+                                        <span class="name"><?php echo $task['title']; ?></span>
+                                        <span class="description"><?php echo $task['info_description']; ?></span>
+                                    </a> <?php
+                                }
+                                if ($links) {
+                                    foreach ($links as $link) { ?>
+                                        <a class="link-box"<?php if ($link['link']) { ?> href="<?php echo $link['link']; ?>" target="_blank"<?php } ?>>
+                                            <span class="type"><?php echo $link['type']; ?></span>
+                                            <span class="name"><?php echo $link['title']; ?></span>
+                                            <span class="description"><?php echo $link['type_desc']; ?></span>
+                                        </a> <?php
+                                    }
+                                } ?>
+                            </div>
+                            </div> <?php
+                        }
+                        else { ?>
+                            <div class="mid tbl">
+                            <div class="table-container">
+                                <div class="empty-table">NO LINKS</div>
+                            </div>
                             </div> <?php
                         }
                         if ($comments) {
@@ -1710,6 +1889,9 @@ if (isset($_SESSION['account'])) {
                                     <div class="comment-body"><?php echo $comment['comment']; ?></div>
                                 </div> <?php
                             }
+                        }
+                        else { ?>
+                            <div class="empty-table comments">NO COMMENTS</div> <?php
                         } ?>
                     </div>
                     </div> <?php

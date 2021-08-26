@@ -45,8 +45,7 @@ class Account extends Database
         2 => "WRONG NAME OR PASSWORD",
         3 => "FILL IN BOTH FIELDS",
     ];
-    public function getLoginStatusName()
-    {
+    public function getLoginStatusName() {
         return $this->loginStatuses[$this->loginStatus];
     }
 }

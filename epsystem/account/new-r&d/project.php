@@ -46,9 +46,10 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-projectpr']['info']['description']) > InfobarCharLimit)
                     $_SESSION['new-projectpr']['info']['description'] = substr($_SESSION['new-projectpr']['info']['description'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-projectpr']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $presetID = Database::insert('preset-project', $_SESSION['new-projectpr']['fields'], true, false);
                 unset($_SESSION['new-projectpr']);
-                header('Location: ../r&d.php?p=' . $presetID);
+                header('Location: ../r&d.php?p=' . $presetID . '&l1=overview');
                 exit();
             }
 
@@ -66,7 +67,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-projectpr']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Project: Select Product</span>
+                <span>New Project Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -120,7 +121,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-projectpr']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Project: Enter Preset Name</span>
+                <span>New Project Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -144,7 +145,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="test" name="title" id="title" class="field admin" placeholder="Enter Preset Name Here" value="<?php if (isset($_SESSION['new-projectpr']['fields']['title'])) echo $_SESSION['new-projectpr']['fields']['title']; ?>">
+                    <input form="test" name="title" id="title" class="field admin" placeholder="Enter Preset Name Here" value="<?php if (isset($_SESSION['new-projectpr']['fields']['title'])) echo htmlspecialchars($_SESSION['new-projectpr']['fields']['title']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))
@@ -152,7 +153,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-projectpr']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Project: Enter Description</span>
+                <span>New Project Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -176,7 +177,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table large">
                 <div class="row">
-                    <input form="test" name="description" id="description" class="field admin" placeholder="Enter Project Description Here" value="<?php if (isset($_SESSION['new-projectpr']['fields']['description'])) echo $_SESSION['new-projectpr']['fields']['description']; ?>">
+                    <input form="test" name="description" id="description" class="field admin" placeholder="Enter Project Description Here" value="<?php if (isset($_SESSION['new-projectpr']['fields']['description'])) echo htmlspecialchars($_SESSION['new-projectpr']['fields']['description']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

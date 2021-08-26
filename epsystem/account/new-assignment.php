@@ -26,29 +26,17 @@ if (isset($_SESSION['account'])) {
 
                 $fieldsStatus = [
                     'assignmentid' => $asgID,
-                    'statusid' => 1,
+                    'status1' => 1,
+                    'status2' => 1,
                     'time' => date("Y-m-d H-i-s"),
-                    'assigned_by' => $account->id,
-                    'note' => "New Assignment"
+                    'assigned_by' => $account->id
                 ];
-                // Insert to `assignment_status` table and save ID of the new record
-                $statusID = Assignment::insert('assignment_status', $fieldsStatus, true, false);
+                // Insert to `status_assignment` table and save ID of the new record
+                $statusID = Assignment::insert('status_assignment', $fieldsStatus, true, false);
                 // Update `assignment` table record with saved ID status
                 Assignment::update('assignment', $asgID, ["statusid" => $statusID], false);
 
-                // If project completed/canceled change to pending
-                $projectStatus = Project::selectProject($_SESSION['new-assignment']['fields']['projectid'])['statusid'];
-                if ($projectStatus == 7 || $projectStatus == 8) {
-                    $fieldsStatus = [
-                        'projectid' => $_SESSION['new-assignment']['fields']['projectid'],
-                        'statusid' => 6,
-                        'time' => date("Y-m-d H-i-s"),
-                        'assigned_by' => $account->id,
-                        'note' => "Added assignment"
-                    ];
-                    $statusID = Project::insert('project_status', $fieldsStatus, true, false);
-                    Project::update('project', $_SESSION['new-assignment']['fields']['projectid'], ["statusid" => $statusID], false);
-                }
+                Project::projectStatusChanger($_SESSION['new-assignment']['fields']['projectid'], $account->id);
 
                 header('Location: projects.php?p=' . $_SESSION['new-assignment']['fields']['projectid'] . '&l1=assignments&l2=pending');
                 unset($_SESSION['new-assignment']);
@@ -65,7 +53,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-assignment']['stage'] == '1c') { ?>
             <div class="head-up-display-bar">
-                <span>Enter the objective of the new custom assignment</span>
+                <span>New Custom Assignment</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -89,7 +77,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table medium">
                 <div class="row">
-                    <input form="objective" name="objective" id="objective" class="field admin" placeholder="Enter Custom Assignment Objective Here" maxlength="100" value="<?php if (isset($_SESSION['new-assignment']['fields']['objective'])) echo $_SESSION['new-assignment']['fields']['objective']; ?>">
+                    <input form="objective" name="objective" id="objective" class="field admin" placeholder="Enter Custom Assignment Objective Here" maxlength="100" value="<?php if (isset($_SESSION['new-assignment']['fields']['objective'])) echo htmlspecialchars($_SESSION['new-assignment']['fields']['objective']); ?>">
                 </div>
             </div> <?php
         }

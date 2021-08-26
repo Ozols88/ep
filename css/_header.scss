@@ -14,10 +14,15 @@
   .logo-container {
     display: flex;
     flex: 1;
-    .logo-header {
+    .logo-link {
+      display: flex;
       margin-left: 1vw;
       align-self: center;
-      height: 50%;
+      height: 40%;
+      .logo-header {
+        display: block;
+        height: 100%;
+      }
     }
   }
 

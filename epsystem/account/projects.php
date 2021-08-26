@@ -289,7 +289,8 @@ if (isset($_SESSION['account'])) {
             elseif ((isset($_POST['cancel1']) || isset($_POST['cancel2']) || isset($_POST['cancel3'])) && isset($canCancel) && $canCancel) {
                 $fields = [
                     'projectid' => $_GET['p'],
-                    'statusid' => 8,
+                    'status1' => 4,
+                    'status2' => 1,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
                 ];
@@ -297,13 +298,13 @@ if (isset($_SESSION['account'])) {
                 if (isset($_POST['cancel2'])) $fields['note'] = "Couldn't finish";
                 if (isset($_POST['cancel3'])) $fields['note'] = "Other";
 
-                $statusID = Project::insert('project_status', $fields, true, false);
+                $statusID = Project::insert('status_project', $fields, true, false);
                 $redirect = "projects.php?p=" . $_GET['p'] . "&l1=project";
                 Project::update('project', $_GET['p'], ["statusid" => $statusID], false);
                 $assignments = Assignment::selectProjectAssignments($_GET['p']);
                 // Remove unnecessary(1,2,3) assignments
                 foreach ($assignments as $assignment) {
-                    if ($assignment['statusid'] == 1 || $assignment['statusid'] == 2 || $assignment['statusid'] == 3)
+                    if ($assignment['status1'] == 1 && $assignment['status2'] != 10 && $assignment['status2'] != 11)
                         Assignment::remove('assignment', $assignment['id'], false);
                 }
                 header('Location: ' . $redirect);
@@ -311,12 +312,13 @@ if (isset($_SESSION['account'])) {
             elseif (isset($_POST['complete']) && isset($canComplete) && $canComplete) {
                 $fields = [
                     'projectid' => $_GET['p'],
-                    'statusid' => 7,
+                    'status1' => 3,
+                    'status2' => 1,
                     'time' => date("Y-m-d H-i-s"),
                     'assigned_by' => $account->id,
                 ];
 
-                $statusID = Project::insert('project_status', $fields, true, false);
+                $statusID = Project::insert('status_project', $fields, true, false);
                 $redirect = "projects.php?p=" . $_GET['p'] . "&l1=project";
                 Project::update('project', $_GET['p'], ["statusid" => $statusID], $redirect);
             }
@@ -338,29 +340,17 @@ if (isset($_SESSION['account'])) {
 
                     $fieldsStatus = [
                         'assignmentid' => $asgID,
-                        'statusid' => 1,
+                        'status1' => 1,
+                        'status2' => 1,
                         'time' => date("Y-m-d H-i-s"),
-                        'assigned_by' => $account->id,
-                        'note' => "New Assignment"
+                        'assigned_by' => $account->id
                     ];
-                    // Insert to `assignment_status` table and save ID of the new record
-                    $statusID = Assignment::insert('assignment_status', $fieldsStatus, true, false);
+                    // Insert to `status_assignment` table and save ID of the new record
+                    $statusID = Assignment::insert('status_assignment', $fieldsStatus, true, false);
                     // Update `assignment` table record with saved ID status
                     Assignment::update('assignment', $asgID, ["statusid" => $statusID], false);
 
-                    // If project completed/canceled change to pending
-                    $projectStatus = Project::selectProject($_SESSION['new-assignment']['fields']['projectid'])['statusid'];
-                    if ($projectStatus == 7 || $projectStatus == 8) {
-                        $fieldsStatus = [
-                            'projectid' => $_SESSION['new-assignment']['fields']['projectid'],
-                            'statusid' => 6,
-                            'time' => date("Y-m-d H-i-s"),
-                            'assigned_by' => $account->id,
-                            'note' => "Added assignment"
-                        ];
-                        $statusID = Project::insert('project_status', $fieldsStatus, true, false);
-                        Project::update('project', $_SESSION['new-assignment']['fields']['projectid'], ["statusid" => $statusID], false);
-                    }
+                    Project::projectStatusChanger($project['id'], $account->id);
 
                     header('Location: projects.php?p=' . $_SESSION['new-assignment']['fields']['projectid'] . '&l1=assignments&l2=pending');
                     unset($_SESSION['new-assignment']);
@@ -510,7 +500,7 @@ if (isset($_SESSION['account'])) {
                     </div>
                     <div class="table small">
                         <div class="row">
-                            <input form="title" name="title" class="field admin" placeholder="Enter Project Name Here" maxlength="50" value="<?php if (isset($project['title'])) echo htmlentities($project['title']); ?>">
+                            <input form="title" name="title" class="field admin" placeholder="Enter Project Name Here" maxlength="50" value="<?php if (isset($project['title'])) echo htmlspecialchars($project['title']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -535,7 +525,7 @@ if (isset($_SESSION['account'])) {
                     </div>
                     <div class="table large">
                         <div class="row">
-                            <input form="description" name="description" class="field admin" placeholder="Enter Project Description Here" maxlength="200" value="<?php if (isset($project['description'])) echo htmlentities($project['description']); ?>">
+                            <input form="description" name="description" class="field admin" placeholder="Enter Project Description Here" maxlength="200" value="<?php if (isset($project['description'])) echo htmlspecialchars($project['description']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -595,6 +585,16 @@ if (isset($_SESSION['account'])) {
         }
         elseif (isset($_GET['ioptions'])) {
             if (isset($_GET['l1']) && $_GET['l1'] == "add") {
+                if (isset($_POST['custom'])) {
+                    header('Location: new-info.php?p=' . $_GET['p']);
+                } ?>
+
+                <div class="navbar level-2 unselected">
+                    <form method="post" class="container-button">
+                        <input type="hidden" name="custom">
+                        <input type="submit" name="submit" value="+ Custom Project Link" class="button admin-menu">
+                    </form>
+                </div> <?php
                 if (isset($_POST['preset'])) {
                     $preset = Database::selectInfoPagePreset($_POST['preset']);
                     $fields = [
@@ -613,7 +613,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Info Preset Name" required style="width: calc(20% - 8px);">
+                           type="text" name="name" class="input-name" placeholder="Enter Project Link Preset Name" required style="width: calc(20% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
                            type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(50% - 8px);">
                     <div class="custom-select input-group" style="width: calc(15% - 8px);">
@@ -631,7 +631,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension admin"></div>
                     <div class="header">
                         <div class="head admin" style="width: 7.5%">№</div>
-                        <div class="head admin" style="width: 20%">Info Preset Name</div>
+                        <div class="head admin" style="width: 20%">Project Link Preset Name</div>
                         <div class="head admin" style="width: 50%">Description</div>
                         <div class="head admin" style="width: 15%">Group</div>
                         <div class="head admin" style="width: 7.5%">Add</div>
@@ -664,7 +664,7 @@ if (isset($_SESSION['account'])) {
                     </div> <?php
                 }
                 else { ?>
-                    <div class="empty-table">NO INFO PAGE PRESETS</div> <?php
+                    <div class="empty-table">NO PROJECT LINK PRESETS</div> <?php
                 }
             }
             elseif (isset($_GET['l1']) && $_GET['l1'] == "edit") {
@@ -675,7 +675,7 @@ if (isset($_SESSION['account'])) {
                         <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
                                type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                         <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
-                               type="text" name="name" class="input-name" placeholder="Enter Info Link Name" required style="width: calc(20% - 8px);">
+                               type="text" name="name" class="input-name" placeholder="Enter Project Link Name" required style="width: calc(20% - 8px);">
                         <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
                                type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(40% - 8px);">
                         <div class="custom-select input-group" style="width: calc(15% - 8px);">
@@ -693,7 +693,7 @@ if (isset($_SESSION['account'])) {
                         <div class="header-extension admin"></div>
                         <div class="header">
                             <div class="head admin" style="width: 7.5%">№</div>
-                            <div class="head admin" style="width: 20%">Info Link Name</div>
+                            <div class="head admin" style="width: 20%">Project Link Name</div>
                             <div class="head admin" style="width: 40%">Description</div>
                             <div class="head admin" style="width: 15%">Group</div>
                             <div class="head admin" style="width: 10%">Link</div>
@@ -718,7 +718,58 @@ if (isset($_SESSION['account'])) {
                         </div> <?php
                     }
                     else { ?>
-                        <div class="empty-table">NO INFO PAGES</div> <?php
+                        <div class="empty-table">NO PROJECT LINKS</div> <?php
+                    }
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "group") {
+                    if (isset($_POST['group']))
+                        Database::update('project_infopage', $_GET['i'], ["groupid" => $_POST['group']], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']);
+                    elseif (isset($_POST['none']))
+                        Database::update('project_infopage', $_GET['i'], ["groupid" => null], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']);
+
+                    $products = Project::selectProducts(); ?>
+                    <div class="navbar level-3 unselected">
+                        <form method="post" class="container-button">
+                            <input type="hidden" name="none">
+                            <input type="submit" name="submit" value="NONE" class="button admin-menu">
+                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="search-bar admin">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description'})"
+                               type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description'})"
+                               type="text" name="name" class="input-name" placeholder="Enter Project Link Group Name" required style="width: calc(20% - 8px);">
+                        <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description'})"
+                               type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(65% - 8px);">
+                    </div>
+                    <div class="table-header-container">
+                        <div class="header-extension admin"></div>
+                        <div class="header">
+                            <div class="head admin" style="width: 7.5%">№</div>
+                            <div class="head admin" style="width: 20%">Project Link Group Name</div>
+                            <div class="head admin" style="width: 65%">Project Link Group Description</div>
+                            <div class="head admin" style="width: 7.5%">Select</div>
+                        </div>
+                        <div class="header-extension admin"></div>
+                    </div>
+                    </div> <?php
+                    $groups = Project::selectInfoPageGroups();
+                    if ($groups) { ?>
+                        <div class="table admin"> <?php
+                            foreach ($groups as $group) { ?>
+                                <form method="post" class="row">
+                                    <div class="cell id" style="width: 7.5%"><input type="submit" name="submit" value="<?php echo "#" . sprintf('%03d', $group['id']); ?>" class="content"></div>
+                                    <div class="cell name" style="width: 20%"><input type="submit" name="submit" value="<?php echo $group['title']; ?>" class="content"></div>
+                                    <div class="cell description" style="width: 65%"><input type="submit" name="submit" value="<?php echo $group['description']; ?>" class="content"></div>
+                                    <div class="cell" style="width: 7.5%"><input type="submit" name="submit" value="Select" class="content select-button"></div>
+                                    <input type="hidden" name="group" value="<?php echo $group['id']; ?>">
+                                </form> <?php
+                            } ?>
+                        </div> <?php
+                    }
+                    else { ?>
+                        <div class="empty-table">NO GROUPS</div> <?php
                     }
                 }
                 elseif (isset($_GET['l2']) && $_GET['l2'] == "name") {
@@ -735,39 +786,14 @@ if (isset($_SESSION['account'])) {
                     <div class="table-header-container">
                         <div class="header-extension small admin"></div>
                         <div class="header small">
-                            <div class="head admin">Info Link Name</div>
+                            <div class="head admin">Project Link Name</div>
                         </div>
                         <div class="header-extension small admin"></div>
                     </div>
                     </div>
                     <div class="table small">
                         <div class="row">
-                            <input form="title" name="title" class="field admin" placeholder="Enter Info Link Name Here" maxlength="50" value="<?php if (isset($infopage['title'])) echo $infopage['title']; ?>">
-                        </div>
-                    </div> <?php
-                }
-                elseif (isset($_GET['l2']) && $_GET['l2'] == "description") {
-                    if (isset($_POST['description']))
-                        Database::update('project_infopage', $_GET['i'], ['description' => $_POST['description']], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']); ?>
-
-                    <div class="navbar level-3 unselected">
-                        <form method="post" id="description" class="container-button">
-                            <input type="hidden" name="description">
-                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
-                        </form>
-                    </div> <?php
-                    include_once "includes/info-bar.php"; ?>
-                    <div class="table-header-container">
-                        <div class="header-extension large admin"></div>
-                        <div class="header large">
-                            <div class="head admin">Info Link Description</div>
-                        </div>
-                        <div class="header-extension large admin"></div>
-                    </div>
-                    </div>
-                    <div class="table large">
-                        <div class="row">
-                            <input form="description" name="description" class="field admin" placeholder="Enter Info Link Description Here" maxlength="200" value="<?php if (isset($infopage['description'])) echo $infopage['description']; ?>">
+                            <input form="title" name="title" class="field admin" placeholder="Enter Project Link Name Here" maxlength="50" value="<?php if (isset($infopage['title'])) echo htmlspecialchars($infopage['title']); ?>">
                         </div>
                     </div> <?php
                 }
@@ -785,21 +811,46 @@ if (isset($_SESSION['account'])) {
                     <div class="table-header-container">
                         <div class="header-extension large admin"></div>
                         <div class="header large">
-                            <div class="head admin">Info Link URL</div>
+                            <div class="head admin">Project Link URL</div>
                         </div>
                         <div class="header-extension large admin"></div>
                     </div>
                     </div>
                     <div class="table large">
                         <div class="row">
-                            <input form="link" name="link" class="field admin" placeholder="Enter Info Link URL Here" maxlength="255" value="<?php if (isset($infopage['link'])) echo $infopage['link']; ?>">
+                            <input form="link" name="link" class="field admin" placeholder="Enter Project Link URL Here" maxlength="255" value="<?php if (isset($infopage['link'])) echo htmlspecialchars($infopage['link']); ?>">
+                        </div>
+                    </div> <?php
+                }
+                elseif (isset($_GET['l2']) && $_GET['l2'] == "description") {
+                    if (isset($_POST['description']))
+                        Database::update('project_infopage', $_GET['i'], ['description' => $_POST['description']], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=edit&i=" . $_GET['i']); ?>
+
+                    <div class="navbar level-3 unselected">
+                        <form method="post" id="description" class="container-button">
+                            <input type="hidden" name="description">
+                            <input type="submit" name="submit" value="SAVE" class="button admin-menu">
+                        </form>
+                    </div> <?php
+                    include_once "includes/info-bar.php"; ?>
+                    <div class="table-header-container">
+                        <div class="header-extension large admin"></div>
+                        <div class="header large">
+                            <div class="head admin">Project Link Description</div>
+                        </div>
+                        <div class="header-extension large admin"></div>
+                    </div>
+                    </div>
+                    <div class="table large">
+                        <div class="row">
+                            <input form="description" name="description" class="field admin" placeholder="Enter Project Link Description Here" maxlength="200" value="<?php if (isset($infopage['description'])) echo htmlspecialchars($infopage['description']); ?>">
                         </div>
                     </div> <?php
                 }
             }
             elseif (isset($_GET['l1']) && $_GET['l1'] == "remove") {
                 if (isset($_POST['del-info']))
-                    Database::remove('project_infopage', $_POST['del-info'], "projects.php?p=" . $_GET['p'] . "&l1=info");
+                    Database::remove('project_infopage', $_POST['del-info'], "projects.php?p=" . $_GET['p'] . "&ioptions&l1=remove");
 
                 $presets = Database::selectInfoPagePresets();
                 $groups = Database::selectInfoPageGroups(); ?>
@@ -807,7 +858,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Info Link Name" required style="width: calc(20% - 8px);">
+                           type="text" name="name" class="input-name" placeholder="Enter Project Link Name" required style="width: calc(20% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .input-description':'.cell.description', '.search-bar .custom-select.input-group .input-group':'.cell.group'})"
                            type="text" name="description" class="input-description" placeholder="Enter Description" required style="width: calc(40% - 8px);">
                     <div class="custom-select input-group" style="width: calc(15% - 8px);">
@@ -825,7 +876,7 @@ if (isset($_SESSION['account'])) {
                     <div class="header-extension admin"></div>
                     <div class="header">
                         <div class="head admin" style="width: 7.5%">№</div>
-                        <div class="head admin" style="width: 20%">Info Link Name</div>
+                        <div class="head admin" style="width: 20%">Project Link Name</div>
                         <div class="head admin" style="width: 40%">Description</div>
                         <div class="head admin" style="width: 15%">Group</div>
                         <div class="head admin" style="width: 10%">Link</div>
@@ -835,6 +886,16 @@ if (isset($_SESSION['account'])) {
                 </div>
                 </div> <?php
                 $infopages = Project::selectProjectInfoPages($_GET['p']);
+                $tasks = Task::selectProjectTasks($_GET['p']);
+                if ($infopages) {
+                    foreach ($infopages as $infopage) {
+                        foreach ($tasks as $task) {
+                            if ($infopage['id'] == $task['infoid']) {
+                                unset($infopages[$infopage['id']]);
+                            }
+                        }
+                    }
+                }
                 if ($infopages) { ?>
                     <div class="table admin"> <?php
                         foreach ($infopages as $infopage) { ?>
@@ -851,7 +912,7 @@ if (isset($_SESSION['account'])) {
                     </div> <?php
                 }
                 else { ?>
-                    <div class="empty-table">NO INFO PAGES</div> <?php
+                    <div class="empty-table">NO PROJECT LINKS</div> <?php
                 }
             }
         }
@@ -863,7 +924,7 @@ if (isset($_SESSION['account'])) {
 
                 $projectHistory = Project::selectProjectHistory($project['id']);
                 $created = "-";
-                if ($projectHistory && $projectHistory[0]['statusid'] == 6)
+                if ($projectHistory && $projectHistory[0]['status1'] == 1)
                     $created = $projectHistory[0]['time2'];
 
                 $assignments = Assignment::selectProjectAssignments($project['id']);
@@ -877,40 +938,28 @@ if (isset($_SESSION['account'])) {
 
                 <div class="info-bar short">
                     <div class="section">
-                        <div class="stage active">CREATED:</div>
-                        <div class="content"><?php echo $created; ?></div>
+                        <div class="content light"><?php echo "#" . sprintf('%04d', $projectData['id']); ?></div>
                     </div>
                     <div class="section">
                         <div class="stage active">STATUS:</div>
                         <div class="content"><?php echo $projectData['status']; ?></div>
                     </div>
                     <div class="section">
-                        <div class="content"><?php echo $projectData['time2']; ?></div>
+                        <div class="content light"><?php echo $projectData['time2']; ?></div>
                     </div>
-                </div> <?php
-                if ($projectData['productid'] != null) {
-                    if ($projectData['presetid'] != null) { ?>
-                        <div class="info-bar tiny">
-                            <div class="section line-right active">
-                                <div class="content"><?php echo $projectData['product']; ?></div>
-                            </div>
-                            <div class="section">
-                                <div class="content"><?php echo $projectData['preset']; ?></div>
-                            </div>
-                        </div> <?php
-                    }
-                    else { ?>
-                        <div class="info-bar tiny">
-                            <div class="section">
-                                <div class="content"><?php echo $projectData['product']; ?></div>
-                            </div>
-                        </div> <?php
-                    }
-                } ?>
+                </div>
+                <div class="info-bar tiny">
+                    <div class="section line-right active">
+                        <div class="content"><?php echo $projectData['product']; ?></div>
+                    </div>
+                    <div class="section">
+                        <div class="content"><?php echo $projectData['preset']; ?></div>
+                    </div>
+                </div>
                 <div class="overview">
                     <div class="top">
                         <div class="box">
-                            <div class="title"><?php echo "#" . sprintf('%04d', $projectData['id']) . ": " . $projectData['title']; ?></div>
+                            <div class="title"><?php echo $projectData['title']; ?></div>
                             <div class="data"><?php echo $projectData['description']; ?></div>
                         </div>
                     </div>
@@ -956,17 +1005,29 @@ if (isset($_SESSION['account'])) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="box-container">
-                            <div class="box">
-                                <span class="title"><?php echo $projectData['links']; ?> INFO LINKS</span>
-                            </div>
-                        </div>
+                        </div> <?php
+                        if ($account->manager == 1) { ?>
+                            <div class="box-container">
+                                <div class="box">
+                                    <span class="title"><?php echo $projectData['links']; ?> PROJECT LINKS</span>
+                                    <div class="data">
+                                        <div class="total-container">
+                                            <span class="number"><?php echo $projectData['link_groups']; ?></span>
+                                            <span class="num-data">GROUPS</span>
+                                        </div>
+                                        <div class="total-container">
+                                            <span class="number"><?php echo $projectData['links_nourl']; ?></span>
+                                            <span class="num-data">NO URL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <?php
+                        } ?>
                     </div>
                 </div>
                 <div class="info-bar" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
                     <div class="section line-right active">
-                        <div class="stage active"><?php echo $projectData['task_time']; ?></div>
+                        <div class="stage active"><?php echo $projectData['task_time_rem']; ?></div>
                         <div class="content">REMAINING</div>
                     </div>
                     <div class="section">
@@ -974,8 +1035,13 @@ if (isset($_SESSION['account'])) {
                         <div class="content">MEMBERS</div>
                     </div>
                     <div class="section line-left active">
-                        <div class="stage active"><?php echo $projectData['task_time']; ?></div>
+                        <div class="stage active"><?php echo $projectData['task_time_spent']; ?></div>
                         <div class="content">SPENT</div>
+                    </div>
+                </div>
+                <div class="info-bar short" style="margin: 0 20vw; padding: 0 0 3.5vh 0;">
+                    <div class="section">
+                        <div class="content light"><?php echo $created; ?></div>
                     </div>
                 </div>
                 </div> <?php
@@ -991,13 +1057,14 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(45% - 8px);">
+                           type="text" name="name" class="input-name" placeholder="Enter Assignment Objective" required style="width: calc(45% - 8px);">
                     <div class="custom-select input-division" style="width: calc(20% - 8px);">
                         <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
                                 name="preset" class="input-division" required>
                             <option value="">All Divisions</option>
                             <option value="None">None</option>
-                            <option value="Custom">Custom</option> <?php                            foreach ($divisions as $division) { ?>
+                            <option value="Custom">Custom</option> <?php
+                            foreach ($divisions as $division) { ?>
                                 <option value="<?php echo $division['title']; ?>"><?php echo $division['title']; ?></option> <?php
                             } ?>
                         </select>
@@ -1038,13 +1105,14 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(45% - 8px);">
+                           type="text" name="name" class="input-name" placeholder="Enter Assignment Objective" required style="width: calc(45% - 8px);">
                     <div class="custom-select input-division" style="width: calc(20% - 8px);">
                         <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
                                 name="preset" class="input-division" required>
                             <option value="">All Divisions</option>
                             <option value="None">None</option>
-                            <option value="Custom">Custom</option> <?php                            foreach ($divisions as $division) { ?>
+                            <option value="Custom">Custom</option> <?php
+                            foreach ($divisions as $division) { ?>
                                 <option value="<?php echo $division['title']; ?>"><?php echo $division['title']; ?></option> <?php
                             } ?>
                         </select>
@@ -1087,7 +1155,7 @@ if (isset($_SESSION['account'])) {
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
                            type="text" name="id" class="input-id" placeholder="Enter №" required style="width: calc(7.5% - 8px);">
                     <input oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'})"
-                           type="text" name="name" class="input-name" placeholder="Enter Project Name" required style="width: calc(45% - 8px);">
+                           type="text" name="name" class="input-name" placeholder="Enter Assignment Objective" required style="width: calc(45% - 8px);">
                     <div class="custom-select input-division" style="width: calc(20% - 8px);">
                         <select oninput="searchTable(fields = {'.search-bar .input-id':'.cell.id', '.search-bar .input-name':'.cell.name', '.search-bar .custom-select.input-division .input-division':'.cell.division'}, this)"
                                 name="preset" class="input-division" required>

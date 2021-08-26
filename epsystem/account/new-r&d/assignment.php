@@ -46,6 +46,7 @@ if (isset($_SESSION['account'])) {
                 if (strlen($_SESSION['new-assignmentpr']['info']['objective']) > InfobarCharLimit)
                     $_SESSION['new-assignmentpr']['info']['objective'] = substr($_SESSION['new-assignmentpr']['info']['objective'], 0, InfobarCharLimit) . "...";
 
+                $_SESSION['new-assignmentpr']['fields']['date_created'] = date("Y-m-d H-i-s");
                 $asgPresetID = Database::insert('preset-assignment', $_SESSION['new-assignmentpr']['fields'], true, false);
                 unset($_SESSION['new-assignmentpr']);
                 header('Location: ../r&d.php?a=' . $asgPresetID . "&l1=overview");
@@ -66,7 +67,7 @@ if (isset($_SESSION['account'])) {
         <div class="menu"> <?php
         if ($_SESSION['new-assignmentpr']['stage'] == '1') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Assignment: Select Division</span>
+                <span>New Assignment Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -121,7 +122,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-assignmentpr']['stage'] == '2') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Assignment: Enter Preset Name</span>
+                <span>New Assignment Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -145,7 +146,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table small">
                 <div class="row">
-                    <input form="test" name="title" id="title" class="field admin" placeholder="Enter Preset Name Here" value="<?php if (isset($_SESSION['new-assignmentpr']['fields']['title'])) echo $_SESSION['new-assignmentpr']['fields']['title']; ?>">
+                    <input form="test" name="title" id="title" class="field admin" placeholder="Enter Preset Name Here" value="<?php if (isset($_SESSION['new-assignmentpr']['fields']['title'])) echo htmlspecialchars($_SESSION['new-assignmentpr']['fields']['title']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))
@@ -153,7 +154,7 @@ if (isset($_SESSION['account'])) {
         }
         elseif ($_SESSION['new-assignmentpr']['stage'] == '3') { ?>
             <div class="head-up-display-bar">
-                <span>+ New Assignment: Enter Objective</span>
+                <span>New Assignment Preset</span>
             </div>
             <div class="navbar level-1 unselected">
                 <form class="container-button disabled">
@@ -177,7 +178,7 @@ if (isset($_SESSION['account'])) {
             </div>
             <div class="table medium">
                 <div class="row">
-                    <input form="test" name="objective" id="objective" class="field admin" placeholder="Enter Assignment Objective Here" value="<?php if (isset($_SESSION['new-assignmentpr']['fields']['objective'])) echo $_SESSION['new-assignmentpr']['fields']['objective']; ?>">
+                    <input form="test" name="objective" id="objective" class="field admin" placeholder="Enter Assignment Objective Here" value="<?php if (isset($_SESSION['new-assignmentpr']['fields']['objective'])) echo htmlspecialchars($_SESSION['new-assignmentpr']['fields']['objective']); ?>">
                 </div>
             </div> <?php
             if (isset($errorMsg))

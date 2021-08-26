@@ -187,10 +187,15 @@ body {
   display: flex;
   flex: 1;
 }
-.container-header .logo-container .logo-header {
+.container-header .logo-container .logo-link {
+  display: flex;
   margin-left: 1vw;
   align-self: center;
-  height: 50%;
+  height: 40%;
+}
+.container-header .logo-container .logo-link .logo-header {
+  display: block;
+  height: 100%;
 }
 .container-header .menu-header {
   display: flex;
@@ -715,20 +720,6 @@ body {
   user-select: none;
   padding: 3vh 0 5vh 0;
 }
-.info-bar.short {
-  margin: 0 10vw;
-}
-.info-bar.tiny {
-  margin: 0 30vw;
-  padding: 0 0 2.5vh 0;
-}
-.info-bar.tiny .section .content {
-  color: #E2DFD6;
-  text-transform: uppercase;
-}
-.info-bar.tiny .section .content.lower {
-  text-transform: none;
-}
 .info-bar .section {
   display: flex;
   flex: 1;
@@ -760,6 +751,7 @@ body {
   color: #E2DFD6;
   font-weight: bold;
   font-size: 0.8vw;
+  text-decoration: none;
 }
 .info-bar .section .stage.active {
   color: #F5B82E;
@@ -790,6 +782,23 @@ body {
 }
 .info-bar .section .content.active {
   color: #F5B82E;
+}
+.info-bar.short {
+  margin: 0 10vw;
+}
+.info-bar.short .section .content.light {
+  color: #E2DFD6;
+}
+.info-bar.tiny {
+  margin: 0 30vw;
+  padding: 0 0 2.5vh 0;
+}
+.info-bar.tiny .section .content {
+  color: #C6BEAE;
+  text-transform: uppercase;
+}
+.info-bar.tiny .section .content.lower {
+  text-transform: none;
 }
 
 .info-bar.edit .section .stage {
@@ -980,6 +989,12 @@ hr {
   font-weight: bold;
   color: #EEF5F4;
   line-height: 12vh;
+}
+.empty-table.comments {
+  font-size: 1.4vw;
+  line-height: 6vh;
+  color: #E2DFD6;
+  margin: 0 0 3vh 0;
 }
 
 .table {

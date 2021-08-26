@@ -4,7 +4,7 @@
         <a<?php /*if ($page == "") echo ' class="active"'; */?>>Shortcut 2</a>
         <a<?php /*if ($page == "") echo ' class="active"'; */?>>Shortcut 3</a>-->
     </nav>
-    <span class="copyright">© enokspriede.com 2020</span>
+    <span class="copyright">© enokspriede.com 2021</span>
 </div>
 </body>
 </html>

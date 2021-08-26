@@ -7,8 +7,10 @@ if (isset($_SESSION['account'])) {
         require_once "includes/header.php"; ?>
 
         <div class="menu"> <?php
-            require "includes/menu.php"; ?>
-        </div> <?php
+        require "includes/menu.php";
+        if (isset($_GET['l1']) && $_GET['l1'] == "library") { ?>
+            </div> <?php
+        }
 
         require_once "includes/footer.php";
     }

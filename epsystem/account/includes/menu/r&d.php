@@ -8,7 +8,7 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                 "admin" => false,
                 "link" => "project",
                 "default-link" => "project",
-                "hud" => "ep project setup",
+                "hud" => "Project Research & Development",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -48,7 +48,47 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                         "admin" => false,
                         "link" => "products",
                         "default-link" => "products",
-                        "hud" => "ep products",
+                        "hud" => "ep system products",
+                        "home" => [
+                            "title" => "",
+                            "description" => "",
+                            "total" => [
+                                "name" => "",
+                                "count" => ""
+                            ],
+                            "last-hours" => [
+                                "title" => "",
+                                "details" => []
+                            ],
+                            "link" => "",
+                            "note" => ""
+                        ]
+                    ],
+                    "PROJECT LINK GROUPS" => [
+                        "admin" => false,
+                        "link" => "infogr",
+                        "default-link" => "infogr",
+                        "hud" => "ep system link groups",
+                        "home" => [
+                            "title" => "",
+                            "description" => "",
+                            "total" => [
+                                "name" => "",
+                                "count" => ""
+                            ],
+                            "last-hours" => [
+                                "title" => "",
+                                "details" => []
+                            ],
+                            "link" => "",
+                            "note" => ""
+                        ]
+                    ],
+                    "PROJECT LINK PRESETS" => [
+                        "admin" => false,
+                        "link" => "info",
+                        "default-link" => "info",
+                        "hud" => "ep system link presets",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -70,7 +110,7 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                 "admin" => false,
                 "link" => "assignment",
                 "default-link" => "assignment",
-                "hud" => "ep assignment setup",
+                "hud" => "Assignment Research & Development",
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -86,26 +126,6 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                     "note" => ""
                 ],
                 "level-2" => [
-                    "ASSIGNMENT PRESETS" => [
-                        "admin" => false,
-                        "link" => "assignments",
-                        "default-link" => "assignments",
-                        "hud" => "ep system assignment presets",
-                        "home" => [
-                            "title" => "",
-                            "description" => "",
-                            "total" => [
-                                "name" => "",
-                                "count" => ""
-                            ],
-                            "last-hours" => [
-                                "title" => "",
-                                "details" => []
-                            ],
-                            "link" => "",
-                            "note" => ""
-                        ]
-                    ],
                     "DEPARTMENTS" => [
                         "admin" => false,
                         "link" => "departments",
@@ -130,7 +150,7 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                         "admin" => false,
                         "link" => "divisions",
                         "default-link" => "divisions",
-                        "hud" => "ep system department divisions",
+                        "hud" => "ep system divisions",
                         "home" => [
                             "title" => "",
                             "description" => "",
@@ -145,29 +165,27 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                             "link" => "",
                             "note" => ""
                         ]
-                    ]
-                ]
-            ],
-            "TASK R&D" => [
-                "admin" => false,
-                "link" => "task",
-                "default-link" => "task",
-                "hud" => "ep task setup",
-                "home" => [
-                    "title" => "",
-                    "description" => "",
-                    "total" => [
-                        "name" => "",
-                        "count" => ""
                     ],
-                    "last-hours" => [
-                        "title" => "",
-                        "details" => []
+                    "ASSIGNMENT PRESETS" => [
+                        "admin" => false,
+                        "link" => "assignments",
+                        "default-link" => "assignments",
+                        "hud" => "ep system assignment presets",
+                        "home" => [
+                            "title" => "",
+                            "description" => "",
+                            "total" => [
+                                "name" => "",
+                                "count" => ""
+                            ],
+                            "last-hours" => [
+                                "title" => "",
+                                "details" => []
+                            ],
+                            "link" => "",
+                            "note" => ""
+                        ]
                     ],
-                    "link" => "",
-                    "note" => ""
-                ],
-                "level-2" => [
                     "TASK PRESETS" => [
                         "admin" => false,
                         "link" => "tasks",
@@ -188,47 +206,7 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                             "note" => ""
                         ]
                     ],
-                    "INFO PRESETS" => [
-                        "admin" => false,
-                        "link" => "info",
-                        "default-link" => "info",
-                        "hud" => "ep system info presets",
-                        "home" => [
-                            "title" => "",
-                            "description" => "",
-                            "total" => [
-                                "name" => "",
-                                "count" => ""
-                            ],
-                            "last-hours" => [
-                                "title" => "",
-                                "details" => []
-                            ],
-                            "link" => "",
-                            "note" => ""
-                        ]
-                    ],
-                    "INFO GROUPS" => [
-                        "admin" => false,
-                        "link" => "infogr",
-                        "default-link" => "infogr",
-                        "hud" => "ep system info groups",
-                        "home" => [
-                            "title" => "",
-                            "description" => "",
-                            "total" => [
-                                "name" => "",
-                                "count" => ""
-                            ],
-                            "last-hours" => [
-                                "title" => "",
-                                "details" => []
-                            ],
-                            "link" => "",
-                            "note" => ""
-                        ]
-                    ],
-                    "LINK TYPES" => [
+                    "TASK LINK TYPES" => [
                         "admin" => false,
                         "link" => "linktypes",
                         "default-link" => "linktypes",
@@ -249,7 +227,7 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
                         ]
                     ]
                 ]
-            ],
+            ]
         ]
     ];
 }
@@ -257,16 +235,16 @@ if (!isset($_GET['p']) && !isset($_GET['a']) && !isset($_GET['t']) && !isset($_G
 // Project Preset
 elseif (isset($_GET['p'])) {
     $preset = Project::selectPresetByID($_GET['p']);
-    $hudInitial = "\"" . $preset['title'] . "\"";
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Project Preset Page";
         $menu = [
-            "hud" => $hudInitial,
+            "hud" => $hud,
             "level-1" => [
                 "PROJECT PRESET OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $hudInitial . " project preset",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -302,7 +280,7 @@ elseif (isset($_GET['p'])) {
                     "admin" => false,
                     "link" => "assignments",
                     "default-link" => "assignments",
-                    "hud" => $preset['title'] . ": Assignment Presets",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -320,15 +298,17 @@ elseif (isset($_GET['p'])) {
                 ],
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Project Preset Options";
         $menu = [
-            "hud" => $preset['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
                 "EDIT PROJECT PRESET" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $preset['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -348,7 +328,7 @@ elseif (isset($_GET['p'])) {
                             "admin" => true,
                             "link" => "product",
                             "default-link" => "product",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -368,7 +348,7 @@ elseif (isset($_GET['p'])) {
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -388,7 +368,7 @@ elseif (isset($_GET['p'])) {
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -408,7 +388,7 @@ elseif (isset($_GET['p'])) {
                             "admin" => true,
                             "link" => "assignments",
                             "default-link" => "assignments&l3=remove",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -472,7 +452,7 @@ elseif (isset($_GET['p'])) {
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => "Delete project preset?",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -490,20 +470,23 @@ elseif (isset($_GET['p'])) {
                 ]
             ]
         ];
+    }
+
 }
 
 // Assignment Preset
 elseif (isset($_GET['a'])) {
     $preset = Assignment::selectPresetByID($_GET['a']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Assignment Preset Page";
         $menu = [
-            "hud" => $preset['title'],
+            "hud" => $hud,
             "level-1" => [
                 "ASSIGNMENT PRESET OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $preset['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -539,7 +522,7 @@ elseif (isset($_GET['a'])) {
                     "admin" => false,
                     "link" => "tasks",
                     "default-link" => "tasks",
-                    "hud" => $preset['title'] . ": Task Presets",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -557,15 +540,17 @@ elseif (isset($_GET['a'])) {
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Assignment Preset Options";
         $menu = [
-            "hud" => $preset['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
                 "EDIT ASSIGNMENT PRESET" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $preset['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -585,7 +570,7 @@ elseif (isset($_GET['a'])) {
                             "admin" => true,
                             "link" => "division",
                             "default-link" => "division",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -605,7 +590,7 @@ elseif (isset($_GET['a'])) {
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -625,7 +610,7 @@ elseif (isset($_GET['a'])) {
                             "admin" => true,
                             "link" => "objective",
                             "default-link" => "objective",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -645,7 +630,7 @@ elseif (isset($_GET['a'])) {
                             "admin" => true,
                             "link" => "tasks",
                             "default-link" => "tasks",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -667,7 +652,7 @@ elseif (isset($_GET['a'])) {
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $preset['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -685,20 +670,22 @@ elseif (isset($_GET['a'])) {
                 ]
             ]
         ];
+    }
 }
 
 // Task Preset
 elseif (isset($_GET['t'])) {
     $preset = Task::selectTaskPreset($_GET['t']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Task Preset Page";
         $menu = [
-            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']),
+            "hud" => $hud,
             "level-1" => [
                 "TASK PRESET OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -734,7 +721,7 @@ elseif (isset($_GET['t'])) {
                     "admin" => false,
                     "link" => "links",
                     "default-link" => "links",
-                    "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -752,15 +739,17 @@ elseif (isset($_GET['t'])) {
                 ],
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Task Preset Options";
         $menu = [
-            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+            "hud" => $hud,
             "level-1" => [
                 "EDIT TASK PRESET" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -776,11 +765,31 @@ elseif (isset($_GET['t'])) {
                         "note" => ""
                     ],
                     "level-2" => [
+                        "TASK PRESET ASSIGNMENT" => [
+                            "admin" => true,
+                            "link" => "assignment",
+                            "default-link" => "assignment",
+                            "hud" => $hud,
+                            "home" => [
+                                "title" => "",
+                                "description" => "",
+                                "total" => [
+                                    "name" => "",
+                                    "count" => ""
+                                ],
+                                "last-hours" => [
+                                    "title" => "",
+                                    "details" => []
+                                ],
+                                "link" => "",
+                                "note" => ""
+                            ]
+                        ],
                         "TASK PRESET NAME" => [
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -800,7 +809,7 @@ elseif (isset($_GET['t'])) {
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -820,7 +829,7 @@ elseif (isset($_GET['t'])) {
                             "admin" => true,
                             "link" => "time",
                             "default-link" => "time",
-                            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -836,11 +845,11 @@ elseif (isset($_GET['t'])) {
                                 "note" => ""
                             ]
                         ],
-                        "TASK INFO PRESET" => [
+                        "TASK PRESET PROJECT LINK" => [
                             "admin" => true,
                             "link" => "info",
                             "default-link" => "info",
-                            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -860,7 +869,7 @@ elseif (isset($_GET['t'])) {
                             "admin" => true,
                             "link" => "links",
                             "default-link" => "links",
-                            "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -882,7 +891,7 @@ elseif (isset($_GET['t'])) {
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => "Task Preset #" . sprintf('%05d', $preset['id']) . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -900,20 +909,22 @@ elseif (isset($_GET['t'])) {
                 ]
             ]
         ];
+    }
 }
 
 // Info page preset
 elseif (isset($_GET['i'])) {
     $preset = Database::selectInfoPagePreset($_GET['i']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Project Link Preset Page";
         $menu = [
-            "hud" => $preset['title'],
+            "hud" => $hud,
             "level-1" => [
-                "INFO PRESET OVERVIEW" => [
+                "PROJECT LINK PRESET OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $preset['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -929,14 +940,14 @@ elseif (isset($_GET['i'])) {
                         "note" => ""
                     ],
                     "level-2" => [
-                        "Edit Info Preset" => [
+                        "Edit Project Link Preset" => [
                             "admin" => false,
                             "page" => "?i=" . $_GET['i'] . "&options&l1=edit",
                             "link" => "",
                             "default-link" => "",
                             "hud" => ""
                         ],
-                        "Delete Info Preset" => [
+                        "Delete Project Link Preset" => [
                             "admin" => false,
                             "page" => "?i=" . $_GET['i'] . "&options&l1=delete",
                             "link" => "",
@@ -947,15 +958,17 @@ elseif (isset($_GET['i'])) {
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Project Link Preset Options";
         $menu = [
-            "hud" => $preset['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
-                "EDIT INFO PRESET" => [
+                "EDIT PROJECT LINK PRESET" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $preset['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -971,11 +984,11 @@ elseif (isset($_GET['i'])) {
                         "note" => ""
                     ],
                     "level-2" => [
-                        "INFO PRESET GROUP" => [
+                        "PROJECT LINK PRESET GROUP" => [
                             "admin" => true,
                             "link" => "group",
                             "default-link" => "group",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -991,11 +1004,11 @@ elseif (isset($_GET['i'])) {
                                 "note" => ""
                             ]
                         ],
-                        "INFO PRESET NAME" => [
+                        "PROJECT LINK PRESET NAME" => [
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1011,11 +1024,11 @@ elseif (isset($_GET['i'])) {
                                 "note" => ""
                             ]
                         ],
-                        "INFO PRESET DESCRIPTION" => [
+                        "PROJECT LINK PRESET DESCRIPTION" => [
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $preset['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1033,11 +1046,11 @@ elseif (isset($_GET['i'])) {
                         ]
                     ]
                 ],
-                "DELETE INFO PRESET" => [
+                "DELETE PROJECT LINK PRESET" => [
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $preset['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1055,20 +1068,22 @@ elseif (isset($_GET['i'])) {
                 ]
             ]
         ];
+    }
 }
 
 // Product
 elseif (isset($_GET['f'])) {
     $product = Project::selectProductByID($_GET['f']);
-    if (!isset($_GET['options']))
+    $hud = "Product Page";
+    if (!isset($_GET['options'])) {
         $menu = [
-            "hud" => $product['title'],
+            "hud" => $hud,
             "level-1" => [
                 "PRODUCT OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $product['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1099,18 +1114,40 @@ elseif (isset($_GET['f'])) {
                             "hud" => ""
                         ]
                     ]
+                ],
+                "PRODUCT PROJECT PRESETS" => [
+                    "admin" => false,
+                    "link" => "projects",
+                    "default-link" => "projects",
+                    "hud" => $hud,
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Product Options";
         $menu = [
-            "hud" => $product['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
                 "EDIT PRODUCT" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $product['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1130,7 +1167,7 @@ elseif (isset($_GET['f'])) {
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $product['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1150,7 +1187,7 @@ elseif (isset($_GET['f'])) {
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $product['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1172,7 +1209,7 @@ elseif (isset($_GET['f'])) {
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $product['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1190,20 +1227,22 @@ elseif (isset($_GET['f'])) {
                 ]
             ]
         ];
+    }
 }
 
 // Department
 elseif (isset($_GET['dp'])) {
     $depart = Assignment::selectDepartmentByID($_GET['dp']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Department Page";
         $menu = [
-            "hud" => $depart['title'],
+            "hud" => $hud,
             "level-1" => [
                 "DEPARTMENT OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $depart['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1234,18 +1273,40 @@ elseif (isset($_GET['dp'])) {
                             "hud" => ""
                         ]
                     ]
+                ],
+                "DEPARTMENT DIVISIONS" => [
+                    "admin" => false,
+                    "link" => "divisions",
+                    "default-link" => "divisions",
+                    "hud" => $hud,
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Department Options";
         $menu = [
-            "hud" => $depart['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
                 "EDIT DEPARTMENT" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $depart['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1265,7 +1326,7 @@ elseif (isset($_GET['dp'])) {
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $depart['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1285,7 +1346,7 @@ elseif (isset($_GET['dp'])) {
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $depart['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1307,7 +1368,7 @@ elseif (isset($_GET['dp'])) {
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $depart['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1325,20 +1386,22 @@ elseif (isset($_GET['dp'])) {
                 ]
             ]
         ];
+    }
 }
 
 // Division
 elseif (isset($_GET['d'])) {
     $division = Assignment::selectDivisionByID($_GET['d']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Division Page";
         $menu = [
-            "hud" => $division['title'],
+            "hud" => $hud,
             "level-1" => [
                 "DIVISION OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $division['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1369,18 +1432,40 @@ elseif (isset($_GET['d'])) {
                             "hud" => ""
                         ]
                     ]
+                ],
+                "DIVISION ASSIGNMENT PRESETS" => [
+                    "admin" => false,
+                    "link" => "assignments",
+                    "default-link" => "assignments",
+                    "hud" => $hud,
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Division Options";
         $menu = [
-            "hud" => $division['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
                 "EDIT DIVISION" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $division['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1396,11 +1481,31 @@ elseif (isset($_GET['d'])) {
                         "note" => ""
                     ],
                     "level-2" => [
+                        "DIVISION DEPARTMENT" => [
+                            "admin" => true,
+                            "link" => "department",
+                            "default-link" => "department",
+                            "hud" => $hud,
+                            "home" => [
+                                "title" => "",
+                                "description" => "",
+                                "total" => [
+                                    "name" => "",
+                                    "count" => ""
+                                ],
+                                "last-hours" => [
+                                    "title" => "",
+                                    "details" => []
+                                ],
+                                "link" => "",
+                                "note" => ""
+                            ]
+                        ],
                         "DIVISION NAME" => [
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $division['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1420,27 +1525,7 @@ elseif (isset($_GET['d'])) {
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $division['title'] . ": Options",
-                            "home" => [
-                                "title" => "",
-                                "description" => "",
-                                "total" => [
-                                    "name" => "",
-                                    "count" => ""
-                                ],
-                                "last-hours" => [
-                                    "title" => "",
-                                    "details" => []
-                                ],
-                                "link" => "",
-                                "note" => ""
-                            ]
-                        ],
-                        "DIVISION DEPARTMENT" => [
-                            "admin" => true,
-                            "link" => "department",
-                            "default-link" => "department",
-                            "hud" => $division['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1462,7 +1547,7 @@ elseif (isset($_GET['d'])) {
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $division['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1480,20 +1565,22 @@ elseif (isset($_GET['d'])) {
                 ],
             ]
         ];
+    }
 }
 
 // Info Page Group
 elseif (isset($_GET['ig'])) {
     $group = Database::selectInfoPageGroup($_GET['ig']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Project Link Group Page";
         $menu = [
-            "hud" => $group['title'],
+            "hud" => $hud,
             "level-1" => [
-                "INFO GROUP OVERVIEW" => [
+                "PROJECT LINK GROUP OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $group['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1509,14 +1596,14 @@ elseif (isset($_GET['ig'])) {
                         "note" => ""
                     ],
                     "level-2" => [
-                        "Edit Info Group" => [
+                        "Edit Project Link Group" => [
                             "admin" => false,
                             "page" => "?ig=" . $_GET['ig'] . "&options&l1=edit",
                             "link" => "",
                             "default-link" => "",
                             "hud" => ""
                         ],
-                        "Delete Info Group" => [
+                        "Delete Project Link Group" => [
                             "admin" => false,
                             "page" => "?ig=" . $_GET['ig'] . "&options&l1=delete",
                             "link" => "",
@@ -1524,18 +1611,40 @@ elseif (isset($_GET['ig'])) {
                             "hud" => ""
                         ]
                     ]
+                ],
+                "PROJECT LINK PRESETS" => [
+                    "admin" => false,
+                    "link" => "links",
+                    "default-link" => "links",
+                    "hud" => $hud,
+                    "home" => [
+                        "title" => "",
+                        "description" => "",
+                        "total" => [
+                            "name" => "",
+                            "count" => ""
+                        ],
+                        "last-hours" => [
+                            "title" => "",
+                            "details" => []
+                        ],
+                        "link" => "",
+                        "note" => ""
+                    ]
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Project Link Group Options";
         $menu = [
-            "hud" => $group['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
-                "EDIT INFO GROUP" => [
+                "EDIT PROJECT LINK GROUP" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $group['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1551,11 +1660,11 @@ elseif (isset($_GET['ig'])) {
                         "note" => ""
                     ],
                     "level-2" => [
-                        "INFO GROUP NAME" => [
+                        "PROJECT LINK GROUP NAME" => [
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $group['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1571,11 +1680,11 @@ elseif (isset($_GET['ig'])) {
                                 "note" => ""
                             ]
                         ],
-                        "INFO GROUP DESCRIPTION" => [
+                        "PROJECT LINK GROUP DESCRIPTION" => [
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $group['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1593,11 +1702,11 @@ elseif (isset($_GET['ig'])) {
                         ]
                     ]
                 ],
-                "DELETE INFO GROUP" => [
+                "DELETE PROJECT LINK GROUP" => [
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $group['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1615,20 +1724,22 @@ elseif (isset($_GET['ig'])) {
                 ]
             ]
         ];
+    }
 }
 
 // Link Type
 elseif (isset($_GET['lt'])) {
     $type = Task::selectLinkType($_GET['lt']);
-    if (!isset($_GET['options']))
+    if (!isset($_GET['options'])) {
+        $hud = "Task Link Type Page";
         $menu = [
-            "hud" => $type['title'],
+            "hud" => $hud,
             "level-1" => [
-                "LINK TYPE OVERVIEW" => [
+                "TASK LINK TYPE OVERVIEW" => [
                     "admin" => false,
                     "link" => "overview",
                     "default-link" => "overview",
-                    "hud" => $type['title'] . ": Overview",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1644,14 +1755,14 @@ elseif (isset($_GET['lt'])) {
                         "note" => ""
                     ],
                     "level-2" => [
-                        "Edit Link Type" => [
+                        "Edit Task Link Type" => [
                             "admin" => false,
                             "page" => "?lt=" . $_GET['lt'] . "&options&l1=edit",
                             "link" => "",
                             "default-link" => "",
                             "hud" => ""
                         ],
-                        "Delete Link Type" => [
+                        "Delete Task Link Type" => [
                             "admin" => false,
                             "page" => "?lt=" . $_GET['lt'] . "&options&l1=delete",
                             "link" => "",
@@ -1662,15 +1773,17 @@ elseif (isset($_GET['lt'])) {
                 ]
             ]
         ];
-    else
+    }
+    else {
+        $hud = "Task Link Type Options";
         $menu = [
-            "hud" => $type['title'] . ": Options",
+            "hud" => $hud,
             "level-1" => [
-                "EDIT LINK TYPE" => [
+                "EDIT TASK LINK TYPE" => [
                     "admin" => true,
                     "link" => "edit",
                     "default-link" => "edit",
-                    "hud" => $type['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1686,11 +1799,11 @@ elseif (isset($_GET['lt'])) {
                         "note" => ""
                     ],
                     "level-2" => [
-                        "LINK TYPE NAME" => [
+                        "TASK LINK TYPE NAME" => [
                             "admin" => true,
                             "link" => "name",
                             "default-link" => "name",
-                            "hud" => $type['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1706,11 +1819,11 @@ elseif (isset($_GET['lt'])) {
                                 "note" => ""
                             ]
                         ],
-                        "LINK TYPE DESCRIPTION" => [
+                        "TASK LINK TYPE DESCRIPTION" => [
                             "admin" => true,
                             "link" => "description",
                             "default-link" => "description",
-                            "hud" => $type['title'] . ": Options",
+                            "hud" => $hud,
                             "home" => [
                                 "title" => "",
                                 "description" => "",
@@ -1728,11 +1841,11 @@ elseif (isset($_GET['lt'])) {
                         ]
                     ]
                 ],
-                "DELETE LINK TYPE" => [
+                "DELETE TASK LINK TYPE" => [
                     "admin" => true,
                     "link" => "delete",
                     "default-link" => "delete",
-                    "hud" => $type['title'] . ": Options",
+                    "hud" => $hud,
                     "home" => [
                         "title" => "",
                         "description" => "",
@@ -1750,19 +1863,21 @@ elseif (isset($_GET['lt'])) {
                 ]
             ]
         ];
+    }
 }
 
 // R&D
-else
+else {
+    $hud = "New R&D";
     $menu = [
-        "hud" => "New R&D",
+        "hud" => $hud,
         "level-1" => [
             "Project" => [
                 "admin" => true,
                 "link" => "new",
                 "default-link" => "new",
                 "page" => "project",
-                "hud" => "New R&D",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -1783,7 +1898,7 @@ else
                 "link" => "new",
                 "default-link" => "new",
                 "page" => "assignment",
-                "hud" => "New R&D",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -1799,12 +1914,12 @@ else
                     "note" => ""
                 ]
             ],
-            "Info Page" => [
+            "Project Link" => [
                 "admin" => true,
                 "link" => "new",
                 "default-link" => "new",
                 "page" => "info",
-                "hud" => "New R&D",
+                "hud" => $hud,
                 "home" => [
                     "title" => "",
                     "description" => "",
@@ -1822,3 +1937,4 @@ else
             ]
         ]
     ];
+}

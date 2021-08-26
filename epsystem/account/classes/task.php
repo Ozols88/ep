@@ -12,7 +12,7 @@ class Task extends Database
     }
 
     public static function selectAssignmentTasks($assignmentID) {
-        $rows = self::selectStatic(array($assignmentID), "SELECT `task`.`id`, `task`.`assignmentid`, `task`.`presetid`, `task`.`name`, `task`.`description`, `task`.`number`, `task`.`estimated`, `task_status`.`statusid`, `status`.`title` AS `status`, `status`.`title2` AS `status2`, `task_status`.`time`, `task_status`.`assigned_by`, `task_status`.`note`, ( SELECT COUNT(*) FROM `task_link` WHERE `task_link`.`taskid` = `task`.`id` ) AS `links`, ( SELECT COUNT(*) FROM `task_comment` WHERE `task_comment`.`taskid` = `task`.`id` ) AS `comments` FROM `task` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` LEFT JOIN `status` ON `status`.`id` = `task_status`.`statusid` WHERE `task`.`assignmentid` = ?");
+        $rows = self::selectStatic(array($assignmentID), "SELECT `task`.`id`, `task`.`assignmentid`, `task`.`presetid`, `task`.`name`, `task`.`description`, `task`.`number`, `task`.`estimated`, `status_task`.`status1`, `status_task`.`status2`, `status_task`.`time`, `status_task`.`assigned_by`, `status_task`.`note`, ( SELECT COUNT(*) FROM `task_link` WHERE `task_link`.`taskid` = `task`.`id` ) AS `links`, ( SELECT COUNT(*) FROM `task_comment` WHERE `task_comment`.`taskid` = `task`.`id` ) AS `comments` FROM `task` LEFT JOIN `status_task` ON `status_task`.`id` = `task`.`statusid` WHERE `task`.`assignmentid` = ?");
         if ($rows) {
             foreach ($rows as $key => $value) {
                 if (!$rows[$key]['estimated'])
@@ -23,19 +23,57 @@ class Task extends Database
         else return null;
     }
 
+    public static function selectProjectTasks($projectID) {
+        $rows = self::selectStatic(array($projectID), "SELECT * FROM `task` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `assignment`.`projectid` = ?");
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+            }
+            return $rows;
+        }
+        else return null;
+    }
+
     public static function selectPresets() {
         $rows = self::selectStatic(null, "SELECT `preset-task`.`id`, `preset-task`.`assignmentid`, `preset-task`.`name`, `preset-task`.`description`, `preset-task`.`estimated`, `preset-task`.`infoid`, `preset-assignment`.`title` AS `asg-title`, `preset-assignment`.`divisionid`, `division`.`title` AS `division`, ( SELECT COUNT(*) FROM `preset-task_links` WHERE `preset-task_links`.`taskid` = `preset-task`.`id` ) AS `links` FROM `preset-task` LEFT JOIN `preset-assignment` ON `preset-assignment`.`id` = `preset-task`.`assignmentid` LEFT JOIN `division` ON `division`.`id` = `preset-assignment`.`divisionid`");
-        if (isset($rows)) {
-            foreach ($rows as $row) {}
+        if ($rows) {
+            foreach ($rows as $key => $value) {
+                if (!$rows[$key]['division'])
+                    $rows[$key]['division'] = "None";
+                if (!$rows[$key]['assignmentid'])
+                    $rows[$key]['asg-title'] = "None";
+            }
             return $rows;
         }
         else return null;
     }
     public static function selectTaskPreset($taskID) {
-        $rows = self::selectStatic(array($taskID), "SELECT `preset-task`.`id`, `preset-task`.`assignmentid`, `preset-task`.`name`, `preset-task`.`description`, `preset-task`.`estimated`, `preset-task`.`infoid`, `preset-infopage`.`title` AS `info-title`, `preset-infopage`.`description` AS `info-desc`, ( SELECT COUNT(*) FROM `preset-task_links` WHERE `preset-task_links`.`taskid` = `preset-task`.`id` ) AS `links` FROM `preset-task` LEFT JOIN `preset-infopage` ON `preset-infopage`.`id` = `preset-task`.`infoid` WHERE `preset-task`.`id` = ?");
+        $rows = self::selectStatic(array($taskID), "SELECT `preset-task`.`id`, `preset-task`.`assignmentid`, `preset-task`.`name`, `preset-task`.`description`, `preset-task`.`estimated`, `preset-task`.`infoid`, `preset-infopage`.`title` AS `info-title`, `preset-infopage`.`description` AS `info-desc`, `preset-task`.`date_created`, `preset-task`.`date_updated`, `preset-task`.`times_updated`, ( SELECT COUNT(*) FROM `preset-task_links` WHERE `preset-task_links`.`taskid` = `preset-task`.`id` ) AS `links`, `preset-assignment`.`title` AS `assignment`, ( SELECT COUNT(*) FROM `task` WHERE `task`.`presetid` = `preset-task`.`id` ) AS `task_count` FROM `preset-task` LEFT JOIN `preset-infopage` ON `preset-infopage`.`id` = `preset-task`.`infoid` LEFT JOIN `preset-assignment` ON `preset-assignment`.`id` = `preset-task`.`assignmentid` WHERE `preset-task`.`id` = ?");
         if (isset($rows[0])) {
+            if (!$rows[0]['assignmentid'])
+                $rows[0]['assignment'] = "None";
             if (!$rows[0]['info-title'])
                 $rows[0]['info-title'] = "None";
+            if ($rows[0]['infoid'])
+                $rows[0]['project_link_preset'] = "Yes";
+            else
+                $rows[0]['project_link_preset'] = "No";
+
+            if ($rows[0]['date_created']) {
+                $rows[0]['date_created_ago'] = Database::datetimeToTimeAgo($rows[0]['date_created']);
+                if (strtotime($rows[0]['date_created']) < strtotime('-7 days'))
+                    $rows[0]['date_created_time2'] = date('d M Y', strtotime($rows[0]['date_created']));
+                else
+                    $rows[0]['date_created_time2'] = $rows[0]['date_created_ago'];
+                $rows[0]['date_created_time'] = date('d M Y', strtotime($rows[0]['date_created']));
+            }
+            if ($rows[0]['date_updated']) {
+                $rows[0]['date_updated_ago'] = Database::datetimeToTimeAgo($rows[0]['date_updated']);
+                if (strtotime($rows[0]['date_updated']) < strtotime('-7 days'))
+                    $rows[0]['date_updated_time2'] = date('d M Y', strtotime($rows[0]['date_updated']));
+                else
+                    $rows[0]['date_updated_time2'] = $rows[0]['date_updated_ago'];
+                $rows[0]['date_updated_time'] = date('d M Y', strtotime($rows[0]['date_updated']));
+            }
             return $rows[0];
         }
         else return null;
@@ -47,23 +85,17 @@ class Task extends Database
             foreach ($rows as $key => $value) {
                 if (!$rows[$key]['type'])
                     $rows[$key]['type'] = "None";
+                $rows[$key]['linkWithNone'] = $rows[$key]['link'];
+                if (!$rows[$key]['link'])
+                    $rows[$key]['linkWithNone'] = "None";
             }
             return $rows;
         }
         else return null;
     }
-    public static function selectTaskPresetLink($linkID) {
-        $rows = self::selectStatic(array($linkID), "SELECT `preset-task_links`.`id`, `preset-task_links`.`taskid`, `preset-task_links`.`typeid`, `preset-task_links`.`title`, `preset-task_links`.`link`, `link_type`.`title` AS `type` FROM `preset-task_links` LEFT JOIN `link_type` ON `link_type`.`id` = `preset-task_links`.`typeid` WHERE `preset-task_links`.`id` = ?");
-        if ($rows[0]) {
-            if (!$rows[0]['type'])
-                $rows[0]['type'] = "None";
-            return $rows[0];
-        }
-        else return null;
-    }
 
     public static function selectTask($taskID) {
-        $rows = self::selectStatic(array($taskID), "SELECT `task`.`id`, `task`.`name`, `task`.`assignmentid`, `assignment`.`presetid` AS `asg-presetid`, `task`.`presetid`, `preset-task`.`name` AS `preset`, `task`.`description`, `task`.`number`, `task`.`infoid`, `task`.`estimated`, `task_status`.`statusid`, `task_status`.`time` AS `status_time`, `task_status`.`assigned_by`, `task_status`.`note`, `project_infopage`.`title`, `project_infopage`.`link`, `status`.`title` AS `status`, `status`.`title2` AS `status2`, ( SELECT COUNT(*) FROM `task_link` WHERE `task_link`.`taskid` = `task`.`id` ) AS `links`, ( SELECT COUNT(*) FROM `task_comment` WHERE `task_comment`.`taskid` = `task`.`id` ) AS `comments`, ( SELECT COUNT(*) FROM `task_comment` LEFT JOIN `account` ON `account`.`id` = `task_comment`.`accountid` WHERE `task_comment`.`taskid` = `task`.`id` AND `account`.`manager` = '1' ) AS `manager_comments`, ( SELECT COUNT(*) FROM `task_comment` LEFT JOIN `account` ON `account`.`id` = `task_comment`.`accountid` WHERE `task_comment`.`taskid` = `task`.`id` AND `account`.`manager` != '1' ) AS `member_comments` FROM `task` LEFT JOIN `preset-task` ON `preset-task`.`id` = `task`.`presetid` LEFT JOIN `project_infopage` ON `project_infopage`.`id` = `task`.`infoid` LEFT JOIN `task_status` ON `task_status`.`id` = `task`.`statusid` LEFT JOIN `status` ON `status`.`id` = `task_status`.`statusid` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `task`.`id` = ?");
+        $rows = self::selectStatic(array($taskID), "SELECT `task`.`id`, `task`.`name`, `task`.`assignmentid`, `assignment`.`presetid` AS `asg-presetid`, `task`.`presetid`, `preset-task`.`name` AS `preset`, `task`.`description`, `task`.`number`, `task`.`infoid`, `task`.`estimated`, `status_task`.`status1`, `status_task`.`status2`, `status_task`.`time` AS `status_time`, `status_task`.`assigned_by`, `status_task`.`note`, `project_infopage`.`title`, `project_infopage`.`link`, `project_infopage`.`description` AS `info_description`, ( SELECT COUNT(*) FROM `task_link` WHERE `task_link`.`taskid` = `task`.`id` ) AS `links`, ( SELECT COUNT(*) FROM `task_comment` WHERE `task_comment`.`taskid` = `task`.`id` ) AS `comments`, ( SELECT COUNT(*) FROM `task_comment` LEFT JOIN `account` ON `account`.`id` = `task_comment`.`accountid` WHERE `task_comment`.`taskid` = `task`.`id` AND `account`.`manager` = '1' ) AS `manager_comments`, ( SELECT COUNT(*) FROM `task_comment` LEFT JOIN `account` ON `account`.`id` = `task_comment`.`accountid` WHERE `task_comment`.`taskid` = `task`.`id` AND `account`.`manager` != '1' ) AS `member_comments` FROM `task` LEFT JOIN `preset-task` ON `preset-task`.`id` = `task`.`presetid` LEFT JOIN `project_infopage` ON `project_infopage`.`id` = `task`.`infoid` LEFT JOIN `status_task` ON `status_task`.`id` = `task`.`statusid` LEFT JOIN `assignment` ON `assignment`.`id` = `task`.`assignmentid` WHERE `task`.`id` = ?");
         if ($rows[0]) {
             if (!$rows[0]['preset'])
                 $rows[0]['preset'] = "None";
@@ -77,6 +109,16 @@ class Task extends Database
             else {
                 $rows[0]['estimated'] = "00:00:00";
             }
+
+            if ($rows[0]['status1'] == 1)
+                $rows[0]['status'] = "Pending";
+            elseif ($rows[0]['status1'] == 2)
+                $rows[0]['status'] = "In Progress";
+            elseif ($rows[0]['status1'] == 3)
+                $rows[0]['status'] = "Completed";
+            else
+                $rows[0]['status'] = "?";
+
             if (isset($rows[0]['status_time'])) {
                 $rows[0]['time_ago'] = Database::datetimeToTimeAgo($rows[0]['status_time']);
                 if (strtotime($rows[0]['status_time']) < strtotime('-7 days'))
@@ -101,36 +143,9 @@ class Task extends Database
         }
         else return null;
     }
-    public static function selectTaskLinksWithoutInfo($taskID) {
-        $rows = self::selectStatic(array($taskID), "SELECT `task_link`.`id`, `task_link`.`taskid`, `task_link`.`typeid`, `task_link`.`title`, `task_link`.`link`, `link_type`.`title` AS `type`, `link_type`.`description` AS `type_desc` FROM `task_link` LEFT JOIN `link_type` ON `link_type`.`id` = `task_link`.`typeid` WHERE `taskid` = ? AND `typeid` != '1' ORDER BY `task_link`.`typeid`");
-        if ($rows) {
-            foreach ($rows as $key => $value) {
-                if (!$rows[$key]['type'])
-                    $rows[$key]['type'] = "None";
-            }
-            return $rows;
-        }
-        else return null;
-    }
-    public static function selectTaskCustomInfoLinks($taskID) {
-        $rows = self::selectStatic(array($taskID), "SELECT `task_link`.`id`, `task_link`.`taskid`, `task_link`.`typeid`, `task_link`.`title`, `task_link`.`link`, `link_type`.`title` AS `type`, `link_type`.`description` AS `type_desc` FROM `task_link` LEFT JOIN `link_type` ON `link_type`.`id` = `task_link`.`typeid` WHERE `taskid` = ? AND `typeid` = '1' ORDER BY `task_link`.`typeid`");
-        if ($rows) {
-            foreach ($rows as $key => $value) {
-                if (!$rows[$key]['type'])
-                    $rows[$key]['type'] = "None";
-            }
-            return $rows;
-        }
-        else return null;
-    }
-    public static function selectTaskInfoLinks($taskID) {
-        $rows = self::selectStatic(array($taskID), "SELECT `task_link-infopage`.`id`, `task_link-infopage`.`taskid`, `task_link-infopage`.`infoid`, `project_infopage`.`projectid`, `project_infopage`.`presetid`, `project_infopage`.`title`, `project_infopage`.`description`, `project_infopage`.`link` FROM `task_link-infopage` INNER JOIN `project_infopage` ON `project_infopage`.`id` = `task_link-infopage`.`infoid` WHERE `task_link-infopage`.`taskid` = ?");
-        if ($rows) return $rows;
-        else return null;
-    }
 
     public static function RenumberTasksInAssignment($assignmentID) {
-        $rows = self::selectStatic(array($assignmentID), "SELECT task.`id`, task.`number` FROM task WHERE task.`assignmentid` = ? ORDER BY task.`id`");
+        $rows = self::selectStatic(array($assignmentID), "SELECT `task`.`id`, `task`.`number` FROM `task` WHERE `task`.`assignmentid` = ? ORDER BY `task`.`id`");
         if ($rows) {
             $nextTaskNum = count($rows) + 1;
             foreach ($rows as $num => $task) {
@@ -160,8 +175,26 @@ class Task extends Database
     }
 
     public static function selectLinkType($typeID) {
-        $rows = self::selectStatic(array($typeID), "SELECT * FROM `link_type` WHERE `link_type`.`id` = ?");
-        if ($rows[0]) return $rows[0];
+        $rows = self::selectStatic(array($typeID), "SELECT `link_type`.`id`, `link_type`.`title`, `link_type`.`description`, `link_type`.`date_created`, `link_type`.`date_updated`, `link_type`.`times_updated`, ( SELECT COUNT(*) FROM `task_link` WHERE `task_link`.`typeid` = `link_type`.`id` ) AS `tasks`, ( SELECT COUNT(*) FROM `preset-task_links` WHERE `preset-task_links`.`typeid` = `link_type`.`id` ) AS `presets` FROM `link_type` WHERE `link_type`.`id` = ?");
+        if ($rows[0]) {
+            if ($rows[0]['date_created']) {
+                $rows[0]['date_created_ago'] = Database::datetimeToTimeAgo($rows[0]['date_created']);
+                if (strtotime($rows[0]['date_created']) < strtotime('-7 days'))
+                    $rows[0]['date_created_time2'] = date('d M Y', strtotime($rows[0]['date_created']));
+                else
+                    $rows[0]['date_created_time2'] = $rows[0]['date_created_ago'];
+                $rows[0]['date_created_time'] = date('d M Y', strtotime($rows[0]['date_created']));
+            }
+            if ($rows[0]['date_updated']) {
+                $rows[0]['date_updated_ago'] = Database::datetimeToTimeAgo($rows[0]['date_updated']);
+                if (strtotime($rows[0]['date_updated']) < strtotime('-7 days'))
+                    $rows[0]['date_updated_time2'] = date('d M Y', strtotime($rows[0]['date_updated']));
+                else
+                    $rows[0]['date_updated_time2'] = $rows[0]['date_updated_ago'];
+                $rows[0]['date_updated_time'] = date('d M Y', strtotime($rows[0]['date_updated']));
+            }
+            return $rows[0];
+        }
         else return null;
     }
 }
